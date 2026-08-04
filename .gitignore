@@ -55,3 +55,6 @@ next-env.d.ts
 /.claude
 /.windsurf
 skills-lock.json
+
+.vercel
+.env*
