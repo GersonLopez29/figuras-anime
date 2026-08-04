@@ -9,6 +9,7 @@ type ListingCardProps = {
   category: string;
   imageUrl?: string;
   sellerName?: string;
+  sold?: boolean;
 };
 
 export default function ListingCard({
@@ -18,6 +19,7 @@ export default function ListingCard({
   category,
   imageUrl,
   sellerName,
+  sold,
 }: ListingCardProps) {
   return (
     <Link
@@ -30,7 +32,7 @@ export default function ListingCard({
             src={imageUrl}
             alt={title}
             fill
-            className="object-cover transition group-hover:scale-105"
+            className={`object-cover transition group-hover:scale-105 ${sold ? "grayscale" : ""}`}
             sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
           />
         ) : (
@@ -41,6 +43,13 @@ export default function ListingCard({
         <span className="absolute left-2 top-2 rounded-full bg-red-600 px-2.5 py-1 text-xs font-semibold text-white shadow-sm">
           {category}
         </span>
+        {sold && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+            <span className="-rotate-12 rounded bg-zinc-900 px-3 py-1 text-sm font-extrabold uppercase tracking-wide text-white shadow-lg">
+              Vendido
+            </span>
+          </div>
+        )}
       </div>
       <div className="p-3">
         <h3 className="line-clamp-1 text-sm font-medium text-zinc-900">{title}</h3>

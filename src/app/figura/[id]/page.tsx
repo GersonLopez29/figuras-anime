@@ -51,9 +51,16 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
         <ListingGallery images={listing.images} title={listing.title} />
 
         <div>
-          <span className="inline-block rounded-full bg-zinc-100 px-3 py-1 text-xs font-medium text-zinc-600">
-            {listing.category}
-          </span>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="inline-block rounded-full bg-zinc-100 px-3 py-1 text-xs font-medium text-zinc-600">
+              {listing.category}
+            </span>
+            {listing.sold && (
+              <span className="inline-block rounded-full bg-zinc-800 px-3 py-1 text-xs font-semibold text-white">
+                Vendido
+              </span>
+            )}
+          </div>
           <h1 className="mt-3 text-2xl font-bold text-zinc-900">{listing.title}</h1>
           <p className="mt-2 text-3xl font-bold text-orange-600">
             {formatPrice(listing.price)}
@@ -76,7 +83,13 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
             </div>
           </Link>
 
-          {whatsappLink ? (
+          {listing.sold ? (
+            <div className="mt-6 rounded-lg border border-zinc-200 bg-zinc-100 p-4 text-center">
+              <p className="text-sm font-medium text-zinc-600">
+                Este producto ya fue vendido.
+              </p>
+            </div>
+          ) : whatsappLink ? (
             <a
               href={whatsappLink}
               target="_blank"

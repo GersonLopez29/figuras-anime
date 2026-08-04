@@ -134,6 +134,7 @@ export default async function Home({ searchParams }: HomeProps) {
                 category={listing.category}
                 imageUrl={listing.images[0]?.url}
                 sellerName={listing.user.name}
+                sold={listing.sold}
               />
             ))}
           </div>

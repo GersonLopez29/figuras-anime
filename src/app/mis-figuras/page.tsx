@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/session";
 import { prisma } from "@/lib/db";
 import DeleteListingButton from "@/components/DeleteListingButton";
+import ToggleSoldButton from "@/components/ToggleSoldButton";
 import { formatPrice } from "@/lib/format";
 
 export default async function MisFigurasPage() {
@@ -50,24 +51,34 @@ export default async function MisFigurasPage() {
               </div>
 
               <div className="flex-1 min-w-0">
-                <Link
-                  href={`/figura/${listing.id}`}
-                  className="line-clamp-1 text-sm font-medium text-zinc-900 hover:underline"
-                >
-                  {listing.title}
-                </Link>
+                <div className="flex items-center gap-2">
+                  <Link
+                    href={`/figura/${listing.id}`}
+                    className="line-clamp-1 text-sm font-medium text-zinc-900 hover:underline"
+                  >
+                    {listing.title}
+                  </Link>
+                  {listing.sold && (
+                    <span className="shrink-0 rounded bg-zinc-800 px-1.5 py-0.5 text-xs font-medium text-white">
+                      Vendido
+                    </span>
+                  )}
+                </div>
                 <p className="text-sm text-zinc-500">
                   {formatPrice(listing.price)} · {listing.category}
                 </p>
               </div>
 
-              <Link
-                href={`/mis-figuras/${listing.id}/editar`}
-                className="text-sm font-medium text-zinc-600 hover:text-zinc-900"
-              >
-                Editar
-              </Link>
-              <DeleteListingButton listingId={listing.id} />
+              <div className="flex flex-wrap items-center justify-end gap-3">
+                <ToggleSoldButton listingId={listing.id} sold={listing.sold} />
+                <Link
+                  href={`/mis-figuras/${listing.id}/editar`}
+                  className="text-sm font-medium text-zinc-600 hover:text-zinc-900"
+                >
+                  Editar
+                </Link>
+                <DeleteListingButton listingId={listing.id} />
+              </div>
             </div>
           ))}
         </div>

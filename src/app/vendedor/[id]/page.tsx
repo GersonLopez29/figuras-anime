@@ -64,6 +64,7 @@ export default async function VendedorPage({ params }: VendedorPageProps) {
                 price={listing.price}
                 category={listing.category}
                 imageUrl={listing.images[0]?.url}
+                sold={listing.sold}
               />
             ))}
           </div>

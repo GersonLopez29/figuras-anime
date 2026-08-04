@@ -3,6 +3,7 @@ import Image from "next/image";
 import { prisma } from "@/lib/db";
 import { formatPrice } from "@/lib/format";
 import DeleteListingButton from "@/components/DeleteListingButton";
+import ToggleSoldButton from "@/components/ToggleSoldButton";
 
 export default async function AdminPublicacionesPage() {
   const listings = await prisma.listing.findMany({
@@ -37,12 +38,19 @@ export default async function AdminPublicacionesPage() {
               </div>
 
               <div className="min-w-0 flex-1">
-                <Link
-                  href={`/figura/${listing.id}`}
-                  className="line-clamp-1 text-sm font-medium text-zinc-900 hover:underline"
-                >
-                  {listing.title}
-                </Link>
+                <div className="flex items-center gap-2">
+                  <Link
+                    href={`/figura/${listing.id}`}
+                    className="line-clamp-1 text-sm font-medium text-zinc-900 hover:underline"
+                  >
+                    {listing.title}
+                  </Link>
+                  {listing.sold && (
+                    <span className="shrink-0 rounded bg-zinc-800 px-1.5 py-0.5 text-xs font-medium text-white">
+                      Vendido
+                    </span>
+                  )}
+                </div>
                 <p className="text-sm text-zinc-500">
                   {formatPrice(listing.price)} · {listing.category}
                 </p>
@@ -51,7 +59,10 @@ export default async function AdminPublicacionesPage() {
                 </p>
               </div>
 
-              <DeleteListingButton listingId={listing.id} />
+              <div className="flex flex-wrap items-center justify-end gap-3">
+                <ToggleSoldButton listingId={listing.id} sold={listing.sold} />
+                <DeleteListingButton listingId={listing.id} />
+              </div>
             </div>
           ))}
         </div>
