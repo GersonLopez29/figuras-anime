@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 import { formatPrice } from "@/lib/format";
+import { getCurrentUser } from "@/lib/session";
 import ListingGallery from "@/components/ListingGallery";
 import StarRating from "@/components/StarRating";
 
@@ -25,6 +26,8 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
     notFound();
   }
 
+  const currentUser = await getCurrentUser();
+
   const ratingAgg = await prisma.review.aggregate({
     where: { sellerId: listing.user.id },
     _avg: { rating: true },
@@ -34,7 +37,9 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
   const reviewCount = ratingAgg._count;
 
   const message = `Hola ${listing.user.name}, vi tu figura "${listing.title}" en FigurasAnime y me interesa. ¿Sigue disponible?`;
-  const whatsappLink = buildWhatsAppLink(listing.user.whatsapp, message);
+  const whatsappLink = currentUser
+    ? buildWhatsAppLink(listing.user.whatsapp, message)
+    : null;
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
@@ -71,14 +76,36 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
             </div>
           </Link>
 
-          <a
-            href={whatsappLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-green-600 px-4 py-3 text-sm font-bold text-white hover:bg-green-700"
-          >
-            Contactar por WhatsApp
-          </a>
+          {whatsappLink ? (
+            <a
+              href={whatsappLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-green-600 px-4 py-3 text-sm font-bold text-white hover:bg-green-700"
+            >
+              Contactar por WhatsApp
+            </a>
+          ) : (
+            <div className="mt-6 rounded-lg border border-zinc-200 bg-zinc-50 p-4 text-center">
+              <p className="text-sm text-zinc-600">
+                Inicia sesión para contactar al vendedor por WhatsApp.
+              </p>
+              <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:justify-center">
+                <Link
+                  href="/login"
+                  className="rounded-full bg-orange-600 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-700"
+                >
+                  Iniciar sesión
+                </Link>
+                <Link
+                  href="/registro"
+                  className="rounded-full border border-orange-300 bg-white px-4 py-2 text-sm font-semibold text-orange-700 hover:bg-orange-50"
+                >
+                  Crear cuenta
+                </Link>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
