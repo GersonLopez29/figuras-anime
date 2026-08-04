@@ -1,13 +1,23 @@
+import Link from "next/link";
 import { getCurrentUser } from "@/lib/session";
 import { prisma } from "@/lib/db";
 import BlockUserButton from "@/components/admin/BlockUserButton";
 import DeleteUserButton from "@/components/admin/DeleteUserButton";
 
+const COMMUNITY_POSTS_PREVIEW = 3;
+
 export default async function AdminUsuariosPage() {
   const currentUser = await getCurrentUser();
 
   const users = await prisma.user.findMany({
-    include: { _count: { select: { listings: true } } },
+    include: {
+      _count: { select: { listings: true, collectionPosts: true } },
+      collectionPosts: {
+        select: { id: true, caption: true },
+        orderBy: { createdAt: "desc" },
+        take: COMMUNITY_POSTS_PREVIEW,
+      },
+    },
     orderBy: { createdAt: "desc" },
   });
 
@@ -25,6 +35,7 @@ export default async function AdminUsuariosPage() {
               <th className="px-4 py-3">Correo</th>
               <th className="px-4 py-3">WhatsApp</th>
               <th className="px-4 py-3">Figuras</th>
+              <th className="px-4 py-3">Publicaciones en comunidad</th>
               <th className="px-4 py-3">Estado</th>
               <th className="px-4 py-3">Registrado</th>
               <th className="px-4 py-3">Acciones</th>
@@ -44,6 +55,28 @@ export default async function AdminUsuariosPage() {
                 <td className="px-4 py-3 text-zinc-600">{user.email}</td>
                 <td className="px-4 py-3 text-zinc-600">{user.whatsapp}</td>
                 <td className="px-4 py-3 text-zinc-600">{user._count.listings}</td>
+                <td className="px-4 py-3">
+                  {user._count.collectionPosts === 0 ? (
+                    <span className="text-xs text-zinc-400">Sin publicaciones</span>
+                  ) : (
+                    <div className="space-y-1">
+                      {user.collectionPosts.map((post) => (
+                        <Link
+                          key={post.id}
+                          href={`/comunidad/${post.id}`}
+                          className="block max-w-[14rem] truncate text-xs text-orange-600 hover:underline"
+                        >
+                          {post.caption}
+                        </Link>
+                      ))}
+                      {user._count.collectionPosts > COMMUNITY_POSTS_PREVIEW && (
+                        <p className="text-xs text-zinc-400">
+                          +{user._count.collectionPosts - COMMUNITY_POSTS_PREVIEW} más
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </td>
                 <td className="px-4 py-3">
                   {user.isBlocked ? (
                     <span className="rounded bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">
