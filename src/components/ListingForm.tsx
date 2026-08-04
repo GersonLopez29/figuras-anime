@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, FormEvent, ChangeEvent } from "react";
+import { useRef, useState, FormEvent, ChangeEvent, DragEvent } from "react";
 import Image from "next/image";
 import { CATEGORIES } from "@/lib/categories";
 
@@ -36,11 +36,23 @@ export default function ListingForm(props: ListingFormProps) {
   const [newFiles, setNewFiles] = useState<File[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  function addFiles(fileList: FileList | File[]) {
+    const files = Array.from(fileList).filter((file) => file.type.startsWith("image/"));
+    setNewFiles((prev) => [...prev, ...files]);
+  }
 
   function handleFilesSelected(e: ChangeEvent<HTMLInputElement>) {
-    const files = Array.from(e.target.files ?? []);
-    setNewFiles((prev) => [...prev, ...files]);
+    addFiles(e.target.files ?? []);
     e.target.value = "";
+  }
+
+  function handleDrop(e: DragEvent<HTMLDivElement>) {
+    e.preventDefault();
+    setIsDragging(false);
+    addFiles(e.dataTransfer.files);
   }
 
   function removeNewFile(index: number) {
@@ -156,13 +168,57 @@ export default function ListingForm(props: ListingFormProps) {
         <label className="block text-sm font-medium text-zinc-700">
           Imágenes (hasta 6)
         </label>
+
         <input
+          ref={fileInputRef}
           type="file"
           accept="image/png, image/jpeg, image/webp, image/gif"
           multiple
           onChange={handleFilesSelected}
-          className="mt-1 w-full text-sm text-zinc-600"
+          className="hidden"
         />
+
+        <div
+          role="button"
+          tabIndex={0}
+          onClick={() => fileInputRef.current?.click()}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              fileInputRef.current?.click();
+            }
+          }}
+          onDragOver={(e) => {
+            e.preventDefault();
+            setIsDragging(true);
+          }}
+          onDragLeave={() => setIsDragging(false)}
+          onDrop={handleDrop}
+          className={`mt-1 flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed px-4 py-8 text-center transition-colors ${
+            isDragging
+              ? "border-orange-500 bg-orange-50"
+              : "border-zinc-300 bg-zinc-50 hover:border-orange-400 hover:bg-orange-50"
+          }`}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={1.5}
+            className="h-9 w-9 text-orange-500"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 8.25 12 3.75m0 0L7.5 8.25M12 3.75v13.5"
+            />
+          </svg>
+          <p className="text-sm font-medium text-zinc-700">
+            Haz clic para subir fotos o arrástralas aquí
+          </p>
+          <p className="text-xs text-zinc-500">JPG, PNG, WEBP o GIF · hasta 6 imágenes</p>
+        </div>
 
         {(existingImages.length > 0 || newFiles.length > 0) && (
           <div className="mt-3 grid grid-cols-3 gap-3 sm:grid-cols-4">
