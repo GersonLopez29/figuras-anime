@@ -7,13 +7,22 @@ type WelcomeBannerProps = {
   name: string;
 };
 
+const AUTO_DISMISS_MS = 45_000;
+
 export default function WelcomeBanner({ name }: WelcomeBannerProps) {
   const router = useRouter();
   const [visible, setVisible] = useState(true);
 
-  useEffect(() => {
+  function dismiss() {
+    setVisible(false);
     router.replace("/", { scroll: false });
-  }, [router]);
+  }
+
+  useEffect(() => {
+    const timer = setTimeout(dismiss, AUTO_DISMISS_MS);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (!visible) return null;
 
@@ -26,7 +35,7 @@ export default function WelcomeBanner({ name }: WelcomeBannerProps) {
         </p>
         <button
           type="button"
-          onClick={() => setVisible(false)}
+          onClick={dismiss}
           aria-label="Cerrar mensaje"
           className="shrink-0 text-green-700 hover:text-green-900"
         >
