@@ -10,7 +10,7 @@ type Sparkle = {
   rotation: number;
 };
 
-const EMOJIS = ["✨", "⭐", "🌟", "💫"];
+const EMOJIS = ["🔥", "⚡", "💥"];
 const MIN_DISTANCE = 28;
 const LIFETIME_MS = 700;
 
