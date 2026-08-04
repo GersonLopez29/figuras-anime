@@ -56,8 +56,9 @@ export default function MobileMenu({ isLoggedIn, userName, isAdmin }: MobileMenu
               <Link
                 href="/comunidad"
                 onClick={() => setOpen(false)}
-                className="rounded-md px-2 py-2.5 text-sm font-medium text-zinc-700 hover:bg-zinc-50"
+                className="my-1 flex items-center gap-1.5 rounded-full bg-gradient-to-r from-fuchsia-500 to-orange-500 px-3.5 py-2 text-sm font-bold text-white shadow-sm"
               >
+                <span aria-hidden="true">✨</span>
                 Comunidad
               </Link>
 

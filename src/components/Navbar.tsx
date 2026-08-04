@@ -18,8 +18,9 @@ export default async function Navbar() {
         <nav className="hidden items-center gap-5 md:flex">
           <Link
             href="/comunidad"
-            className="text-sm font-medium text-zinc-600 hover:text-zinc-900"
+            className="flex items-center gap-1 rounded-full bg-gradient-to-r from-fuchsia-500 to-orange-500 px-3.5 py-1.5 text-sm font-bold text-white shadow-sm transition hover:shadow-md hover:brightness-105"
           >
+            <span aria-hidden="true">✨</span>
             Comunidad
           </Link>
           {user ? (

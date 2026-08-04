@@ -17,3 +17,18 @@ body {
   color: var(--foreground);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }
+
+@keyframes sparkle-fade {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) rotate(var(--sparkle-rotation, 0deg)) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -140%) rotate(var(--sparkle-rotation, 0deg)) scale(0.4);
+  }
+}
+
+.animate-sparkle-fade {
+  animation: sparkle-fade 700ms ease-out forwards;
+}
