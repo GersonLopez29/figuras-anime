@@ -1,17 +1,21 @@
 import { prisma } from "@/lib/db";
 import { CATEGORIES } from "@/lib/categories";
+import { getCurrentUser } from "@/lib/session";
 import ListingCard from "@/components/ListingCard";
 import CategoryFilter from "@/components/CategoryFilter";
+import WelcomeBanner from "@/components/WelcomeBanner";
 
 type HomeProps = {
-  searchParams: Promise<{ categoria?: string; q?: string }>;
+  searchParams: Promise<{ categoria?: string; q?: string; bienvenida?: string }>;
 };
 
 export default async function Home({ searchParams }: HomeProps) {
-  const { categoria, q } = await searchParams;
+  const { categoria, q, bienvenida } = await searchParams;
   const category = CATEGORIES.includes(categoria as (typeof CATEGORIES)[number])
     ? categoria
     : undefined;
+  const user = await getCurrentUser();
+  const sellCtaHref = user ? "/publicar" : "/registro";
 
   const listings = await prisma.listing.findMany({
     where: {
@@ -36,6 +40,8 @@ export default async function Home({ searchParams }: HomeProps) {
 
   return (
     <div>
+      {bienvenida && <WelcomeBanner name={bienvenida} />}
+
       {showHero && (
         <section className="bg-orange-50">
           <div className="mx-auto max-w-6xl px-4 py-16 text-center sm:text-left">
@@ -53,7 +59,7 @@ export default async function Home({ searchParams }: HomeProps) {
             </p>
             <div className="mt-7 flex flex-col gap-3 sm:flex-row">
               <a
-                href="/registro"
+                href={sellCtaHref}
                 className="inline-block rounded-full bg-red-600 px-6 py-3 text-sm font-bold text-white hover:bg-red-700"
               >
                 Empieza a vender
