@@ -10,9 +10,11 @@ export default async function Navbar() {
   return (
     <header className="sticky top-0 z-20 border-b border-zinc-200 bg-white/95 backdrop-blur">
       <div className="relative mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3.5">
-        <Link href="/" className="flex items-center gap-1.5 text-lg font-extrabold text-zinc-900">
-          <span aria-hidden="true">🎌</span>
-          Figuras<span className="text-orange-600">Anime</span>
+        <Link href="/" className="flex items-center gap-2 text-2xl font-extrabold sm:text-3xl">
+          <span aria-hidden="true" className="logo-pop inline-block text-3xl sm:text-4xl">
+            🎌
+          </span>
+          <span className="logo-shine">FigurasAnime</span>
         </Link>
 
         <nav className="hidden items-center gap-5 md:flex">
