@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CursorTrail from "@/components/CursorTrail";
+import { registerSiteVisit } from "@/lib/siteStats";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -21,7 +22,9 @@ export const metadata: Metadata = {
     "Marketplace para comprar y vender figuras de anime (Naruto, Dragon Ball Z y más) contactando directo por WhatsApp.",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const totalVisits = await registerSiteVisit();
+
   return (
     <html
       lang="es"
@@ -31,7 +34,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <CursorTrail />
         <Navbar />
         <main className="flex-1">{children}</main>
-        <Footer />
+        <Footer totalVisits={totalVisits} />
       </body>
     </html>
   );

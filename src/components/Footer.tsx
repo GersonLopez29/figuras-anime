@@ -1,7 +1,11 @@
 import Link from "next/link";
 import { CATEGORIES, CATEGORY_ICONS } from "@/lib/categories";
 
-export default function Footer() {
+type FooterProps = {
+  totalVisits: number;
+};
+
+export default function Footer({ totalVisits }: FooterProps) {
   const year = new Date().getFullYear();
 
   return (
@@ -66,8 +70,12 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-10 border-t border-zinc-100 pt-6 text-center text-xs text-zinc-400">
-          FigurasAnime © {year} — Compra y venta entre coleccionistas
+        <div className="mt-10 flex flex-col items-center gap-1 border-t border-zinc-100 pt-6 text-center text-xs text-zinc-400">
+          <p>FigurasAnime © {year} — Compra y venta entre coleccionistas</p>
+          <p className="flex items-center gap-1">
+            <span aria-hidden="true">📊</span>
+            {totalVisits.toLocaleString("es-PE")} visitas totales
+          </p>
         </div>
       </div>
     </footer>

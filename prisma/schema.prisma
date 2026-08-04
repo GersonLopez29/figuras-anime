@@ -115,3 +115,8 @@ model ListingImage {
   listingId String
   listing   Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
 }
+
+model SiteStats {
+  id          String @id
+  totalVisits Int    @default(0)
+}
