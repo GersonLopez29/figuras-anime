@@ -1,0 +1,214 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+import { useState, FormEvent, ChangeEvent } from "react";
+import Image from "next/image";
+import { CATEGORIES } from "@/lib/categories";
+
+type ExistingImage = { id: string; url: string };
+
+type ListingFormProps =
+  | {
+      mode: "create";
+    }
+  | {
+      mode: "edit";
+      listingId: string;
+      initialTitle: string;
+      initialDescription: string;
+      initialPrice: number;
+      initialCategory: string;
+      initialImages: ExistingImage[];
+    };
+
+export default function ListingForm(props: ListingFormProps) {
+  const router = useRouter();
+  const isEdit = props.mode === "edit";
+
+  const [title, setTitle] = useState(isEdit ? props.initialTitle : "");
+  const [description, setDescription] = useState(isEdit ? props.initialDescription : "");
+  const [price, setPrice] = useState(isEdit ? String(props.initialPrice) : "");
+  const [category, setCategory] = useState(isEdit ? props.initialCategory : CATEGORIES[0]);
+  const [existingImages, setExistingImages] = useState<ExistingImage[]>(
+    isEdit ? props.initialImages : []
+  );
+  const [removedImageIds, setRemovedImageIds] = useState<string[]>([]);
+  const [newFiles, setNewFiles] = useState<File[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  function handleFilesSelected(e: ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files ?? []);
+    setNewFiles((prev) => [...prev, ...files]);
+    e.target.value = "";
+  }
+
+  function removeNewFile(index: number) {
+    setNewFiles((prev) => prev.filter((_, i) => i !== index));
+  }
+
+  function removeExistingImage(id: string) {
+    setExistingImages((prev) => prev.filter((img) => img.id !== id));
+    setRemovedImageIds((prev) => [...prev, id]);
+  }
+
+  async function handleSubmit(e: FormEvent) {
+    e.preventDefault();
+    setError(null);
+
+    const totalImages = existingImages.length + newFiles.length;
+    if (totalImages === 0) {
+      setError("Sube al menos una imagen de la figura");
+      return;
+    }
+
+    setLoading(true);
+
+    const formData = new FormData();
+    formData.set("title", title);
+    formData.set("description", description);
+    formData.set("price", price);
+    formData.set("category", category);
+    newFiles.forEach((file) => formData.append("images", file));
+    if (isEdit) {
+      removedImageIds.forEach((id) => formData.append("removeImageIds", id));
+    }
+
+    const url = isEdit ? `/api/listings/${props.listingId}` : "/api/listings";
+    const method = isEdit ? "PATCH" : "POST";
+
+    const res = await fetch(url, { method, body: formData });
+    setLoading(false);
+
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      setError(data.error ?? "Ocurrió un error, intenta de nuevo");
+      return;
+    }
+
+    const listing = await res.json();
+    router.push(`/figura/${listing.id}`);
+    router.refresh();
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-5">
+      <div>
+        <label className="block text-sm font-medium text-zinc-700">Título</label>
+        <input
+          type="text"
+          required
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Ej: Figura de Goku Ultra Instinto 25cm"
+          className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-orange-500 focus:outline-none"
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-zinc-700">Descripción</label>
+        <textarea
+          required
+          rows={4}
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          placeholder="Estado, material, tamaño, si tiene caja original, etc."
+          className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-orange-500 focus:outline-none"
+        />
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-zinc-700">Precio (S/)</label>
+          <div className="relative mt-1">
+            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-zinc-400">
+              S/
+            </span>
+            <input
+              type="number"
+              required
+              min="0"
+              step="0.01"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+              className="w-full rounded-md border border-zinc-300 py-2 pl-9 pr-3 text-sm focus:border-orange-500 focus:outline-none"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-zinc-700">Categoría</label>
+          <select
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-orange-500 focus:outline-none"
+          >
+            {CATEGORIES.map((cat) => (
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-zinc-700">
+          Imágenes (hasta 6)
+        </label>
+        <input
+          type="file"
+          accept="image/png, image/jpeg, image/webp, image/gif"
+          multiple
+          onChange={handleFilesSelected}
+          className="mt-1 w-full text-sm text-zinc-600"
+        />
+
+        {(existingImages.length > 0 || newFiles.length > 0) && (
+          <div className="mt-3 grid grid-cols-3 gap-3 sm:grid-cols-4">
+            {existingImages.map((img) => (
+              <div key={img.id} className="relative aspect-square overflow-hidden rounded-md border border-zinc-200">
+                <Image src={img.url} alt="" fill className="object-cover" />
+                <button
+                  type="button"
+                  onClick={() => removeExistingImage(img.id)}
+                  className="absolute right-1 top-1 rounded-full bg-black/60 px-1.5 py-0.5 text-xs text-white"
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+            {newFiles.map((file, index) => (
+              <div key={index} className="relative aspect-square overflow-hidden rounded-md border border-zinc-200">
+                <Image
+                  src={URL.createObjectURL(file)}
+                  alt=""
+                  fill
+                  className="object-cover"
+                  unoptimized
+                />
+                <button
+                  type="button"
+                  onClick={() => removeNewFile(index)}
+                  className="absolute right-1 top-1 rounded-full bg-black/60 px-1.5 py-0.5 text-xs text-white"
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {error && <p className="text-sm text-red-600">{error}</p>}
+
+      <button
+        type="submit"
+        disabled={loading}
+        className="w-full rounded-full bg-orange-600 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-700 disabled:opacity-60"
+      >
+        {loading ? "Guardando..." : isEdit ? "Guardar cambios" : "Publicar figura"}
+      </button>
+    </form>
+  );
+}

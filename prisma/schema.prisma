@@ -1,0 +1,115 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id              String           @id @default(cuid())
+  name            String
+  email           String           @unique
+  passwordHash    String
+  whatsapp        String
+  role            String           @default("user")
+  isBlocked       Boolean          @default(false)
+  createdAt       DateTime         @default(now())
+  listings        Listing[]
+  reviewsWritten  Review[]         @relation("ReviewsWritten")
+  reviewsReceived Review[]         @relation("ReviewsReceived")
+  collectionPosts CollectionPost[]
+  postComments    PostComment[]
+  postRatings     PostRating[]
+  postReports     PostReport[]
+}
+
+model CollectionPost {
+  id        String                @id @default(cuid())
+  caption   String
+  createdAt DateTime              @default(now())
+  authorId  String
+  author    User                  @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  images    CollectionPostImage[]
+  comments  PostComment[]
+  ratings   PostRating[]
+  reports   PostReport[]
+}
+
+model CollectionPostImage {
+  id     String         @id @default(cuid())
+  url    String
+  postId String
+  post   CollectionPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+}
+
+model PostComment {
+  id        String         @id @default(cuid())
+  text      String
+  createdAt DateTime       @default(now())
+  authorId  String
+  author    User           @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  postId    String
+  post      CollectionPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+}
+
+model PostRating {
+  id        String         @id @default(cuid())
+  value     Int
+  createdAt DateTime       @default(now())
+  authorId  String
+  author    User           @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  postId    String
+  post      CollectionPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([authorId, postId])
+}
+
+model PostReport {
+  id         String         @id @default(cuid())
+  reason     String
+  createdAt  DateTime       @default(now())
+  reporterId String
+  reporter   User           @relation(fields: [reporterId], references: [id], onDelete: Cascade)
+  postId     String
+  post       CollectionPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([reporterId, postId])
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  rating    Int
+  comment   String
+  createdAt DateTime @default(now())
+  authorId  String
+  author    User     @relation("ReviewsWritten", fields: [authorId], references: [id], onDelete: Cascade)
+  sellerId  String
+  seller    User     @relation("ReviewsReceived", fields: [sellerId], references: [id], onDelete: Cascade)
+}
+
+model Listing {
+  id          String         @id @default(cuid())
+  title       String
+  description String
+  price       Float
+  category    String
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  userId      String
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  images      ListingImage[]
+}
+
+model ListingImage {
+  id        String  @id @default(cuid())
+  url       String
+  listingId String
+  listing   Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+}

@@ -1,0 +1,101 @@
+import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
+import { prisma } from "@/lib/db";
+import { getCurrentUser } from "@/lib/session";
+import { saveUploadedImage } from "@/lib/uploads";
+import { CATEGORIES } from "@/lib/categories";
+
+export async function GET(request: NextRequest) {
+  const searchParams = request.nextUrl.searchParams;
+  const category = searchParams.get("categoria");
+  const q = searchParams.get("q")?.trim();
+
+  const listings = await prisma.listing.findMany({
+    where: {
+      ...(category && CATEGORIES.includes(category as (typeof CATEGORIES)[number])
+        ? { category }
+        : {}),
+      ...(q
+        ? {
+            OR: [
+              { title: { contains: q } },
+              { description: { contains: q } },
+            ],
+          }
+        : {}),
+    },
+    include: {
+      images: true,
+      user: { select: { name: true } },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
+  return NextResponse.json(listings);
+}
+
+const createListingSchema = z.object({
+  title: z.string().trim().min(3, "El título debe tener al menos 3 caracteres"),
+  description: z.string().trim().min(10, "Describe un poco más la figura"),
+  price: z.coerce.number().positive("El precio debe ser mayor a 0"),
+  category: z.enum(CATEGORIES, { message: "Selecciona una categoría válida" }),
+});
+
+export async function POST(request: NextRequest) {
+  const user = await getCurrentUser();
+  if (!user) {
+    return NextResponse.json({ error: "Debes iniciar sesión" }, { status: 401 });
+  }
+
+  const formData = await request.formData();
+
+  const parsed = createListingSchema.safeParse({
+    title: formData.get("title"),
+    description: formData.get("description"),
+    price: formData.get("price"),
+    category: formData.get("category"),
+  });
+
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: parsed.error.issues[0].message },
+      { status: 400 }
+    );
+  }
+
+  const files = formData
+    .getAll("images")
+    .filter((entry): entry is File => entry instanceof File && entry.size > 0);
+
+  if (files.length === 0) {
+    return NextResponse.json(
+      { error: "Sube al menos una imagen de la figura" },
+      { status: 400 }
+    );
+  }
+  if (files.length > 6) {
+    return NextResponse.json(
+      { error: "Puedes subir hasta 6 imágenes por figura" },
+      { status: 400 }
+    );
+  }
+
+  let imageUrls: string[];
+  try {
+    imageUrls = await Promise.all(files.map(saveUploadedImage));
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "No se pudieron subir las imágenes";
+    return NextResponse.json({ error: message }, { status: 400 });
+  }
+
+  const listing = await prisma.listing.create({
+    data: {
+      ...parsed.data,
+      userId: user.id,
+      images: { create: imageUrls.map((url) => ({ url })) },
+    },
+    include: { images: true },
+  });
+
+  return NextResponse.json(listing, { status: 201 });
+}

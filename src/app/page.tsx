@@ -1,0 +1,138 @@
+import { prisma } from "@/lib/db";
+import { CATEGORIES } from "@/lib/categories";
+import ListingCard from "@/components/ListingCard";
+import CategoryFilter from "@/components/CategoryFilter";
+
+type HomeProps = {
+  searchParams: Promise<{ categoria?: string; q?: string }>;
+};
+
+export default async function Home({ searchParams }: HomeProps) {
+  const { categoria, q } = await searchParams;
+  const category = CATEGORIES.includes(categoria as (typeof CATEGORIES)[number])
+    ? categoria
+    : undefined;
+
+  const listings = await prisma.listing.findMany({
+    where: {
+      ...(category ? { category } : {}),
+      ...(q
+        ? {
+            OR: [
+              { title: { contains: q } },
+              { description: { contains: q } },
+            ],
+          }
+        : {}),
+    },
+    include: {
+      images: { take: 1 },
+      user: { select: { name: true } },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
+  const showHero = !category && !q;
+
+  return (
+    <div>
+      {showHero && (
+        <section className="bg-orange-50">
+          <div className="mx-auto max-w-6xl px-4 py-16 text-center sm:text-left">
+            <p className="text-sm font-semibold uppercase tracking-wide text-red-600">
+              ¡Coleccionar nunca fue tan fácil!
+            </p>
+            <h1 className="mt-2 max-w-2xl text-3xl font-extrabold text-zinc-900 sm:text-4xl">
+              Compra y vende{" "}
+              <span className="text-orange-600">figuras de anime</span>
+            </h1>
+            <p className="mt-3 max-w-xl text-sm text-zinc-600 sm:text-base">
+              Naruto, Dragon Ball Z, One Piece y muchas más. Publica las figuras que ya
+              no usas o encuentra tu próxima pieza de colección, y coordina todo directo
+              por WhatsApp.
+            </p>
+            <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+              <a
+                href="/registro"
+                className="inline-block rounded-full bg-red-600 px-6 py-3 text-sm font-bold text-white hover:bg-red-700"
+              >
+                Empieza a vender
+              </a>
+              <a
+                href="#catalogo"
+                className="inline-block rounded-full border border-orange-300 bg-white px-6 py-3 text-sm font-bold text-orange-700 hover:bg-orange-100"
+              >
+                Explorar catálogo
+              </a>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {showHero && (
+        <section className="border-b border-zinc-200 bg-white">
+          <div className="mx-auto max-w-6xl px-4 py-10">
+            <div className="grid gap-8 sm:grid-cols-3">
+              <div className="flex flex-col items-center text-center sm:items-start sm:text-left">
+                <span className="flex h-14 w-14 items-center justify-center rounded-full bg-orange-50 text-2xl">
+                  📸
+                </span>
+                <h3 className="mt-3 font-semibold text-zinc-900">1. Publica</h3>
+                <p className="mt-1 text-sm text-zinc-500">
+                  Sube fotos de tu figura, ponle precio y categoría.
+                </p>
+              </div>
+              <div className="flex flex-col items-center text-center sm:items-start sm:text-left">
+                <span className="flex h-14 w-14 items-center justify-center rounded-full bg-orange-50 text-2xl">
+                  💬
+                </span>
+                <h3 className="mt-3 font-semibold text-zinc-900">2. Conecta</h3>
+                <p className="mt-1 text-sm text-zinc-500">
+                  Los interesados te escriben directo a tu WhatsApp.
+                </p>
+              </div>
+              <div className="flex flex-col items-center text-center sm:items-start sm:text-left">
+                <span className="flex h-14 w-14 items-center justify-center rounded-full bg-orange-50 text-2xl">
+                  🤝
+                </span>
+                <h3 className="mt-3 font-semibold text-zinc-900">3. Vende</h3>
+                <p className="mt-1 text-sm text-zinc-500">
+                  Coordinan la entrega y el pago entre ustedes.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      <div id="catalogo" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-8">
+        <CategoryFilter activeCategory={category} q={q} />
+
+        <h2 className="mt-8 flex items-center gap-2 text-lg font-bold text-zinc-900">
+          <span aria-hidden="true">🔥</span>
+          {category ? category : q ? `Resultados para "${q}"` : "Recién publicadas"}
+        </h2>
+
+        {listings.length === 0 ? (
+          <p className="mt-16 text-center text-sm text-zinc-400">
+            No hay figuras publicadas todavía con ese criterio.
+          </p>
+        ) : (
+          <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+            {listings.map((listing) => (
+              <ListingCard
+                key={listing.id}
+                id={listing.id}
+                title={listing.title}
+                price={listing.price}
+                category={listing.category}
+                imageUrl={listing.images[0]?.url}
+                sellerName={listing.user.name}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
