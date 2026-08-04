@@ -55,7 +55,11 @@ export default async function AdminPublicacionesPage() {
                   {formatPrice(listing.price)} · {listing.category}
                 </p>
                 <p className="text-xs text-zinc-400">
-                  Publicado por {listing.user.name} ({listing.user.email})
+                  Publicado por {listing.user.name} ({listing.user.email}) ·{" "}
+                  <span className="inline-flex items-center gap-0.5">
+                    <span aria-hidden="true">👁️</span>
+                    {listing.views} {listing.views === 1 ? "vista" : "vistas"}
+                  </span>
                 </p>
               </div>
 

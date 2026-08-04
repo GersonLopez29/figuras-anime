@@ -10,6 +10,7 @@ type ListingCardProps = {
   imageUrl?: string;
   sellerName?: string;
   sold?: boolean;
+  views?: number;
 };
 
 export default function ListingCard({
@@ -20,6 +21,7 @@ export default function ListingCard({
   imageUrl,
   sellerName,
   sold,
+  views,
 }: ListingCardProps) {
   return (
     <Link
@@ -56,9 +58,17 @@ export default function ListingCard({
         <p className="mt-1 text-base font-bold text-orange-600">
           {formatPrice(price)}
         </p>
-        {sellerName && (
-          <p className="mt-0.5 text-xs text-zinc-400">Vende: {sellerName}</p>
-        )}
+        <div className="mt-0.5 flex items-center justify-between gap-2">
+          {sellerName && (
+            <p className="truncate text-xs text-zinc-400">Vende: {sellerName}</p>
+          )}
+          {typeof views === "number" && (
+            <span className="flex shrink-0 items-center gap-0.5 text-xs text-zinc-400">
+              <span aria-hidden="true">👁️</span>
+              {views}
+            </span>
+          )}
+        </div>
       </div>
     </Link>
   );

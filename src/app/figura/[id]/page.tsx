@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { cache } from "react";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
@@ -11,9 +12,9 @@ type FiguraPageProps = {
   params: Promise<{ id: string }>;
 };
 
-export default async function FiguraPage({ params }: FiguraPageProps) {
-  const { id } = await params;
-
+// cache() evita que un doble-render de este Server Component (algo que
+// Next.js puede hacer en la misma petición) cuente la visita dos veces.
+const getListingAndRegisterView = cache(async (id: string, viewerId: string | null) => {
   const listing = await prisma.listing.findUnique({
     where: { id },
     include: {
@@ -22,11 +23,30 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
     },
   });
 
-  if (!listing) {
-    notFound();
+  if (!listing) return null;
+
+  let views = listing.views;
+  if (viewerId !== listing.userId) {
+    const updated = await prisma.listing.update({
+      where: { id: listing.id },
+      data: { views: { increment: 1 } },
+      select: { views: true },
+    });
+    views = updated.views;
   }
 
+  return { listing, views };
+});
+
+export default async function FiguraPage({ params }: FiguraPageProps) {
+  const { id } = await params;
   const currentUser = await getCurrentUser();
+
+  const result = await getListingAndRegisterView(id, currentUser?.id ?? null);
+  if (!result) {
+    notFound();
+  }
+  const { listing, views } = result;
 
   const ratingAgg = await prisma.review.aggregate({
     where: { sellerId: listing.user.id },
@@ -60,6 +80,10 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
                 Vendido
               </span>
             )}
+            <span className="inline-flex items-center gap-1 text-xs text-zinc-400">
+              <span aria-hidden="true">👁️</span>
+              {views} {views === 1 ? "vista" : "vistas"}
+            </span>
           </div>
           <h1 className="mt-3 text-2xl font-bold text-zinc-900">{listing.title}</h1>
           <p className="mt-2 text-3xl font-bold text-orange-600">

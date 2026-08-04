@@ -67,6 +67,10 @@ export default async function MisFigurasPage() {
                 <p className="text-sm text-zinc-500">
                   {formatPrice(listing.price)} · {listing.category}
                 </p>
+                <p className="flex items-center gap-1 text-xs text-zinc-400">
+                  <span aria-hidden="true">👁️</span>
+                  {listing.views} {listing.views === 1 ? "vista" : "vistas"}
+                </p>
               </div>
 
               <div className="flex flex-wrap items-center justify-end gap-3">
