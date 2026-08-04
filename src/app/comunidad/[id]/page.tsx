@@ -49,7 +49,7 @@ export default async function ComunidadDetailPage({ params }: ComunidadDetailPag
       </Link>
 
       <div className="mt-4 grid gap-8 sm:grid-cols-2">
-        <ListingGallery images={post.images} title={post.caption} />
+        <ListingGallery images={post.images} title={post.caption} imageFit="contain" />
 
         <div>
           <p className="text-sm text-zinc-500">

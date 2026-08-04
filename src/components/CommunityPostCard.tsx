@@ -32,7 +32,7 @@ export default function CommunityPostCard({
             src={imageUrl}
             alt={caption}
             fill
-            className="object-cover transition group-hover:scale-105"
+            className="object-contain transition group-hover:scale-105"
             sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
           />
         ) : (

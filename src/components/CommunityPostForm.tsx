@@ -138,13 +138,13 @@ export default function CommunityPostForm() {
             {files.map((file, index) => (
               <div
                 key={index}
-                className="relative aspect-square overflow-hidden rounded-md border border-zinc-200"
+                className="relative aspect-square overflow-hidden rounded-md border border-zinc-200 bg-zinc-100"
               >
                 <Image
                   src={URL.createObjectURL(file)}
                   alt=""
                   fill
-                  className="object-cover"
+                  className="object-contain"
                   unoptimized
                 />
                 <button

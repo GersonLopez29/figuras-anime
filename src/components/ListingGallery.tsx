@@ -6,11 +6,13 @@ import Image from "next/image";
 type ListingGalleryProps = {
   images: { id: string; url: string }[];
   title: string;
+  imageFit?: "cover" | "contain";
 };
 
-export default function ListingGallery({ images, title }: ListingGalleryProps) {
+export default function ListingGallery({ images, title, imageFit = "cover" }: ListingGalleryProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const active = images[activeIndex];
+  const fitClass = imageFit === "contain" ? "object-contain" : "object-cover";
 
   return (
     <div>
@@ -20,7 +22,7 @@ export default function ListingGallery({ images, title }: ListingGalleryProps) {
             src={active.url}
             alt={title}
             fill
-            className="object-cover"
+            className={fitClass}
             sizes="(min-width: 640px) 50vw, 100vw"
             priority
           />
@@ -44,7 +46,7 @@ export default function ListingGallery({ images, title }: ListingGalleryProps) {
                   : "border-transparent hover:border-zinc-300"
               }`}
             >
-              <Image src={img.url} alt="" fill className="object-cover" />
+              <Image src={img.url} alt="" fill className={fitClass} />
             </button>
           ))}
         </div>
