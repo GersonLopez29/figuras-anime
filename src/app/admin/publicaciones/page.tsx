@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { formatPrice } from "@/lib/format";
 import DeleteListingButton from "@/components/DeleteListingButton";
 import ToggleSoldButton from "@/components/ToggleSoldButton";
+import CategorySelect from "@/components/CategorySelect";
 
 export default async function AdminPublicacionesPage() {
   const listings = await prisma.listing.findMany({
@@ -51,9 +52,7 @@ export default async function AdminPublicacionesPage() {
                     </span>
                   )}
                 </div>
-                <p className="text-sm text-zinc-500">
-                  {formatPrice(listing.price)} · {listing.category}
-                </p>
+                <p className="text-sm text-zinc-500">{formatPrice(listing.price)}</p>
                 <p className="text-xs text-zinc-400">
                   Publicado por {listing.user.name} ({listing.user.email}) ·{" "}
                   <span className="inline-flex items-center gap-0.5">
@@ -64,6 +63,7 @@ export default async function AdminPublicacionesPage() {
               </div>
 
               <div className="flex flex-wrap items-center justify-end gap-3">
+                <CategorySelect listingId={listing.id} category={listing.category} />
                 <ToggleSoldButton listingId={listing.id} sold={listing.sold} />
                 <DeleteListingButton listingId={listing.id} />
               </div>
