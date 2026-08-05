@@ -3,13 +3,15 @@
 import { useRouter } from "next/navigation";
 import { useRef, useState, FormEvent, ChangeEvent, DragEvent } from "react";
 import Image from "next/image";
-import { CATEGORIES } from "@/lib/categories";
+import CategoryRequestForm from "@/components/CategoryRequestForm";
 
 type ExistingImage = { id: string; url: string };
+type CategoryOption = { name: string; icon: string };
 
 type ListingFormProps =
   | {
       mode: "create";
+      categories: CategoryOption[];
     }
   | {
       mode: "edit";
@@ -19,6 +21,7 @@ type ListingFormProps =
       initialPrice: number;
       initialCategory: string;
       initialImages: ExistingImage[];
+      categories: CategoryOption[];
     };
 
 export default function ListingForm(props: ListingFormProps) {
@@ -28,7 +31,9 @@ export default function ListingForm(props: ListingFormProps) {
   const [title, setTitle] = useState(isEdit ? props.initialTitle : "");
   const [description, setDescription] = useState(isEdit ? props.initialDescription : "");
   const [price, setPrice] = useState(isEdit ? String(props.initialPrice) : "");
-  const [category, setCategory] = useState(isEdit ? props.initialCategory : CATEGORIES[0]);
+  const [category, setCategory] = useState(
+    isEdit ? props.initialCategory : (props.categories[0]?.name ?? "")
+  );
   const [existingImages, setExistingImages] = useState<ExistingImage[]>(
     isEdit ? props.initialImages : []
   );
@@ -155,12 +160,13 @@ export default function ListingForm(props: ListingFormProps) {
             onChange={(e) => setCategory(e.target.value)}
             className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-orange-500 focus:outline-none"
           >
-            {CATEGORIES.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
+            {props.categories.map((cat) => (
+              <option key={cat.name} value={cat.name}>
+                {cat.icon} {cat.name}
               </option>
             ))}
           </select>
+          <CategoryRequestForm />
         </div>
       </div>
 

@@ -2,18 +2,22 @@ import Link from "next/link";
 import Image from "next/image";
 import { prisma } from "@/lib/db";
 import { formatPrice } from "@/lib/format";
+import { getCategoryNames } from "@/lib/categories";
 import DeleteListingButton from "@/components/DeleteListingButton";
 import ToggleSoldButton from "@/components/ToggleSoldButton";
 import CategorySelect from "@/components/CategorySelect";
 
 export default async function AdminPublicacionesPage() {
-  const listings = await prisma.listing.findMany({
-    include: {
-      images: { take: 1 },
-      user: { select: { name: true, email: true } },
-    },
-    orderBy: { createdAt: "desc" },
-  });
+  const [listings, categoryNames] = await Promise.all([
+    prisma.listing.findMany({
+      include: {
+        images: { take: 1 },
+        user: { select: { name: true, email: true } },
+      },
+      orderBy: { createdAt: "desc" },
+    }),
+    getCategoryNames(),
+  ]);
 
   return (
     <div>
@@ -63,7 +67,11 @@ export default async function AdminPublicacionesPage() {
               </div>
 
               <div className="flex flex-wrap items-center justify-end gap-3">
-                <CategorySelect listingId={listing.id} category={listing.category} />
+                <CategorySelect
+                  listingId={listing.id}
+                  category={listing.category}
+                  categories={categoryNames}
+                />
                 <ToggleSoldButton listingId={listing.id} sold={listing.sold} />
                 <DeleteListingButton listingId={listing.id} />
               </div>

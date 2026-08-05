@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/session";
+import { getCategories } from "@/lib/categories";
 import ListingForm from "@/components/ListingForm";
 
 export default async function PublicarPage() {
@@ -7,6 +8,8 @@ export default async function PublicarPage() {
   if (!user) {
     redirect("/login");
   }
+
+  const categories = await getCategories();
 
   return (
     <div className="mx-auto max-w-xl px-4 py-10">
@@ -17,7 +20,7 @@ export default async function PublicarPage() {
       </p>
 
       <div className="mt-8">
-        <ListingForm mode="create" />
+        <ListingForm mode="create" categories={categories} />
       </div>
     </div>
   );

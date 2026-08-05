@@ -3,7 +3,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { getCurrentUser, isAdmin } from "@/lib/session";
 import { saveUploadedImage, deleteUploadedImage } from "@/lib/uploads";
-import { CATEGORIES } from "@/lib/categories";
+import { isValidCategory } from "@/lib/categories";
 
 export async function GET(
   _request: NextRequest,
@@ -30,7 +30,7 @@ const updateListingSchema = z.object({
   title: z.string().trim().min(3, "El título debe tener al menos 3 caracteres"),
   description: z.string().trim().min(10, "Describe un poco más la figura"),
   price: z.coerce.number().positive("El precio debe ser mayor a 0"),
-  category: z.enum(CATEGORIES, { message: "Selecciona una categoría válida" }),
+  category: z.string().trim().min(1, "Selecciona una categoría"),
 });
 
 export async function PATCH(
@@ -68,6 +68,9 @@ export async function PATCH(
       { error: parsed.error.issues[0].message },
       { status: 400 }
     );
+  }
+  if (!(await isValidCategory(parsed.data.category))) {
+    return NextResponse.json({ error: "Selecciona una categoría válida" }, { status: 400 });
   }
 
   const removeImageIds = formData.getAll("removeImageIds").map(String);

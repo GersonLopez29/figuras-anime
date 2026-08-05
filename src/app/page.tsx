@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/db";
-import { CATEGORIES } from "@/lib/categories";
+import { getCategories } from "@/lib/categories";
 import { getCurrentUser } from "@/lib/session";
 import ListingCard from "@/components/ListingCard";
 import CategoryFilter from "@/components/CategoryFilter";
@@ -11,10 +11,8 @@ type HomeProps = {
 
 export default async function Home({ searchParams }: HomeProps) {
   const { categoria, q, bienvenida } = await searchParams;
-  const category = CATEGORIES.includes(categoria as (typeof CATEGORIES)[number])
-    ? categoria
-    : undefined;
-  const user = await getCurrentUser();
+  const [categories, user] = await Promise.all([getCategories(), getCurrentUser()]);
+  const category = categories.some((c) => c.name === categoria) ? categoria : undefined;
   const sellCtaHref = user ? "/publicar" : "/registro";
 
   const listings = await prisma.listing.findMany({
@@ -112,7 +110,7 @@ export default async function Home({ searchParams }: HomeProps) {
       )}
 
       <div id="catalogo" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-8">
-        <CategoryFilter activeCategory={category} q={q} />
+        <CategoryFilter activeCategory={category} q={q} categories={categories} />
 
         <h2 className="mt-8 flex items-center gap-2 text-lg font-bold text-zinc-900">
           <span aria-hidden="true">🔥</span>

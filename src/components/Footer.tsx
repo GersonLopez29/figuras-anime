@@ -1,11 +1,13 @@
 import Link from "next/link";
-import { CATEGORIES, CATEGORY_ICONS } from "@/lib/categories";
+
+type CategoryOption = { name: string; icon: string };
 
 type FooterProps = {
   totalVisits: number;
+  categories: CategoryOption[];
 };
 
-export default function Footer({ totalVisits }: FooterProps) {
+export default function Footer({ totalVisits, categories }: FooterProps) {
   const year = new Date().getFullYear();
 
   return (
@@ -28,13 +30,13 @@ export default function Footer({ totalVisits }: FooterProps) {
               Categorías
             </h3>
             <ul className="mt-3 space-y-2">
-              {CATEGORIES.slice(0, 5).map((cat) => (
-                <li key={cat}>
+              {categories.slice(0, 5).map((cat) => (
+                <li key={cat.name}>
                   <Link
-                    href={`/?categoria=${encodeURIComponent(cat)}`}
+                    href={`/?categoria=${encodeURIComponent(cat.name)}`}
                     className="text-sm text-zinc-600 hover:text-orange-600"
                   >
-                    {CATEGORY_ICONS[cat]} {cat}
+                    {cat.icon} {cat.name}
                   </Link>
                 </li>
               ))}

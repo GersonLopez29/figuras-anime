@@ -1,12 +1,14 @@
 import Link from "next/link";
-import { CATEGORIES, CATEGORY_ICONS } from "@/lib/categories";
+
+type CategoryOption = { name: string; icon: string };
 
 type CategoryFilterProps = {
   activeCategory?: string;
   q?: string;
+  categories: CategoryOption[];
 };
 
-export default function CategoryFilter({ activeCategory, q }: CategoryFilterProps) {
+export default function CategoryFilter({ activeCategory, q, categories }: CategoryFilterProps) {
   return (
     <div className="space-y-5">
       <form action="/" method="get" className="flex gap-2">
@@ -46,14 +48,14 @@ export default function CategoryFilter({ activeCategory, q }: CategoryFilterProp
           </span>
           <span className="text-xs font-medium text-zinc-700">Todas</span>
         </Link>
-        {CATEGORIES.map((cat) => {
+        {categories.map((cat) => {
           const params = new URLSearchParams();
-          params.set("categoria", cat);
+          params.set("categoria", cat.name);
           if (q) params.set("q", q);
-          const active = activeCategory === cat;
+          const active = activeCategory === cat.name;
           return (
             <Link
-              key={cat}
+              key={cat.name}
               href={`/?${params.toString()}`}
               className="flex shrink-0 flex-col items-center gap-1.5"
             >
@@ -64,10 +66,10 @@ export default function CategoryFilter({ activeCategory, q }: CategoryFilterProp
                     : "bg-orange-50 text-zinc-700 hover:bg-orange-100"
                 }`}
               >
-                {CATEGORY_ICONS[cat]}
+                {cat.icon}
               </span>
               <span className="max-w-[4.5rem] text-center text-xs font-medium text-zinc-700">
-                {cat}
+                {cat.name}
               </span>
             </Link>
           );

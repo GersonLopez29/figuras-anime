@@ -2,14 +2,14 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { CATEGORIES } from "@/lib/categories";
 
 type CategorySelectProps = {
   listingId: string;
   category: string;
+  categories: string[];
 };
 
-export default function CategorySelect({ listingId, category }: CategorySelectProps) {
+export default function CategorySelect({ listingId, category, categories }: CategorySelectProps) {
   const router = useRouter();
   const [value, setValue] = useState(category);
   const [loading, setLoading] = useState(false);
@@ -40,7 +40,7 @@ export default function CategorySelect({ listingId, category }: CategorySelectPr
       onChange={(e) => handleChange(e.target.value)}
       className="rounded-md border border-zinc-300 bg-white px-2 py-1 text-xs font-medium text-zinc-700 focus:border-orange-500 focus:outline-none disabled:opacity-60"
     >
-      {CATEGORIES.map((cat) => (
+      {categories.map((cat) => (
         <option key={cat} value={cat}>
           {cat}
         </option>

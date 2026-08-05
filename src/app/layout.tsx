@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CursorTrail from "@/components/CursorTrail";
 import { registerSiteVisit } from "@/lib/siteStats";
+import { getCategories } from "@/lib/categories";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,7 +24,7 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
-  const totalVisits = await registerSiteVisit();
+  const [totalVisits, categories] = await Promise.all([registerSiteVisit(), getCategories()]);
 
   return (
     <html
@@ -34,7 +35,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
         <CursorTrail />
         <Navbar />
         <main className="flex-1">{children}</main>
-        <Footer totalVisits={totalVisits} />
+        <Footer totalVisits={totalVisits} categories={categories} />
       </body>
     </html>
   );

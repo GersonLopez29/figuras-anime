@@ -13,21 +13,40 @@ datasource db {
 }
 
 model User {
-  id              String           @id @default(cuid())
-  name            String
-  email           String           @unique
-  passwordHash    String
-  whatsapp        String
-  role            String           @default("user")
-  isBlocked       Boolean          @default(false)
-  createdAt       DateTime         @default(now())
-  listings        Listing[]
-  reviewsWritten  Review[]         @relation("ReviewsWritten")
-  reviewsReceived Review[]         @relation("ReviewsReceived")
-  collectionPosts CollectionPost[]
-  postComments    PostComment[]
-  postRatings     PostRating[]
-  postReports     PostReport[]
+  id                String            @id @default(cuid())
+  name              String
+  email             String            @unique
+  passwordHash      String
+  whatsapp          String
+  role              String            @default("user")
+  isBlocked         Boolean           @default(false)
+  createdAt         DateTime          @default(now())
+  listings          Listing[]
+  reviewsWritten    Review[]          @relation("ReviewsWritten")
+  reviewsReceived   Review[]          @relation("ReviewsReceived")
+  collectionPosts   CollectionPost[]
+  postComments      PostComment[]
+  postRatings       PostRating[]
+  postReports       PostReport[]
+  categoryRequests  CategoryRequest[]
+}
+
+model Category {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  icon      String   @default("📦")
+  createdAt DateTime @default(now())
+}
+
+model CategoryRequest {
+  id          String    @id @default(cuid())
+  name        String
+  message     String
+  status      String    @default("pending")
+  createdAt   DateTime  @default(now())
+  resolvedAt  DateTime?
+  requesterId String
+  requester   User      @relation(fields: [requesterId], references: [id], onDelete: Cascade)
 }
 
 model CollectionPost {

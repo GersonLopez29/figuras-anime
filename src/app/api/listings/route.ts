@@ -3,18 +3,17 @@ import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/session";
 import { saveUploadedImage } from "@/lib/uploads";
-import { CATEGORIES } from "@/lib/categories";
+import { getCategoryNames, isValidCategory } from "@/lib/categories";
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const category = searchParams.get("categoria");
   const q = searchParams.get("q")?.trim();
+  const categoryNames = category ? await getCategoryNames() : [];
 
   const listings = await prisma.listing.findMany({
     where: {
-      ...(category && CATEGORIES.includes(category as (typeof CATEGORIES)[number])
-        ? { category }
-        : {}),
+      ...(category && categoryNames.includes(category) ? { category } : {}),
       ...(q
         ? {
             OR: [
@@ -38,7 +37,7 @@ const createListingSchema = z.object({
   title: z.string().trim().min(3, "El título debe tener al menos 3 caracteres"),
   description: z.string().trim().min(10, "Describe un poco más la figura"),
   price: z.coerce.number().positive("El precio debe ser mayor a 0"),
-  category: z.enum(CATEGORIES, { message: "Selecciona una categoría válida" }),
+  category: z.string().trim().min(1, "Selecciona una categoría"),
 });
 
 export async function POST(request: NextRequest) {
@@ -61,6 +60,9 @@ export async function POST(request: NextRequest) {
       { error: parsed.error.issues[0].message },
       { status: 400 }
     );
+  }
+  if (!(await isValidCategory(parsed.data.category))) {
+    return NextResponse.json({ error: "Selecciona una categoría válida" }, { status: 400 });
   }
 
   const files = formData

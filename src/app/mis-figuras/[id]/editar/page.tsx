@@ -1,6 +1,7 @@
 import { redirect, notFound } from "next/navigation";
 import { getCurrentUser } from "@/lib/session";
 import { prisma } from "@/lib/db";
+import { getCategories } from "@/lib/categories";
 import ListingForm from "@/components/ListingForm";
 
 type EditarPageProps = {
@@ -26,6 +27,8 @@ export default async function EditarFiguraPage({ params }: EditarPageProps) {
     redirect("/mis-figuras");
   }
 
+  const categories = await getCategories();
+
   return (
     <div className="mx-auto max-w-xl px-4 py-10">
       <h1 className="text-2xl font-bold text-zinc-900">Editar figura</h1>
@@ -39,6 +42,7 @@ export default async function EditarFiguraPage({ params }: EditarPageProps) {
           initialPrice={listing.price}
           initialCategory={listing.category}
           initialImages={listing.images.map((img) => ({ id: img.id, url: img.url }))}
+          categories={categories}
         />
       </div>
     </div>

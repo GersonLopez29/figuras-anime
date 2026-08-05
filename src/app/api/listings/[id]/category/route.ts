@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { getCurrentUser, isAdmin } from "@/lib/session";
-import { CATEGORIES } from "@/lib/categories";
+import { isValidCategory } from "@/lib/categories";
 
 const categorySchema = z.object({
-  category: z.enum(CATEGORIES, { message: "Selecciona una categoría válida" }),
+  category: z.string().trim().min(1, "Selecciona una categoría"),
 });
 
 export async function PATCH(
@@ -33,6 +33,9 @@ export async function PATCH(
   const parsed = categorySchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
+  }
+  if (!(await isValidCategory(parsed.data.category))) {
+    return NextResponse.json({ error: "Selecciona una categoría válida" }, { status: 400 });
   }
 
   const updated = await prisma.listing.update({
