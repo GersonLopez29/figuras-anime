@@ -1,8 +1,9 @@
 import { prisma } from "@/lib/db";
 import CategoryRequestActions from "@/components/admin/CategoryRequestActions";
+import CategoryManager from "@/components/admin/CategoryManager";
 
 export default async function AdminCategoriasPage() {
-  const [pending, resolved, categories] = await Promise.all([
+  const [pending, resolved, categories, listingCounts] = await Promise.all([
     prisma.categoryRequest.findMany({
       where: { status: "pending" },
       include: { requester: { select: { name: true, email: true } } },
@@ -15,7 +16,18 @@ export default async function AdminCategoriasPage() {
       take: 10,
     }),
     prisma.category.findMany({ orderBy: { createdAt: "asc" } }),
+    prisma.listing.groupBy({ by: ["category"], _count: true }),
   ]);
+
+  const listingCountByCategory = new Map(
+    listingCounts.map((row) => [row.category, row._count])
+  );
+  const categoryRows = categories.map((cat) => ({
+    id: cat.id,
+    name: cat.name,
+    icon: cat.icon,
+    listingCount: listingCountByCategory.get(cat.name) ?? 0,
+  }));
 
   return (
     <div className="space-y-10">
@@ -80,16 +92,11 @@ export default async function AdminCategoriasPage() {
         <h2 className="text-lg font-semibold text-zinc-900">
           Categorías actuales ({categories.length})
         </h2>
-        <div className="mt-4 flex flex-wrap gap-2">
-          {categories.map((cat) => (
-            <span
-              key={cat.id}
-              className="inline-flex items-center gap-1.5 rounded-full border border-zinc-200 bg-white px-3 py-1.5 text-sm text-zinc-700"
-            >
-              <span aria-hidden="true">{cat.icon}</span>
-              {cat.name}
-            </span>
-          ))}
+        <p className="mt-1 text-sm text-zinc-500">
+          Crea, renombra o elimina las categorías disponibles para todos los vendedores.
+        </p>
+        <div className="mt-4">
+          <CategoryManager categories={categoryRows} />
         </div>
       </div>
     </div>
