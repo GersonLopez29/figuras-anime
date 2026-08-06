@@ -5,6 +5,7 @@ import ListingCard from "@/components/ListingCard";
 import CategoryFilter from "@/components/CategoryFilter";
 import WelcomeBanner from "@/components/WelcomeBanner";
 import Pagination from "@/components/Pagination";
+import { getActiveDiscountAmount } from "@/lib/format";
 
 const PAGE_SIZE = 24;
 
@@ -152,7 +153,7 @@ export default async function Home({ searchParams }: HomeProps) {
                 id={listing.id}
                 title={listing.title}
                 price={listing.price}
-                discountAmount={listing.discountAmount}
+                discountAmount={getActiveDiscountAmount(listing.discountAmount, listing.discountExpiresAt)}
                 category={listing.category}
                 imageUrl={listing.images[0]?.url}
                 sellerName={listing.user.name}

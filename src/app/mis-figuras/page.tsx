@@ -6,7 +6,7 @@ import { prisma } from "@/lib/db";
 import DeleteListingButton from "@/components/DeleteListingButton";
 import ToggleSoldButton from "@/components/ToggleSoldButton";
 import DiscountControl from "@/components/DiscountControl";
-import { formatPrice, getFinalPrice } from "@/lib/format";
+import { formatPrice, getFinalPrice, getActiveDiscountAmount } from "@/lib/format";
 
 export default async function MisFigurasPage() {
   const user = await getCurrentUser();
@@ -38,7 +38,12 @@ export default async function MisFigurasPage() {
         </p>
       ) : (
         <div className="mt-6 divide-y divide-zinc-200 rounded-lg border border-zinc-200 bg-white">
-          {listings.map((listing) => (
+          {listings.map((listing) => {
+            const activeDiscount = getActiveDiscountAmount(
+              listing.discountAmount,
+              listing.discountExpiresAt
+            );
+            return (
             <div key={listing.id} className="flex items-center gap-4 p-4">
               <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-md bg-zinc-100">
                 {listing.images[0] ? (
@@ -66,11 +71,11 @@ export default async function MisFigurasPage() {
                   )}
                 </div>
                 <p className="text-sm text-zinc-500">
-                  {listing.discountAmount ? (
+                  {activeDiscount ? (
                     <>
                       <span className="mr-1.5 line-through">{formatPrice(listing.price)}</span>
                       <span className="font-semibold text-green-700">
-                        {formatPrice(getFinalPrice(listing.price, listing.discountAmount))}
+                        {formatPrice(getFinalPrice(listing.price, activeDiscount))}
                       </span>
                     </>
                   ) : (
@@ -83,7 +88,11 @@ export default async function MisFigurasPage() {
                   {listing.views} {listing.views === 1 ? "vista" : "vistas"}
                 </p>
                 <div className="mt-1.5">
-                  <DiscountControl listingId={listing.id} discountAmount={listing.discountAmount} />
+                  <DiscountControl
+                    listingId={listing.id}
+                    discountAmount={activeDiscount}
+                    discountExpiresAt={listing.discountExpiresAt}
+                  />
                 </div>
               </div>
 
@@ -98,7 +107,8 @@ export default async function MisFigurasPage() {
                 <DeleteListingButton listingId={listing.id} />
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

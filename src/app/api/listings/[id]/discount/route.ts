@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { getCurrentUser, isAdmin } from "@/lib/session";
+import { DISCOUNT_DURATION_MS } from "@/lib/format";
 
 const discountSchema = z.object({
   discountAmount: z.number().positive("Ingresa un monto de descuento válido").nullable(),
@@ -46,7 +47,12 @@ export async function PATCH(
 
   const updated = await prisma.listing.update({
     where: { id },
-    data: { discountAmount: parsed.data.discountAmount },
+    data: {
+      discountAmount: parsed.data.discountAmount,
+      discountExpiresAt: parsed.data.discountAmount
+        ? new Date(Date.now() + DISCOUNT_DURATION_MS)
+        : null,
+    },
   });
 
   return NextResponse.json(updated);

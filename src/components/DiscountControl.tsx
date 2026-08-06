@@ -2,14 +2,20 @@
 
 import { useRouter } from "next/navigation";
 import { useState, FormEvent } from "react";
-import { formatPrice } from "@/lib/format";
+import { formatPrice, getDaysRemaining } from "@/lib/format";
 
 type DiscountControlProps = {
   listingId: string;
   discountAmount: number | null;
+  discountExpiresAt?: Date | string | null;
 };
 
-export default function DiscountControl({ listingId, discountAmount }: DiscountControlProps) {
+export default function DiscountControl({
+  listingId,
+  discountAmount,
+  discountExpiresAt,
+}: DiscountControlProps) {
+  const daysRemaining = getDaysRemaining(discountExpiresAt);
   const router = useRouter();
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(discountAmount ? String(discountAmount) : "");
@@ -54,7 +60,8 @@ export default function DiscountControl({ listingId, discountAmount }: DiscountC
         {discountAmount ? (
           <>
             <span className="rounded-full bg-green-100 px-2.5 py-1 text-xs font-semibold text-green-700">
-              Descuento de {formatPrice(discountAmount)}
+              Descuento de {formatPrice(discountAmount)} · vence en {daysRemaining}{" "}
+              {daysRemaining === 1 ? "día" : "días"}
             </span>
             <button
               type="button"
@@ -118,6 +125,7 @@ export default function DiscountControl({ listingId, discountAmount }: DiscountC
           Cancelar
         </button>
       </div>
+      <p className="text-xs text-zinc-400">El descuento durará 1 semana desde que lo apliques.</p>
       {error && <p className="text-xs text-red-600">{error}</p>}
     </form>
   );

@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/session";
 import ListingCard from "@/components/ListingCard";
+import { getActiveDiscountAmount } from "@/lib/format";
 
 export default async function FavoritosPage() {
   const user = await getCurrentUser();
@@ -38,7 +39,7 @@ export default async function FavoritosPage() {
               id={listing.id}
               title={listing.title}
               price={listing.price}
-              discountAmount={listing.discountAmount}
+              discountAmount={getActiveDiscountAmount(listing.discountAmount, listing.discountExpiresAt)}
               category={listing.category}
               imageUrl={listing.images[0]?.url}
               sellerName={listing.user.name}

@@ -7,6 +7,7 @@ import StarRating from "@/components/StarRating";
 import ReviewForm from "@/components/ReviewForm";
 import DeleteReviewButton from "@/components/DeleteReviewButton";
 import ListingCard from "@/components/ListingCard";
+import { getActiveDiscountAmount } from "@/lib/format";
 
 type VendedorPageProps = {
   params: Promise<{ id: string }>;
@@ -95,7 +96,7 @@ export default async function VendedorPage({ params }: VendedorPageProps) {
                 id={listing.id}
                 title={listing.title}
                 price={listing.price}
-                discountAmount={listing.discountAmount}
+                discountAmount={getActiveDiscountAmount(listing.discountAmount, listing.discountExpiresAt)}
                 category={listing.category}
                 imageUrl={listing.images[0]?.url}
                 sold={listing.sold}

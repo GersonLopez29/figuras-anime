@@ -132,21 +132,22 @@ model Review {
 }
 
 model Listing {
-  id             String         @id @default(cuid())
-  title          String
-  description    String
-  price          Float
-  discountAmount Float?
-  category       String
-  sold           Boolean        @default(false)
-  views          Int            @default(0)
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
-  userId         String
-  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  images         ListingImage[]
-  favoritedBy    Favorite[]
-  conversations  Conversation[]
+  id                String         @id @default(cuid())
+  title             String
+  description       String
+  price             Float
+  discountAmount    Float?
+  discountExpiresAt DateTime?
+  category          String
+  sold              Boolean        @default(false)
+  views             Int            @default(0)
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  userId            String
+  user              User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  images            ListingImage[]
+  favoritedBy       Favorite[]
+  conversations     Conversation[]
 }
 
 model ListingImage {

@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { prisma } from "@/lib/db";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
-import { formatPrice, getFinalPrice } from "@/lib/format";
+import { formatPrice, getFinalPrice, getActiveDiscountAmount, getDaysRemaining } from "@/lib/format";
 import { getCurrentUser } from "@/lib/session";
 import ListingGallery from "@/components/ListingGallery";
 import StarRating from "@/components/StarRating";
@@ -108,6 +108,15 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
       }))
     : false;
 
+  const activeDiscount = getActiveDiscountAmount(listing.discountAmount, listing.discountExpiresAt);
+  const discountDaysRemaining = getDaysRemaining(listing.discountExpiresAt);
+  const discountExpiresLabel = listing.discountExpiresAt
+    ? new Date(listing.discountExpiresAt).toLocaleDateString("es-PE", {
+        day: "numeric",
+        month: "long",
+      })
+    : null;
+
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
       <Link href="/" className="text-sm text-zinc-500 hover:text-zinc-800">
@@ -127,7 +136,7 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
                 Vendido
               </span>
             )}
-            {!listing.sold && !!listing.discountAmount && (
+            {!listing.sold && !!activeDiscount && (
               <span className="inline-block rounded-full bg-green-600 px-3 py-1 text-xs font-bold text-white">
                 Oferta
               </span>
@@ -147,19 +156,30 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
               />
             )}
           </div>
-          {!listing.sold && listing.discountAmount ? (
+          {!listing.sold && activeDiscount ? (
             <p className="mt-2 flex items-baseline gap-2">
               <span className="text-lg text-zinc-400 line-through">
                 {formatPrice(listing.price)}
               </span>
               <span className="text-3xl font-bold text-green-700">
-                {formatPrice(getFinalPrice(listing.price, listing.discountAmount))}
+                {formatPrice(getFinalPrice(listing.price, activeDiscount))}
               </span>
             </p>
           ) : (
             <p className="mt-2 text-3xl font-bold text-orange-600">
               {formatPrice(listing.price)}
             </p>
+          )}
+
+          {!listing.sold && activeDiscount && (
+            <div className="mt-3 flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-4 py-2.5 text-sm text-green-800">
+              <span aria-hidden="true">⏰</span>
+              <span>
+                Oferta por tiempo limitado: válida hasta el {discountExpiresLabel} (
+                {discountDaysRemaining} {discountDaysRemaining === 1 ? "día" : "días"} restante
+                {discountDaysRemaining === 1 ? "" : "s"}).
+              </span>
+            </div>
           )}
 
           <p className="mt-4 whitespace-pre-line text-sm leading-relaxed text-zinc-700">
