@@ -41,7 +41,7 @@ export default async function ConversacionPage({ params }: MensajePageProps) {
   const otherUser = conversation.buyerId === user.id ? conversation.seller : conversation.buyer;
 
   return (
-    <div className="mx-auto flex h-[calc(100vh-4rem)] max-w-3xl flex-col px-4 py-6">
+    <div className="mx-auto flex h-[calc(100dvh-4rem)] max-w-3xl flex-col px-4 py-4 sm:py-6">
       <Link href="/mensajes" className="text-sm text-zinc-500 hover:text-zinc-800">
         &larr; Mensajes
       </Link>

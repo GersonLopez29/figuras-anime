@@ -45,59 +45,64 @@ export default async function MisFigurasPage() {
               listing.discountExpiresAt
             );
             return (
-            <div key={listing.id} className="flex items-center gap-4 p-4">
-              <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-md bg-zinc-100">
-                {listing.images[0] ? (
-                  <Image
-                    src={listing.images[0].url}
-                    alt={listing.title}
-                    fill
-                    className="object-cover"
-                  />
-                ) : null}
-              </div>
-
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <Link
-                    href={`/figura/${listing.id}`}
-                    className="line-clamp-1 text-sm font-medium text-zinc-900 hover:underline"
-                  >
-                    {listing.title}
-                  </Link>
-                  {listing.sold && (
-                    <span className="shrink-0 rounded bg-zinc-800 px-1.5 py-0.5 text-xs font-medium text-white">
-                      Vendido
-                    </span>
-                  )}
+            <div
+              key={listing.id}
+              className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:gap-4"
+            >
+              <div className="flex min-w-0 flex-1 items-center gap-4">
+                <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-md bg-zinc-100">
+                  {listing.images[0] ? (
+                    <Image
+                      src={listing.images[0].url}
+                      alt={listing.title}
+                      fill
+                      className="object-cover"
+                    />
+                  ) : null}
                 </div>
-                <p className="text-sm text-zinc-500">
-                  {activeDiscount ? (
-                    <>
-                      <span className="mr-1.5 line-through">{formatPrice(listing.price)}</span>
-                      <span className="font-semibold text-green-700">
-                        {formatPrice(getFinalPrice(listing.price, activeDiscount))}
+
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <Link
+                      href={`/figura/${listing.id}`}
+                      className="line-clamp-1 text-sm font-medium text-zinc-900 hover:underline"
+                    >
+                      {listing.title}
+                    </Link>
+                    {listing.sold && (
+                      <span className="shrink-0 rounded bg-zinc-800 px-1.5 py-0.5 text-xs font-medium text-white">
+                        Vendido
                       </span>
-                    </>
-                  ) : (
-                    formatPrice(listing.price)
-                  )}{" "}
-                  · {listing.category} · {getConditionLabel(listing.condition)}
-                </p>
-                <p className="flex items-center gap-1 text-xs text-zinc-400">
-                  <span aria-hidden="true">👁️</span>
-                  {listing.views} {listing.views === 1 ? "vista" : "vistas"}
-                </p>
-                <div className="mt-1.5">
-                  <DiscountControl
-                    listingId={listing.id}
-                    discountAmount={activeDiscount}
-                    discountExpiresAt={listing.discountExpiresAt}
-                  />
+                    )}
+                  </div>
+                  <p className="text-sm text-zinc-500">
+                    {activeDiscount ? (
+                      <>
+                        <span className="mr-1.5 line-through">{formatPrice(listing.price)}</span>
+                        <span className="font-semibold text-green-700">
+                          {formatPrice(getFinalPrice(listing.price, activeDiscount))}
+                        </span>
+                      </>
+                    ) : (
+                      formatPrice(listing.price)
+                    )}{" "}
+                    · {listing.category} · {getConditionLabel(listing.condition)}
+                  </p>
+                  <p className="flex items-center gap-1 text-xs text-zinc-400">
+                    <span aria-hidden="true">👁️</span>
+                    {listing.views} {listing.views === 1 ? "vista" : "vistas"}
+                  </p>
+                  <div className="mt-1.5">
+                    <DiscountControl
+                      listingId={listing.id}
+                      discountAmount={activeDiscount}
+                      discountExpiresAt={listing.discountExpiresAt}
+                    />
+                  </div>
                 </div>
               </div>
 
-              <div className="flex flex-wrap items-center justify-end gap-3">
+              <div className="flex flex-wrap items-center gap-3 sm:shrink-0 sm:justify-end">
                 <ToggleSoldButton listingId={listing.id} sold={listing.sold} />
                 <Link
                   href={`/mis-figuras/${listing.id}/editar`}

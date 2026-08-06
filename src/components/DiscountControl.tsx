@@ -56,7 +56,7 @@ export default function DiscountControl({
 
   if (!editing) {
     return (
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         {discountAmount ? (
           <>
             <span className="rounded-full bg-green-100 px-2.5 py-1 text-xs font-semibold text-green-700">
@@ -93,8 +93,8 @@ export default function DiscountControl({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col items-end gap-1">
-      <div className="flex items-center gap-2">
+    <form onSubmit={handleSubmit} className="flex w-full flex-col items-start gap-1 sm:items-end">
+      <div className="flex flex-wrap items-center gap-2">
         <input
           type="number"
           inputMode="decimal"
@@ -104,12 +104,12 @@ export default function DiscountControl({
           value={value}
           onChange={(e) => setValue(e.target.value)}
           placeholder="Monto en S/"
-          className="w-28 rounded-full border border-zinc-300 px-3 py-1 text-sm focus:border-orange-500 focus:outline-none"
+          className="w-28 rounded-full border border-zinc-300 px-3 py-1.5 text-sm focus:border-orange-500 focus:outline-none"
         />
         <button
           type="submit"
           disabled={loading}
-          className="rounded-full bg-orange-600 px-3 py-1 text-sm font-semibold text-white hover:bg-orange-700 disabled:opacity-60"
+          className="rounded-full bg-orange-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-orange-700 disabled:opacity-60"
         >
           {loading ? "..." : "Aplicar"}
         </button>
@@ -120,7 +120,7 @@ export default function DiscountControl({
             setError(null);
             setValue(discountAmount ? String(discountAmount) : "");
           }}
-          className="text-sm font-medium text-zinc-500 hover:text-zinc-800"
+          className="px-1 py-1.5 text-sm font-medium text-zinc-500 hover:text-zinc-800"
         >
           Cancelar
         </button>
