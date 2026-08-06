@@ -3,14 +3,16 @@
 import { useState } from "react";
 import Link from "next/link";
 import LogoutButton from "@/components/LogoutButton";
+import MessagesNavLink from "@/components/MessagesNavLink";
 
 type MobileMenuProps = {
   isLoggedIn: boolean;
   userName?: string;
   isAdmin: boolean;
+  unreadCount: number;
 };
 
-export default function MobileMenu({ isLoggedIn, userName, isAdmin }: MobileMenuProps) {
+export default function MobileMenu({ isLoggedIn, userName, isAdmin, unreadCount }: MobileMenuProps) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -78,6 +80,11 @@ export default function MobileMenu({ isLoggedIn, userName, isAdmin }: MobileMenu
                   >
                     Favoritos
                   </Link>
+                  <MessagesNavLink
+                    initialCount={unreadCount}
+                    onClick={() => setOpen(false)}
+                    className="flex items-center rounded-md px-2 py-2.5 text-sm font-medium text-zinc-700 hover:bg-zinc-50"
+                  />
                   <Link
                     href="/publicar"
                     onClick={() => setOpen(false)}

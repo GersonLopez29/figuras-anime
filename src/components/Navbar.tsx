@@ -1,11 +1,22 @@
 import Link from "next/link";
+import { prisma } from "@/lib/db";
 import { getCurrentUser, isAdmin } from "@/lib/session";
 import LogoutButton from "@/components/LogoutButton";
 import MobileMenu from "@/components/MobileMenu";
+import MessagesNavLink from "@/components/MessagesNavLink";
 
 export default async function Navbar() {
   const user = await getCurrentUser();
   const admin = isAdmin(user);
+  const unreadCount = user
+    ? await prisma.message.count({
+        where: {
+          readAt: null,
+          senderId: { not: user.id },
+          conversation: { OR: [{ buyerId: user.id }, { sellerId: user.id }] },
+        },
+      })
+    : 0;
 
   return (
     <header className="sticky top-0 z-20 border-b border-zinc-200 bg-white/95 backdrop-blur">
@@ -39,6 +50,10 @@ export default async function Navbar() {
               >
                 Favoritos
               </Link>
+              <MessagesNavLink
+                initialCount={unreadCount}
+                className="flex items-center text-sm font-medium text-zinc-600 hover:text-zinc-900"
+              />
               {admin && (
                 <Link
                   href="/admin"
@@ -74,7 +89,12 @@ export default async function Navbar() {
           )}
         </nav>
 
-        <MobileMenu isLoggedIn={!!user} userName={user?.name} isAdmin={admin} />
+        <MobileMenu
+          isLoggedIn={!!user}
+          userName={user?.name}
+          isAdmin={admin}
+          unreadCount={unreadCount}
+        />
       </div>
     </header>
   );

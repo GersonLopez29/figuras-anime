@@ -9,6 +9,7 @@ import { getCurrentUser } from "@/lib/session";
 import ListingGallery from "@/components/ListingGallery";
 import StarRating from "@/components/StarRating";
 import FavoriteButton from "@/components/FavoriteButton";
+import MessageButton from "@/components/MessageButton";
 
 type FiguraPageProps = {
   params: Promise<{ id: string }>;
@@ -169,14 +170,19 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
               </p>
             </div>
           ) : whatsappLink ? (
-            <a
-              href={whatsappLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-green-600 px-4 py-3 text-sm font-bold text-white hover:bg-green-700"
-            >
-              Contactar por WhatsApp
-            </a>
+            <div className="mt-6">
+              <a
+                href={whatsappLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex w-full items-center justify-center gap-2 rounded-full bg-green-600 px-4 py-3 text-sm font-bold text-white hover:bg-green-700"
+              >
+                Contactar por WhatsApp
+              </a>
+              {currentUser && currentUser.id !== listing.user.id && (
+                <MessageButton listingId={listing.id} />
+              )}
+            </div>
           ) : (
             <div className="mt-6 rounded-lg border border-zinc-200 bg-zinc-50 p-4 text-center">
               <p className="text-sm text-zinc-600">

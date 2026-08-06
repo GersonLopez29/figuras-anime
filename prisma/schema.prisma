@@ -33,6 +33,9 @@ model User {
   postReports                PostReport[]
   categoryRequests           CategoryRequest[]
   favorites                  Favorite[]
+  conversationsAsBuyer       Conversation[]    @relation("ConversationsAsBuyer")
+  conversationsAsSeller      Conversation[]    @relation("ConversationsAsSeller")
+  messages                   Message[]
 }
 
 model Favorite {
@@ -142,6 +145,7 @@ model Listing {
   user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   images      ListingImage[]
   favoritedBy Favorite[]
+  conversations Conversation[]
 }
 
 model ListingImage {
@@ -154,4 +158,30 @@ model ListingImage {
 model SiteStats {
   id          String @id
   totalVisits Int    @default(0)
+}
+
+model Conversation {
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  listingId String
+  listing   Listing   @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  buyerId   String
+  buyer     User      @relation("ConversationsAsBuyer", fields: [buyerId], references: [id], onDelete: Cascade)
+  sellerId  String
+  seller    User      @relation("ConversationsAsSeller", fields: [sellerId], references: [id], onDelete: Cascade)
+  messages  Message[]
+
+  @@unique([listingId, buyerId, sellerId])
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  text           String
+  createdAt      DateTime     @default(now())
+  readAt         DateTime?
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  senderId       String
+  sender         User         @relation(fields: [senderId], references: [id], onDelete: Cascade)
 }
