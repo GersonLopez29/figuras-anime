@@ -93,7 +93,17 @@ export default function ConversationThread({
           messages.map((m) => {
             const mine = m.senderId === currentUserId;
             return (
-              <div key={m.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
+              <div
+                key={m.id}
+                className={`flex flex-col ${mine ? "items-end" : "items-start"}`}
+              >
+                <p
+                  className={`mb-0.5 px-1 text-[11px] font-medium text-zinc-500 ${
+                    mine ? "text-right" : "text-left"
+                  }`}
+                >
+                  {mine ? "Tú" : m.sender.name}
+                </p>
                 <div
                   className={`max-w-[75%] rounded-2xl px-3.5 py-2 text-sm ${
                     mine
