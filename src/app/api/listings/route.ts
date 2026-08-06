@@ -28,6 +28,7 @@ export async function GET(request: NextRequest) {
       user: { select: { name: true } },
     },
     orderBy: { createdAt: "desc" },
+    take: 100,
   });
 
   return NextResponse.json(listings);

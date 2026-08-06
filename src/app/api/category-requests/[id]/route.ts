@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { getCurrentUser, isAdmin } from "@/lib/session";
+import { sendCategoryRequestResolvedEmail } from "@/lib/email";
 
 const resolveSchema = z.object({
   action: z.enum(["approve", "reject"]),
@@ -17,7 +18,10 @@ export async function PATCH(
     return NextResponse.json({ error: "No autorizado" }, { status: 403 });
   }
 
-  const existing = await prisma.categoryRequest.findUnique({ where: { id } });
+  const existing = await prisma.categoryRequest.findUnique({
+    where: { id },
+    include: { requester: { select: { name: true, email: true } } },
+  });
   if (!existing) {
     return NextResponse.json({ error: "Solicitud no encontrada" }, { status: 404 });
   }
@@ -50,6 +54,13 @@ export async function PATCH(
       data: { status: "rejected", resolvedAt: new Date() },
     });
   }
+
+  await sendCategoryRequestResolvedEmail(
+    existing.requester.email,
+    existing.requester.name,
+    existing.name,
+    parsed.data.action === "approve"
+  );
 
   const updated = await prisma.categoryRequest.findUnique({ where: { id } });
   return NextResponse.json(updated);

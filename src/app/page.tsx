@@ -4,37 +4,60 @@ import { getCurrentUser } from "@/lib/session";
 import ListingCard from "@/components/ListingCard";
 import CategoryFilter from "@/components/CategoryFilter";
 import WelcomeBanner from "@/components/WelcomeBanner";
+import Pagination from "@/components/Pagination";
+
+const PAGE_SIZE = 24;
 
 type HomeProps = {
-  searchParams: Promise<{ categoria?: string; q?: string; bienvenida?: string }>;
+  searchParams: Promise<{ categoria?: string; q?: string; bienvenida?: string; pagina?: string }>;
 };
 
 export default async function Home({ searchParams }: HomeProps) {
-  const { categoria, q, bienvenida } = await searchParams;
+  const { categoria, q, bienvenida, pagina } = await searchParams;
   const [categories, user] = await Promise.all([getCategories(), getCurrentUser()]);
   const category = categories.some((c) => c.name === categoria) ? categoria : undefined;
   const sellCtaHref = user ? "/publicar" : "/registro";
 
+  const where = {
+    ...(category ? { category } : {}),
+    ...(q
+      ? {
+          OR: [
+            { title: { contains: q } },
+            { description: { contains: q } },
+          ],
+        }
+      : {}),
+  };
+
+  const totalCount = await prisma.listing.count({ where });
+  const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
+  const requestedPage = Math.max(1, parseInt(pagina ?? "1", 10) || 1);
+  const page = Math.min(requestedPage, totalPages);
+
   const listings = await prisma.listing.findMany({
-    where: {
-      ...(category ? { category } : {}),
-      ...(q
-        ? {
-            OR: [
-              { title: { contains: q } },
-              { description: { contains: q } },
-            ],
-          }
-        : {}),
-    },
+    where,
     include: {
       images: { take: 1 },
       user: { select: { name: true } },
     },
     orderBy: { createdAt: "desc" },
+    skip: (page - 1) * PAGE_SIZE,
+    take: PAGE_SIZE,
   });
 
-  const showHero = !category && !q;
+  const favoritedIds = user
+    ? new Set(
+        (
+          await prisma.favorite.findMany({
+            where: { userId: user.id, listingId: { in: listings.map((l) => l.id) } },
+            select: { listingId: true },
+          })
+        ).map((f) => f.listingId)
+      )
+    : null;
+
+  const showHero = !category && !q && page === 1;
 
   return (
     <div>
@@ -134,10 +157,13 @@ export default async function Home({ searchParams }: HomeProps) {
                 sellerName={listing.user.name}
                 sold={listing.sold}
                 views={listing.views}
+                isFavorited={favoritedIds ? favoritedIds.has(listing.id) : undefined}
               />
             ))}
           </div>
         )}
+
+        <Pagination page={page} totalPages={totalPages} categoria={category} q={q} />
       </div>
     </div>
   );

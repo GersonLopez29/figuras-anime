@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/session";
+import { sendNewReviewEmail } from "@/lib/email";
 
 const createReviewSchema = z.object({
   sellerId: z.string().min(1),
@@ -42,6 +43,8 @@ export async function POST(request: NextRequest) {
     data: { sellerId, authorId: user.id, rating, comment },
     include: { author: { select: { name: true } } },
   });
+
+  await sendNewReviewEmail(seller.email, seller.name, user.name, rating, comment, seller.id);
 
   return NextResponse.json(review, { status: 201 });
 }

@@ -72,6 +72,13 @@ export default function MobileMenu({ isLoggedIn, userName, isAdmin }: MobileMenu
                     Mis figuras
                   </Link>
                   <Link
+                    href="/favoritos"
+                    onClick={() => setOpen(false)}
+                    className="rounded-md px-2 py-2.5 text-sm font-medium text-zinc-700 hover:bg-zinc-50"
+                  >
+                    Favoritos
+                  </Link>
+                  <Link
                     href="/publicar"
                     onClick={() => setOpen(false)}
                     className="rounded-md px-2 py-2.5 text-sm font-medium text-orange-600 hover:bg-orange-50"

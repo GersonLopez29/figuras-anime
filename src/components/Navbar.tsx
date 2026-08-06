@@ -33,6 +33,12 @@ export default async function Navbar() {
               >
                 Mis figuras
               </Link>
+              <Link
+                href="/favoritos"
+                className="text-sm font-medium text-zinc-600 hover:text-zinc-900"
+              >
+                Favoritos
+              </Link>
               {admin && (
                 <Link
                   href="/admin"

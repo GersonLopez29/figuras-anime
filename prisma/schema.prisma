@@ -13,22 +13,37 @@ datasource db {
 }
 
 model User {
-  id                String            @id @default(cuid())
-  name              String
-  email             String            @unique
-  passwordHash      String
-  whatsapp          String
-  role              String            @default("user")
-  isBlocked         Boolean           @default(false)
-  createdAt         DateTime          @default(now())
-  listings          Listing[]
-  reviewsWritten    Review[]          @relation("ReviewsWritten")
-  reviewsReceived   Review[]          @relation("ReviewsReceived")
-  collectionPosts   CollectionPost[]
-  postComments      PostComment[]
-  postRatings       PostRating[]
-  postReports       PostReport[]
-  categoryRequests  CategoryRequest[]
+  id                         String            @id @default(cuid())
+  name                       String
+  email                      String            @unique
+  passwordHash               String
+  whatsapp                   String
+  role                       String            @default("user")
+  isBlocked                  Boolean           @default(false)
+  emailVerified              Boolean           @default(false)
+  verificationToken          String?           @unique
+  verificationTokenExpiresAt DateTime?
+  createdAt                  DateTime          @default(now())
+  listings                   Listing[]
+  reviewsWritten             Review[]          @relation("ReviewsWritten")
+  reviewsReceived            Review[]          @relation("ReviewsReceived")
+  collectionPosts            CollectionPost[]
+  postComments               PostComment[]
+  postRatings                PostRating[]
+  postReports                PostReport[]
+  categoryRequests           CategoryRequest[]
+  favorites                  Favorite[]
+}
+
+model Favorite {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listingId String
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, listingId])
 }
 
 model Category {
@@ -126,6 +141,7 @@ model Listing {
   userId      String
   user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   images      ListingImage[]
+  favoritedBy Favorite[]
 }
 
 model ListingImage {

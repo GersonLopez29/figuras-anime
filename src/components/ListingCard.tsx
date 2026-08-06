@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { formatPrice } from "@/lib/format";
+import FavoriteButton from "@/components/FavoriteButton";
 
 type ListingCardProps = {
   id: string;
@@ -11,6 +12,7 @@ type ListingCardProps = {
   sellerName?: string;
   sold?: boolean;
   views?: number;
+  isFavorited?: boolean;
 };
 
 export default function ListingCard({
@@ -22,6 +24,7 @@ export default function ListingCard({
   sellerName,
   sold,
   views,
+  isFavorited,
 }: ListingCardProps) {
   return (
     <Link
@@ -45,6 +48,9 @@ export default function ListingCard({
         <span className="absolute left-2 top-2 rounded-full bg-red-600 px-2.5 py-1 text-xs font-semibold text-white shadow-sm">
           {category}
         </span>
+        {typeof isFavorited === "boolean" && (
+          <FavoriteButton listingId={id} initialFavorited={isFavorited} />
+        )}
         {sold && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/40">
             <span className="-rotate-12 rounded bg-zinc-900 px-3 py-1 text-sm font-extrabold uppercase tracking-wide text-white shadow-lg">

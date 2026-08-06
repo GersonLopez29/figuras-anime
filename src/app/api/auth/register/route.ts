@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
+import { randomBytes } from "crypto";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { createSession } from "@/lib/session";
+import { sendVerificationEmail } from "@/lib/email";
 
 const registerSchema = z.object({
   name: z.string().trim().min(2, "El nombre debe tener al menos 2 caracteres"),
@@ -36,12 +38,22 @@ export async function POST(request: Request) {
   }
 
   const passwordHash = await bcrypt.hash(password, 10);
+  const verificationToken = randomBytes(32).toString("hex");
+  const verificationTokenExpiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24); // 24h
 
   const user = await prisma.user.create({
-    data: { name, email, passwordHash, whatsapp },
+    data: {
+      name,
+      email,
+      passwordHash,
+      whatsapp,
+      verificationToken,
+      verificationTokenExpiresAt,
+    },
   });
 
   await createSession(user.id);
+  await sendVerificationEmail(user.email, user.name, verificationToken);
 
   return NextResponse.json({ id: user.id, name: user.name, email: user.email });
 }

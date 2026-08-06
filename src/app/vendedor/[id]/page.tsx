@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/session";
 import StarRating from "@/components/StarRating";
@@ -10,6 +11,24 @@ import ListingCard from "@/components/ListingCard";
 type VendedorPageProps = {
   params: Promise<{ id: string }>;
 };
+
+export async function generateMetadata({ params }: VendedorPageProps): Promise<Metadata> {
+  const { id } = await params;
+  const seller = await prisma.user.findUnique({ where: { id }, select: { name: true } });
+
+  if (!seller) {
+    return { title: "Vendedor no encontrado — FigurasAnime" };
+  }
+
+  const title = `${seller.name} — Perfil de vendedor | FigurasAnime`;
+  const description = `Figuras de anime publicadas por ${seller.name} y sus reseñas como vendedor en FigurasAnime.`;
+
+  return {
+    title,
+    description,
+    openGraph: { title, description, type: "profile" },
+  };
+}
 
 export default async function VendedorPage({ params }: VendedorPageProps) {
   const { id } = await params;
@@ -41,6 +60,20 @@ export default async function VendedorPage({ params }: VendedorPageProps) {
 
   const isOwnProfile = currentUser?.id === seller.id;
 
+  const favoritedIds = currentUser
+    ? new Set(
+        (
+          await prisma.favorite.findMany({
+            where: {
+              userId: currentUser.id,
+              listingId: { in: seller.listings.map((l) => l.id) },
+            },
+            select: { listingId: true },
+          })
+        ).map((f) => f.listingId)
+      )
+    : null;
+
   return (
     <div className="mx-auto max-w-3xl px-4 py-10">
       <div className="rounded-lg border border-zinc-200 bg-white p-6">
@@ -66,6 +99,7 @@ export default async function VendedorPage({ params }: VendedorPageProps) {
                 imageUrl={listing.images[0]?.url}
                 sold={listing.sold}
                 views={listing.views}
+                isFavorited={favoritedIds ? favoritedIds.has(listing.id) : undefined}
               />
             ))}
           </div>

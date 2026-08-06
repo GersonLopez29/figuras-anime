@@ -48,6 +48,7 @@ export async function getCurrentUser() {
         whatsapp: true,
         role: true,
         isBlocked: true,
+        emailVerified: true,
       },
     });
 

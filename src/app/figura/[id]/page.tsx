@@ -1,16 +1,56 @@
 import Link from "next/link";
 import { cache } from "react";
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { prisma } from "@/lib/db";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 import { formatPrice } from "@/lib/format";
 import { getCurrentUser } from "@/lib/session";
 import ListingGallery from "@/components/ListingGallery";
 import StarRating from "@/components/StarRating";
+import FavoriteButton from "@/components/FavoriteButton";
 
 type FiguraPageProps = {
   params: Promise<{ id: string }>;
 };
+
+export async function generateMetadata({ params }: FiguraPageProps): Promise<Metadata> {
+  const { id } = await params;
+  const listing = await prisma.listing.findUnique({
+    where: { id },
+    select: {
+      title: true,
+      description: true,
+      price: true,
+      images: { take: 1, select: { url: true } },
+    },
+  });
+
+  if (!listing) {
+    return { title: "Figura no encontrada — FigurasAnime" };
+  }
+
+  const title = `${listing.title} — ${formatPrice(listing.price)} | FigurasAnime`;
+  const description = listing.description.slice(0, 155);
+  const image = listing.images[0]?.url;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: "website",
+      images: image ? [{ url: image }] : undefined,
+    },
+    twitter: {
+      card: image ? "summary_large_image" : "summary",
+      title,
+      description,
+      images: image ? [image] : undefined,
+    },
+  };
+}
 
 // cache() evita que un doble-render de este Server Component (algo que
 // Next.js puede hacer en la misma petición) cuente la visita dos veces.
@@ -61,6 +101,12 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
     ? buildWhatsAppLink(listing.user.whatsapp, message)
     : null;
 
+  const isFavorited = currentUser
+    ? !!(await prisma.favorite.findUnique({
+        where: { userId_listingId: { userId: currentUser.id, listingId: listing.id } },
+      }))
+    : false;
+
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
       <Link href="/" className="text-sm text-zinc-500 hover:text-zinc-800">
@@ -85,7 +131,16 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
               {views} {views === 1 ? "vista" : "vistas"}
             </span>
           </div>
-          <h1 className="mt-3 text-2xl font-bold text-zinc-900">{listing.title}</h1>
+          <div className="mt-3 flex items-start justify-between gap-3">
+            <h1 className="text-2xl font-bold text-zinc-900">{listing.title}</h1>
+            {currentUser && (
+              <FavoriteButton
+                listingId={listing.id}
+                initialFavorited={isFavorited}
+                variant="inline"
+              />
+            )}
+          </div>
           <p className="mt-2 text-3xl font-bold text-orange-600">
             {formatPrice(listing.price)}
           </p>

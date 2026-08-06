@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { prisma } from "@/lib/db";
 import { getCurrentUser, isAdmin } from "@/lib/session";
 import ListingGallery from "@/components/ListingGallery";
@@ -12,6 +13,43 @@ import ReportPostButton from "@/components/ReportPostButton";
 type ComunidadDetailPageProps = {
   params: Promise<{ id: string }>;
 };
+
+export async function generateMetadata({ params }: ComunidadDetailPageProps): Promise<Metadata> {
+  const { id } = await params;
+  const post = await prisma.collectionPost.findUnique({
+    where: { id },
+    select: {
+      caption: true,
+      author: { select: { name: true } },
+      images: { take: 1, select: { url: true } },
+    },
+  });
+
+  if (!post) {
+    return { title: "Publicación no encontrada — FigurasAnime" };
+  }
+
+  const title = `${post.author.name} en Comunidad | FigurasAnime`;
+  const description = post.caption.slice(0, 155);
+  const image = post.images[0]?.url;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: "article",
+      images: image ? [{ url: image }] : undefined,
+    },
+    twitter: {
+      card: image ? "summary_large_image" : "summary",
+      title,
+      description,
+      images: image ? [image] : undefined,
+    },
+  };
+}
 
 export default async function ComunidadDetailPage({ params }: ComunidadDetailPageProps) {
   const { id } = await params;
