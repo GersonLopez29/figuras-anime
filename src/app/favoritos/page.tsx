@@ -41,6 +41,7 @@ export default async function FavoritosPage() {
               price={listing.price}
               discountAmount={getActiveDiscountAmount(listing.discountAmount, listing.discountExpiresAt)}
               category={listing.category}
+              condition={listing.condition}
               imageUrl={listing.images[0]?.url}
               sellerName={listing.user.name}
               sold={listing.sold}

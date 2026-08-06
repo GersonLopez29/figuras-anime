@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useRef, useState, FormEvent, ChangeEvent, DragEvent } from "react";
 import Image from "next/image";
 import CategoryRequestForm from "@/components/CategoryRequestForm";
+import { CONDITION_OPTIONS, USED_CONDITION_OPTIONS, isNewCondition } from "@/lib/condition";
 
 type ExistingImage = { id: string; url: string };
 type CategoryOption = { name: string; icon: string };
@@ -20,6 +21,7 @@ type ListingFormProps =
       initialDescription: string;
       initialPrice: number;
       initialCategory: string;
+      initialCondition: string;
       initialImages: ExistingImage[];
       categories: CategoryOption[];
     };
@@ -33,6 +35,9 @@ export default function ListingForm(props: ListingFormProps) {
   const [price, setPrice] = useState(isEdit ? String(props.initialPrice) : "");
   const [category, setCategory] = useState(
     isEdit ? props.initialCategory : (props.categories[0]?.name ?? "")
+  );
+  const [condition, setCondition] = useState(
+    isEdit ? props.initialCondition : CONDITION_OPTIONS[0].value
   );
   const [existingImages, setExistingImages] = useState<ExistingImage[]>(
     isEdit ? props.initialImages : []
@@ -86,6 +91,7 @@ export default function ListingForm(props: ListingFormProps) {
     formData.set("description", description);
     formData.set("price", price);
     formData.set("category", category);
+    formData.set("condition", condition);
     newFiles.forEach((file) => formData.append("images", file));
     if (isEdit) {
       removedImageIds.forEach((id) => formData.append("removeImageIds", id));
@@ -168,6 +174,48 @@ export default function ListingForm(props: ListingFormProps) {
           </select>
           <CategoryRequestForm />
         </div>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-zinc-700">Estado</label>
+        <div className="mt-1 flex gap-2">
+          <button
+            type="button"
+            onClick={() => setCondition("nuevo")}
+            className={`flex-1 rounded-md border px-3 py-2 text-sm font-medium ${
+              isNewCondition(condition)
+                ? "border-orange-500 bg-orange-50 text-orange-700"
+                : "border-zinc-300 text-zinc-600 hover:border-orange-300"
+            }`}
+          >
+            🆕 Nueva
+          </button>
+          <button
+            type="button"
+            onClick={() => setCondition(USED_CONDITION_OPTIONS[0].value)}
+            className={`flex-1 rounded-md border px-3 py-2 text-sm font-medium ${
+              !isNewCondition(condition)
+                ? "border-orange-500 bg-orange-50 text-orange-700"
+                : "border-zinc-300 text-zinc-600 hover:border-orange-300"
+            }`}
+          >
+            ♻️ Usada
+          </button>
+        </div>
+
+        {!isNewCondition(condition) && (
+          <select
+            value={condition}
+            onChange={(e) => setCondition(e.target.value)}
+            className="mt-2 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-orange-500 focus:outline-none"
+          >
+            {USED_CONDITION_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+        )}
       </div>
 
       <div>

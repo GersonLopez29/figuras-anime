@@ -7,6 +7,7 @@ import DeleteListingButton from "@/components/DeleteListingButton";
 import ToggleSoldButton from "@/components/ToggleSoldButton";
 import DiscountControl from "@/components/DiscountControl";
 import { formatPrice, getFinalPrice, getActiveDiscountAmount } from "@/lib/format";
+import { getConditionLabel } from "@/lib/condition";
 
 export default async function MisFigurasPage() {
   const user = await getCurrentUser();
@@ -81,7 +82,7 @@ export default async function MisFigurasPage() {
                   ) : (
                     formatPrice(listing.price)
                   )}{" "}
-                  · {listing.category}
+                  · {listing.category} · {getConditionLabel(listing.condition)}
                 </p>
                 <p className="flex items-center gap-1 text-xs text-zinc-400">
                   <span aria-hidden="true">👁️</span>

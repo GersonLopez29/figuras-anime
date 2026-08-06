@@ -6,6 +6,7 @@ import { prisma } from "@/lib/db";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 import { formatPrice, getFinalPrice, getActiveDiscountAmount, getDaysRemaining } from "@/lib/format";
 import { getCurrentUser } from "@/lib/session";
+import { getConditionLabel, getConditionIcon } from "@/lib/condition";
 import ListingGallery from "@/components/ListingGallery";
 import StarRating from "@/components/StarRating";
 import FavoriteButton from "@/components/FavoriteButton";
@@ -130,6 +131,9 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
           <div className="flex flex-wrap items-center gap-2">
             <span className="inline-block rounded-full bg-zinc-100 px-3 py-1 text-xs font-medium text-zinc-600">
               {listing.category}
+            </span>
+            <span className="inline-block rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700">
+              {getConditionIcon(listing.condition)} {getConditionLabel(listing.condition)}
             </span>
             {listing.sold && (
               <span className="inline-block rounded-full bg-zinc-800 px-3 py-1 text-xs font-semibold text-white">

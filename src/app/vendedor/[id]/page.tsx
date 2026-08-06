@@ -98,6 +98,7 @@ export default async function VendedorPage({ params }: VendedorPageProps) {
                 price={listing.price}
                 discountAmount={getActiveDiscountAmount(listing.discountAmount, listing.discountExpiresAt)}
                 category={listing.category}
+                condition={listing.condition}
                 imageUrl={listing.images[0]?.url}
                 sold={listing.sold}
                 views={listing.views}

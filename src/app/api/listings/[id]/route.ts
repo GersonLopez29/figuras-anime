@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { getCurrentUser, isAdmin } from "@/lib/session";
 import { saveUploadedImage, deleteUploadedImage } from "@/lib/uploads";
 import { isValidCategory } from "@/lib/categories";
+import { isValidCondition } from "@/lib/condition";
 
 export async function GET(
   _request: NextRequest,
@@ -31,6 +32,7 @@ const updateListingSchema = z.object({
   description: z.string().trim().min(10, "Describe un poco más la figura"),
   price: z.coerce.number().positive("El precio debe ser mayor a 0"),
   category: z.string().trim().min(1, "Selecciona una categoría"),
+  condition: z.string().trim().min(1, "Indica el estado de la figura"),
 });
 
 export async function PATCH(
@@ -61,6 +63,7 @@ export async function PATCH(
     description: formData.get("description"),
     price: formData.get("price"),
     category: formData.get("category"),
+    condition: formData.get("condition"),
   });
 
   if (!parsed.success) {
@@ -68,6 +71,9 @@ export async function PATCH(
       { error: parsed.error.issues[0].message },
       { status: 400 }
     );
+  }
+  if (!isValidCondition(parsed.data.condition)) {
+    return NextResponse.json({ error: "Selecciona un estado válido" }, { status: 400 });
   }
   if (!(await isValidCategory(parsed.data.category))) {
     return NextResponse.json({ error: "Selecciona una categoría válida" }, { status: 400 });

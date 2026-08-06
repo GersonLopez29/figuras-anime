@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/session";
 import { saveUploadedImage } from "@/lib/uploads";
 import { getCategoryNames, isValidCategory } from "@/lib/categories";
+import { isValidCondition } from "@/lib/condition";
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
@@ -39,6 +40,7 @@ const createListingSchema = z.object({
   description: z.string().trim().min(10, "Describe un poco más la figura"),
   price: z.coerce.number().positive("El precio debe ser mayor a 0"),
   category: z.string().trim().min(1, "Selecciona una categoría"),
+  condition: z.string().trim().min(1, "Indica el estado de la figura"),
 });
 
 export async function POST(request: NextRequest) {
@@ -54,6 +56,7 @@ export async function POST(request: NextRequest) {
     description: formData.get("description"),
     price: formData.get("price"),
     category: formData.get("category"),
+    condition: formData.get("condition"),
   });
 
   if (!parsed.success) {
@@ -61,6 +64,9 @@ export async function POST(request: NextRequest) {
       { error: parsed.error.issues[0].message },
       { status: 400 }
     );
+  }
+  if (!isValidCondition(parsed.data.condition)) {
+    return NextResponse.json({ error: "Selecciona un estado válido" }, { status: 400 });
   }
   if (!(await isValidCategory(parsed.data.category))) {
     return NextResponse.json({ error: "Selecciona una categoría válida" }, { status: 400 });

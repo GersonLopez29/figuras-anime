@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { formatPrice, getFinalPrice } from "@/lib/format";
+import { isNewCondition } from "@/lib/condition";
 import FavoriteButton from "@/components/FavoriteButton";
 
 type ListingCardProps = {
@@ -9,6 +10,7 @@ type ListingCardProps = {
   price: number;
   discountAmount?: number | null;
   category: string;
+  condition?: string;
   imageUrl?: string;
   sellerName?: string;
   sold?: boolean;
@@ -22,6 +24,7 @@ export default function ListingCard({
   price,
   discountAmount,
   category,
+  condition,
   imageUrl,
   sellerName,
   sold,
@@ -55,6 +58,11 @@ export default function ListingCard({
         {hasDiscount && (
           <span className="absolute left-2 bottom-2 rounded-full bg-green-600 px-2.5 py-1 text-xs font-bold text-white shadow-sm">
             Oferta
+          </span>
+        )}
+        {!sold && condition && (
+          <span className="absolute right-2 bottom-2 rounded-full bg-white/90 px-2.5 py-1 text-xs font-semibold text-zinc-700 shadow-sm backdrop-blur">
+            {isNewCondition(condition) ? "🆕 Nueva" : "♻️ Usada"}
           </span>
         )}
         {typeof isFavorited === "boolean" && (

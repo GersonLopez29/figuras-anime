@@ -139,6 +139,7 @@ model Listing {
   discountAmount    Float?
   discountExpiresAt DateTime?
   category          String
+  condition         String         @default("nuevo")
   sold              Boolean        @default(false)
   views             Int            @default(0)
   createdAt         DateTime       @default(now())
