@@ -5,7 +5,8 @@ import { getCurrentUser } from "@/lib/session";
 import { prisma } from "@/lib/db";
 import DeleteListingButton from "@/components/DeleteListingButton";
 import ToggleSoldButton from "@/components/ToggleSoldButton";
-import { formatPrice } from "@/lib/format";
+import DiscountControl from "@/components/DiscountControl";
+import { formatPrice, getFinalPrice } from "@/lib/format";
 
 export default async function MisFigurasPage() {
   const user = await getCurrentUser();
@@ -65,12 +66,25 @@ export default async function MisFigurasPage() {
                   )}
                 </div>
                 <p className="text-sm text-zinc-500">
-                  {formatPrice(listing.price)} · {listing.category}
+                  {listing.discountAmount ? (
+                    <>
+                      <span className="mr-1.5 line-through">{formatPrice(listing.price)}</span>
+                      <span className="font-semibold text-green-700">
+                        {formatPrice(getFinalPrice(listing.price, listing.discountAmount))}
+                      </span>
+                    </>
+                  ) : (
+                    formatPrice(listing.price)
+                  )}{" "}
+                  · {listing.category}
                 </p>
                 <p className="flex items-center gap-1 text-xs text-zinc-400">
                   <span aria-hidden="true">👁️</span>
                   {listing.views} {listing.views === 1 ? "vista" : "vistas"}
                 </p>
+                <div className="mt-1.5">
+                  <DiscountControl listingId={listing.id} discountAmount={listing.discountAmount} />
+                </div>
               </div>
 
               <div className="flex flex-wrap items-center justify-end gap-3">

@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { prisma } from "@/lib/db";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
-import { formatPrice } from "@/lib/format";
+import { formatPrice, getFinalPrice } from "@/lib/format";
 import { getCurrentUser } from "@/lib/session";
 import ListingGallery from "@/components/ListingGallery";
 import StarRating from "@/components/StarRating";
@@ -127,6 +127,11 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
                 Vendido
               </span>
             )}
+            {!listing.sold && !!listing.discountAmount && (
+              <span className="inline-block rounded-full bg-green-600 px-3 py-1 text-xs font-bold text-white">
+                Oferta
+              </span>
+            )}
             <span className="inline-flex items-center gap-1 text-xs text-zinc-400">
               <span aria-hidden="true">👁️</span>
               {views} {views === 1 ? "vista" : "vistas"}
@@ -142,9 +147,20 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
               />
             )}
           </div>
-          <p className="mt-2 text-3xl font-bold text-orange-600">
-            {formatPrice(listing.price)}
-          </p>
+          {!listing.sold && listing.discountAmount ? (
+            <p className="mt-2 flex items-baseline gap-2">
+              <span className="text-lg text-zinc-400 line-through">
+                {formatPrice(listing.price)}
+              </span>
+              <span className="text-3xl font-bold text-green-700">
+                {formatPrice(getFinalPrice(listing.price, listing.discountAmount))}
+              </span>
+            </p>
+          ) : (
+            <p className="mt-2 text-3xl font-bold text-orange-600">
+              {formatPrice(listing.price)}
+            </p>
+          )}
 
           <p className="mt-4 whitespace-pre-line text-sm leading-relaxed text-zinc-700">
             {listing.description}

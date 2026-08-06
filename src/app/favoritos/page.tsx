@@ -38,6 +38,7 @@ export default async function FavoritosPage() {
               id={listing.id}
               title={listing.title}
               price={listing.price}
+              discountAmount={listing.discountAmount}
               category={listing.category}
               imageUrl={listing.images[0]?.url}
               sellerName={listing.user.name}

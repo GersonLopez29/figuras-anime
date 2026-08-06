@@ -1,12 +1,13 @@
 import Link from "next/link";
 import Image from "next/image";
-import { formatPrice } from "@/lib/format";
+import { formatPrice, getFinalPrice } from "@/lib/format";
 import FavoriteButton from "@/components/FavoriteButton";
 
 type ListingCardProps = {
   id: string;
   title: string;
   price: number;
+  discountAmount?: number | null;
   category: string;
   imageUrl?: string;
   sellerName?: string;
@@ -19,6 +20,7 @@ export default function ListingCard({
   id,
   title,
   price,
+  discountAmount,
   category,
   imageUrl,
   sellerName,
@@ -26,6 +28,8 @@ export default function ListingCard({
   views,
   isFavorited,
 }: ListingCardProps) {
+  const finalPrice = getFinalPrice(price, discountAmount);
+  const hasDiscount = !!discountAmount && !sold;
   return (
     <Link
       href={`/figura/${id}`}
@@ -48,6 +52,11 @@ export default function ListingCard({
         <span className="absolute left-2 top-2 rounded-full bg-red-600 px-2.5 py-1 text-xs font-semibold text-white shadow-sm">
           {category}
         </span>
+        {hasDiscount && (
+          <span className="absolute left-2 bottom-2 rounded-full bg-green-600 px-2.5 py-1 text-xs font-bold text-white shadow-sm">
+            Oferta
+          </span>
+        )}
         {typeof isFavorited === "boolean" && (
           <FavoriteButton listingId={id} initialFavorited={isFavorited} />
         )}
@@ -61,9 +70,14 @@ export default function ListingCard({
       </div>
       <div className="p-3">
         <h3 className="line-clamp-1 text-sm font-medium text-zinc-900">{title}</h3>
-        <p className="mt-1 text-base font-bold text-orange-600">
-          {formatPrice(price)}
-        </p>
+        {hasDiscount ? (
+          <p className="mt-1 flex items-center gap-1.5">
+            <span className="text-xs text-zinc-400 line-through">{formatPrice(price)}</span>
+            <span className="text-base font-bold text-green-700">{formatPrice(finalPrice)}</span>
+          </p>
+        ) : (
+          <p className="mt-1 text-base font-bold text-orange-600">{formatPrice(price)}</p>
+        )}
         <div className="mt-0.5 flex items-center justify-between gap-2">
           {sellerName && (
             <p className="truncate text-xs text-zinc-400">Vende: {sellerName}</p>
