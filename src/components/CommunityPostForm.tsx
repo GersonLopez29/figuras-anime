@@ -63,7 +63,10 @@ export default function CommunityPostForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-5 rounded-2xl border border-zinc-100 bg-white p-6 shadow-sm sm:p-8"
+    >
       <div>
         <label className="block text-sm font-medium text-zinc-700">
           Cuéntanos sobre tu colección
@@ -74,7 +77,7 @@ export default function CommunityPostForm() {
           value={caption}
           onChange={(e) => setCaption(e.target.value)}
           placeholder="Ej: Mi rincón de Dragon Ball después de 5 años coleccionando..."
-          className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-orange-500 focus:outline-none"
+          className="mt-1 w-full rounded-xl border border-zinc-300 px-3 py-2.5 text-sm focus:border-orange-500 focus:outline-none focus:ring-4 focus:ring-orange-100"
         />
       </div>
 
@@ -107,7 +110,7 @@ export default function CommunityPostForm() {
           }}
           onDragLeave={() => setIsDragging(false)}
           onDrop={handleDrop}
-          className={`mt-1 flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed px-4 py-8 text-center transition-colors ${
+          className={`mt-1 flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed px-4 py-8 text-center transition-colors ${
             isDragging
               ? "border-orange-500 bg-orange-50"
               : "border-zinc-300 bg-zinc-50 hover:border-orange-400 hover:bg-orange-50"
@@ -138,7 +141,7 @@ export default function CommunityPostForm() {
             {files.map((file, index) => (
               <div
                 key={index}
-                className="relative aspect-square overflow-hidden rounded-md border border-zinc-200 bg-zinc-100"
+                className="relative aspect-square overflow-hidden rounded-xl border border-zinc-200 bg-zinc-100"
               >
                 <Image
                   src={URL.createObjectURL(file)}
@@ -165,7 +168,7 @@ export default function CommunityPostForm() {
       <button
         type="submit"
         disabled={loading}
-        className="w-full rounded-full bg-orange-600 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-700 disabled:opacity-60"
+        className="w-full rounded-full bg-orange-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-orange-600/20 transition hover:-translate-y-0.5 hover:bg-orange-700 hover:shadow-lg disabled:pointer-events-none disabled:opacity-60"
       >
         {loading ? "Publicando..." : "Publicar en la comunidad"}
       </button>
