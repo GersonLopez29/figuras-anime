@@ -11,9 +11,21 @@ type Slide = {
 };
 
 const SLIDES: Slide[] = [
-  { src: "/banners/banner-1.jpg", alt: "Nuevas figuras cada semana", href: "/#catalogo" },
-  { src: "/banners/banner-2.jpg", alt: "Ofertas por tiempo limitado", href: "/?oferta=1#catalogo" },
-  { src: "/banners/banner-3.jpg", alt: "Únete a la comunidad", href: "/comunidad" },
+  {
+    src: "/banners/banner-1.jpg",
+    alt: "Okarun Transformed — Luminasta Vol. 2, Dandadan",
+    href: "/figura/cmsflkuh2000604laquhof3qa",
+  },
+  {
+    src: "/banners/banner-2.jpg",
+    alt: "Son Goku GT — S.H.Figuarts",
+    href: "/figura/cmsf6vaj6000804l2x4ajpyqx",
+  },
+  {
+    src: "/banners/banner-3.jpg",
+    alt: "Garp Ichiban Kuji Masterlise — One Piece",
+    href: "/figura/cmsf9kuny000004lcgeylb34i",
+  },
 ];
 
 const INTERVAL_MS = 5000;
@@ -32,7 +44,7 @@ export default function BannerCarousel() {
 
   return (
     <div
-      className="relative mx-auto mt-6 aspect-[16/6] w-full max-w-6xl overflow-hidden rounded-2xl shadow-sm sm:aspect-[16/5]"
+      className="relative mx-auto mt-6 aspect-[16/5] w-full max-w-6xl overflow-hidden rounded-2xl shadow-sm"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
