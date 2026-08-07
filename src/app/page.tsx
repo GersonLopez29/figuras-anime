@@ -5,6 +5,7 @@ import ListingCard from "@/components/ListingCard";
 import CategoryFilter from "@/components/CategoryFilter";
 import ListingFilters from "@/components/ListingFilters";
 import WelcomeBanner from "@/components/WelcomeBanner";
+import BannerCarousel from "@/components/BannerCarousel";
 import Pagination from "@/components/Pagination";
 import { getActiveDiscountAmount } from "@/lib/format";
 
@@ -85,6 +86,8 @@ export default async function Home({ searchParams }: HomeProps) {
   return (
     <div>
       {bienvenida && <WelcomeBanner name={bienvenida} />}
+
+      {showHero && <BannerCarousel />}
 
       {showHero && (
         <section className="relative overflow-hidden bg-gradient-to-br from-orange-50 via-orange-50 to-red-50">
