@@ -150,13 +150,14 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
                 Vendido
               </span>
             )}
-            <span className="ml-auto flex items-center gap-1 text-xs text-zinc-400">
-              <span aria-hidden="true">👁️</span>
-              {views} {views === 1 ? "vista" : "vistas"}
-            </span>
           </div>
 
-          <div className="mt-4 flex items-start justify-between gap-3">
+          <div className="mt-2 flex items-center gap-1 text-xs text-zinc-400">
+            <span aria-hidden="true">👁️</span>
+            {views} {views === 1 ? "vista" : "vistas"}
+          </div>
+
+          <div className="mt-3 flex items-start justify-between gap-3">
             <h1 className="text-2xl font-bold text-zinc-900">{listing.title}</h1>
             {currentUser && (
               <FavoriteButton

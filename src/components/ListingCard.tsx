@@ -79,12 +79,12 @@ export default function ListingCard({
           </span>
         )}
         {hasDiscount ? (
-          <p className="mt-1.5 flex items-center gap-1.5">
+          <p className="mt-1.5 flex flex-wrap items-baseline gap-1.5">
             <span className="text-xs text-zinc-400 line-through">{formatPrice(price)}</span>
-            <span className="text-lg font-bold text-green-700">{formatPrice(finalPrice)}</span>
+            <span className="text-base font-bold text-green-700 sm:text-lg">{formatPrice(finalPrice)}</span>
           </p>
         ) : (
-          <p className="mt-1.5 text-lg font-bold text-orange-600">{formatPrice(price)}</p>
+          <p className="mt-1.5 text-base font-bold text-orange-600 sm:text-lg">{formatPrice(price)}</p>
         )}
         <div className="mt-1 flex items-center justify-between gap-2 border-t border-zinc-100 pt-1.5">
           {sellerName && (
