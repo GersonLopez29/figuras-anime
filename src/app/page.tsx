@@ -143,8 +143,6 @@ export default async function Home({ searchParams }: HomeProps) {
     <div>
       {bienvenida && <WelcomeBanner name={bienvenida} />}
 
-      {showHero && bannerSlides.length > 0 && <BannerCarousel slides={bannerSlides} />}
-
       {showHero && (
         <section className="relative overflow-hidden bg-gradient-to-br from-orange-50 via-orange-50 to-red-50">
           <div
@@ -155,34 +153,44 @@ export default async function Home({ searchParams }: HomeProps) {
             aria-hidden="true"
             className="pointer-events-none absolute -bottom-24 left-1/3 h-64 w-64 rounded-full bg-red-200/30 blur-3xl"
           />
-          <div className="relative mx-auto max-w-6xl px-4 py-16 text-center sm:text-left">
-            <p className="inline-block rounded-full bg-white/70 px-3 py-1 text-sm font-semibold uppercase tracking-wide text-red-600 shadow-sm ring-1 ring-red-100">
-              ¡Coleccionar nunca fue tan fácil!
-            </p>
-            <h1 className="mt-4 max-w-2xl text-3xl font-extrabold tracking-tight text-zinc-900 sm:text-5xl">
-              Compra y vende{" "}
-              <span className="bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">
-                figuras de anime
-              </span>
-            </h1>
-            <p className="mt-4 max-w-xl text-sm text-zinc-600 sm:text-base">
-              Naruto, Dragon Ball Z, One Piece y muchas más. Publica las figuras que ya
-              no usas o encuentra tu próxima pieza de colección, y coordina todo directo
-              por WhatsApp.
-            </p>
-            <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-              <a
-                href={sellCtaHref}
-                className="inline-block rounded-full bg-red-600 px-6 py-3 text-sm font-bold text-white shadow-md shadow-red-600/20 transition hover:-translate-y-0.5 hover:bg-red-700 hover:shadow-lg"
-              >
-                Empieza a vender
-              </a>
-              <a
-                href="#catalogo"
-                className="inline-block rounded-full border border-orange-300 bg-white px-6 py-3 text-sm font-bold text-orange-700 transition hover:-translate-y-0.5 hover:bg-orange-100"
-              >
-                Explorar catálogo
-              </a>
+          <div className="relative mx-auto max-w-6xl px-4 py-12 sm:py-16">
+            <div
+              className={`grid items-center gap-10 ${
+                bannerSlides.length > 0 ? "lg:grid-cols-2" : ""
+              }`}
+            >
+              <div className="text-center sm:text-left">
+                <p className="inline-block rounded-full bg-white/70 px-3 py-1 text-sm font-semibold uppercase tracking-wide text-red-600 shadow-sm ring-1 ring-red-100">
+                  ¡Coleccionar nunca fue tan fácil!
+                </p>
+                <h1 className="mt-4 max-w-2xl text-3xl font-extrabold tracking-tight text-zinc-900 sm:text-5xl">
+                  Compra y vende{" "}
+                  <span className="bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">
+                    figuras de anime
+                  </span>
+                </h1>
+                <p className="mt-4 max-w-xl text-sm text-zinc-600 sm:text-base">
+                  Naruto, Dragon Ball Z, One Piece y muchas más. Publica las figuras que ya
+                  no usas o encuentra tu próxima pieza de colección, y coordina todo directo
+                  por WhatsApp.
+                </p>
+                <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:justify-center lg:justify-start">
+                  <a
+                    href={sellCtaHref}
+                    className="inline-block rounded-full bg-red-600 px-6 py-3 text-sm font-bold text-white shadow-md shadow-red-600/20 transition hover:-translate-y-0.5 hover:bg-red-700 hover:shadow-lg"
+                  >
+                    Empieza a vender
+                  </a>
+                  <a
+                    href="#catalogo"
+                    className="inline-block rounded-full border border-orange-300 bg-white px-6 py-3 text-sm font-bold text-orange-700 transition hover:-translate-y-0.5 hover:bg-orange-100"
+                  >
+                    Explorar catálogo
+                  </a>
+                </div>
+              </div>
+
+              {bannerSlides.length > 0 && <BannerCarousel slides={bannerSlides} />}
             </div>
           </div>
         </section>
