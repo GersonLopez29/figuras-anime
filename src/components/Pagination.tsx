@@ -5,15 +5,26 @@ type PaginationProps = {
   totalPages: number;
   categoria?: string;
   q?: string;
+  estado?: "nuevo" | "usado";
+  oferta?: boolean;
 };
 
-export default function Pagination({ page, totalPages, categoria, q }: PaginationProps) {
+export default function Pagination({
+  page,
+  totalPages,
+  categoria,
+  q,
+  estado,
+  oferta,
+}: PaginationProps) {
   if (totalPages <= 1) return null;
 
   function hrefFor(p: number) {
     const params = new URLSearchParams();
     if (categoria) params.set("categoria", categoria);
     if (q) params.set("q", q);
+    if (estado) params.set("estado", estado);
+    if (oferta) params.set("oferta", "1");
     if (p > 1) params.set("pagina", String(p));
     const qs = params.toString();
     return `${qs ? `/?${qs}` : "/"}#catalogo`;

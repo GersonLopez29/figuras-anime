@@ -3,6 +3,7 @@ import { getCategories } from "@/lib/categories";
 import { getCurrentUser } from "@/lib/session";
 import ListingCard from "@/components/ListingCard";
 import CategoryFilter from "@/components/CategoryFilter";
+import ListingFilters from "@/components/ListingFilters";
 import WelcomeBanner from "@/components/WelcomeBanner";
 import Pagination from "@/components/Pagination";
 import { getActiveDiscountAmount } from "@/lib/format";
@@ -10,17 +11,30 @@ import { getActiveDiscountAmount } from "@/lib/format";
 const PAGE_SIZE = 24;
 
 type HomeProps = {
-  searchParams: Promise<{ categoria?: string; q?: string; bienvenida?: string; pagina?: string }>;
+  searchParams: Promise<{
+    categoria?: string;
+    q?: string;
+    bienvenida?: string;
+    pagina?: string;
+    estado?: string;
+    oferta?: string;
+  }>;
 };
 
 export default async function Home({ searchParams }: HomeProps) {
-  const { categoria, q, bienvenida, pagina } = await searchParams;
+  const { categoria, q, bienvenida, pagina, estado: rawEstado, oferta: rawOferta } =
+    await searchParams;
   const [categories, user] = await Promise.all([getCategories(), getCurrentUser()]);
   const category = categories.some((c) => c.name === categoria) ? categoria : undefined;
+  const estado = rawEstado === "nuevo" || rawEstado === "usado" ? rawEstado : undefined;
+  const oferta = rawOferta === "1";
   const sellCtaHref = user ? "/publicar" : "/registro";
 
   const where = {
     ...(category ? { category } : {}),
+    ...(estado === "nuevo" ? { condition: "nuevo" } : {}),
+    ...(estado === "usado" ? { condition: { not: "nuevo" } } : {}),
+    ...(oferta ? { discountAmount: { not: null }, discountExpiresAt: { gt: new Date() } } : {}),
     ...(q
       ? {
           OR: [
@@ -58,7 +72,15 @@ export default async function Home({ searchParams }: HomeProps) {
       )
     : null;
 
-  const showHero = !category && !q && page === 1;
+  const showHero = !category && !q && !estado && !oferta && page === 1;
+
+  const filterLabels: string[] = [];
+  if (category) filterLabels.push(category);
+  if (estado === "nuevo") filterLabels.push("Nuevas");
+  if (estado === "usado") filterLabels.push("Usadas");
+  if (oferta) filterLabels.push("En oferta");
+  if (q) filterLabels.push(`"${q}"`);
+  const heading = filterLabels.length > 0 ? filterLabels.join(" · ") : "Recién publicadas";
 
   return (
     <div>
@@ -136,9 +158,13 @@ export default async function Home({ searchParams }: HomeProps) {
       <div id="catalogo" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-8">
         <CategoryFilter activeCategory={category} q={q} categories={categories} />
 
-        <h2 className="mt-8 flex items-center gap-2 text-lg font-bold text-zinc-900">
+        <div className="mt-4">
+          <ListingFilters estado={estado} oferta={oferta} category={category} q={q} />
+        </div>
+
+        <h2 className="mt-6 flex items-center gap-2 text-lg font-bold text-zinc-900">
           <span aria-hidden="true">🔥</span>
-          {category ? category : q ? `Resultados para "${q}"` : "Recién publicadas"}
+          {heading}
         </h2>
 
         {listings.length === 0 ? (
@@ -166,7 +192,14 @@ export default async function Home({ searchParams }: HomeProps) {
           </div>
         )}
 
-        <Pagination page={page} totalPages={totalPages} categoria={category} q={q} />
+        <Pagination
+          page={page}
+          totalPages={totalPages}
+          categoria={category}
+          q={q}
+          estado={estado}
+          oferta={oferta}
+        />
       </div>
     </div>
   );
