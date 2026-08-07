@@ -56,7 +56,7 @@ export default async function Home({ searchParams }: HomeProps) {
       images: { take: 1 },
       user: { select: { name: true } },
     },
-    orderBy: { createdAt: "desc" },
+    orderBy: [{ sold: "asc" }, { createdAt: "desc" }],
     skip: (page - 1) * PAGE_SIZE,
     take: PAGE_SIZE,
   });
