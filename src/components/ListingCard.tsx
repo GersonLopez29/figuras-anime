@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { formatPrice, getFinalPrice } from "@/lib/format";
-import { isNewCondition } from "@/lib/condition";
+import { isNewCondition, isOpenBoxCondition } from "@/lib/condition";
 import FavoriteButton from "@/components/FavoriteButton";
 
 type ListingCardProps = {
@@ -75,7 +75,11 @@ export default function ListingCard({
         <h3 className="line-clamp-1 text-sm font-medium text-zinc-900">{title}</h3>
         {condition && (
           <span className="mt-1.5 inline-block rounded-full bg-blue-50 px-2 py-0.5 text-[11px] font-medium text-blue-700">
-            {isNewCondition(condition) ? "🆕 Nueva" : "♻️ Usada"}
+            {isNewCondition(condition)
+              ? "🆕 Nueva"
+              : isOpenBoxCondition(condition)
+                ? "📦 Open box"
+                : "♻️ Usada"}
           </span>
         )}
         {hasDiscount ? (

@@ -33,7 +33,7 @@ export default async function Home({ searchParams }: HomeProps) {
   const where = {
     ...(category ? { category } : {}),
     ...(estado === "nuevo" ? { condition: "nuevo" } : {}),
-    ...(estado === "usado" ? { condition: { not: "nuevo" } } : {}),
+    ...(estado === "usado" ? { condition: { notIn: ["nuevo", "open_box"] } } : {}),
     ...(oferta ? { discountAmount: { not: null }, discountExpiresAt: { gt: new Date() } } : {}),
     ...(q
       ? {

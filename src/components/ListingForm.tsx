@@ -4,7 +4,12 @@ import { useRouter } from "next/navigation";
 import { useRef, useState, FormEvent, ChangeEvent, DragEvent } from "react";
 import Image from "next/image";
 import CategoryRequestForm from "@/components/CategoryRequestForm";
-import { CONDITION_OPTIONS, USED_CONDITION_OPTIONS, isNewCondition } from "@/lib/condition";
+import {
+  CONDITION_OPTIONS,
+  USED_CONDITION_OPTIONS,
+  isNewCondition,
+  isOpenBoxCondition,
+} from "@/lib/condition";
 
 type ExistingImage = { id: string; url: string };
 type CategoryOption = { name: string; icon: string };
@@ -195,9 +200,20 @@ export default function ListingForm(props: ListingFormProps) {
           </button>
           <button
             type="button"
+            onClick={() => setCondition("open_box")}
+            className={`flex-1 rounded-xl border px-3 py-2.5 text-sm font-medium transition ${
+              isOpenBoxCondition(condition)
+                ? "border-orange-500 bg-orange-50 text-orange-700"
+                : "border-zinc-300 text-zinc-600 hover:border-orange-300"
+            }`}
+          >
+            📦 Open box
+          </button>
+          <button
+            type="button"
             onClick={() => setCondition(USED_CONDITION_OPTIONS[0].value)}
             className={`flex-1 rounded-xl border px-3 py-2.5 text-sm font-medium transition ${
-              !isNewCondition(condition)
+              !isNewCondition(condition) && !isOpenBoxCondition(condition)
                 ? "border-orange-500 bg-orange-50 text-orange-700"
                 : "border-zinc-300 text-zinc-600 hover:border-orange-300"
             }`}
@@ -206,7 +222,13 @@ export default function ListingForm(props: ListingFormProps) {
           </button>
         </div>
 
-        {!isNewCondition(condition) && (
+        {isOpenBoxCondition(condition) && (
+          <p className="mt-2 text-xs text-zinc-500">
+            La caja se abrió solo para revisarla: la figura no se posó ni se articuló.
+          </p>
+        )}
+
+        {!isNewCondition(condition) && !isOpenBoxCondition(condition) && (
           <select
             value={condition}
             onChange={(e) => setCondition(e.target.value)}
