@@ -115,7 +115,10 @@ export default function ListingForm(props: ListingFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-5 rounded-2xl border border-zinc-100 bg-white p-6 shadow-sm sm:p-8"
+    >
       <div>
         <label className="block text-sm font-medium text-zinc-700">Título</label>
         <input
@@ -124,7 +127,7 @@ export default function ListingForm(props: ListingFormProps) {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Ej: Figura de Goku Ultra Instinto 25cm"
-          className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-orange-500 focus:outline-none"
+          className="mt-1 w-full rounded-xl border border-zinc-300 px-3 py-2.5 text-sm focus:border-orange-500 focus:outline-none focus:ring-4 focus:ring-orange-100"
         />
       </div>
 
@@ -136,7 +139,7 @@ export default function ListingForm(props: ListingFormProps) {
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           placeholder="Estado, material, tamaño, si tiene caja original, etc."
-          className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-orange-500 focus:outline-none"
+          className="mt-1 w-full rounded-xl border border-zinc-300 px-3 py-2.5 text-sm focus:border-orange-500 focus:outline-none focus:ring-4 focus:ring-orange-100"
         />
       </div>
 
@@ -154,7 +157,7 @@ export default function ListingForm(props: ListingFormProps) {
               step="0.01"
               value={price}
               onChange={(e) => setPrice(e.target.value)}
-              className="w-full rounded-md border border-zinc-300 py-2 pl-9 pr-3 text-sm focus:border-orange-500 focus:outline-none"
+              className="w-full rounded-xl border border-zinc-300 py-2.5 pl-9 pr-3 text-sm focus:border-orange-500 focus:outline-none focus:ring-4 focus:ring-orange-100"
             />
           </div>
         </div>
@@ -164,7 +167,7 @@ export default function ListingForm(props: ListingFormProps) {
           <select
             value={category}
             onChange={(e) => setCategory(e.target.value)}
-            className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-orange-500 focus:outline-none"
+            className="mt-1 w-full rounded-xl border border-zinc-300 px-3 py-2.5 text-sm focus:border-orange-500 focus:outline-none focus:ring-4 focus:ring-orange-100"
           >
             {props.categories.map((cat) => (
               <option key={cat.name} value={cat.name}>
@@ -182,7 +185,7 @@ export default function ListingForm(props: ListingFormProps) {
           <button
             type="button"
             onClick={() => setCondition("nuevo")}
-            className={`flex-1 rounded-md border px-3 py-2 text-sm font-medium ${
+            className={`flex-1 rounded-xl border px-3 py-2.5 text-sm font-medium transition ${
               isNewCondition(condition)
                 ? "border-orange-500 bg-orange-50 text-orange-700"
                 : "border-zinc-300 text-zinc-600 hover:border-orange-300"
@@ -193,7 +196,7 @@ export default function ListingForm(props: ListingFormProps) {
           <button
             type="button"
             onClick={() => setCondition(USED_CONDITION_OPTIONS[0].value)}
-            className={`flex-1 rounded-md border px-3 py-2 text-sm font-medium ${
+            className={`flex-1 rounded-xl border px-3 py-2.5 text-sm font-medium transition ${
               !isNewCondition(condition)
                 ? "border-orange-500 bg-orange-50 text-orange-700"
                 : "border-zinc-300 text-zinc-600 hover:border-orange-300"
@@ -207,7 +210,7 @@ export default function ListingForm(props: ListingFormProps) {
           <select
             value={condition}
             onChange={(e) => setCondition(e.target.value)}
-            className="mt-2 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-orange-500 focus:outline-none"
+            className="mt-2 w-full rounded-xl border border-zinc-300 px-3 py-2.5 text-sm focus:border-orange-500 focus:outline-none focus:ring-4 focus:ring-orange-100"
           >
             {USED_CONDITION_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>
@@ -248,7 +251,7 @@ export default function ListingForm(props: ListingFormProps) {
           }}
           onDragLeave={() => setIsDragging(false)}
           onDrop={handleDrop}
-          className={`mt-1 flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed px-4 py-8 text-center transition-colors ${
+          className={`mt-1 flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed px-4 py-8 text-center transition-colors ${
             isDragging
               ? "border-orange-500 bg-orange-50"
               : "border-zinc-300 bg-zinc-50 hover:border-orange-400 hover:bg-orange-50"
@@ -277,7 +280,7 @@ export default function ListingForm(props: ListingFormProps) {
         {(existingImages.length > 0 || newFiles.length > 0) && (
           <div className="mt-3 grid grid-cols-3 gap-3 sm:grid-cols-4">
             {existingImages.map((img) => (
-              <div key={img.id} className="relative aspect-square overflow-hidden rounded-md border border-zinc-200">
+              <div key={img.id} className="relative aspect-square overflow-hidden rounded-xl border border-zinc-200">
                 <Image src={img.url} alt="" fill className="object-cover" />
                 <button
                   type="button"
@@ -289,7 +292,7 @@ export default function ListingForm(props: ListingFormProps) {
               </div>
             ))}
             {newFiles.map((file, index) => (
-              <div key={index} className="relative aspect-square overflow-hidden rounded-md border border-zinc-200">
+              <div key={index} className="relative aspect-square overflow-hidden rounded-xl border border-zinc-200">
                 <Image
                   src={URL.createObjectURL(file)}
                   alt=""
@@ -315,7 +318,7 @@ export default function ListingForm(props: ListingFormProps) {
       <button
         type="submit"
         disabled={loading}
-        className="w-full rounded-full bg-orange-600 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-700 disabled:opacity-60"
+        className="w-full rounded-full bg-orange-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-orange-600/20 transition hover:-translate-y-0.5 hover:bg-orange-700 hover:shadow-lg disabled:pointer-events-none disabled:opacity-60"
       >
         {loading ? "Guardando..." : isEdit ? "Guardar cambios" : "Publicar figura"}
       </button>
