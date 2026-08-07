@@ -97,7 +97,11 @@ export default async function AdminUsuariosPage() {
                   ) : (
                     <div className="flex items-center gap-3">
                       <BlockUserButton userId={user.id} isBlocked={user.isBlocked} />
-                      <DeleteUserButton userId={user.id} userName={user.name} />
+                      <DeleteUserButton
+                        userId={user.id}
+                        userName={user.name}
+                        listingCount={user._count.listings}
+                      />
                     </div>
                   )}
                 </td>
