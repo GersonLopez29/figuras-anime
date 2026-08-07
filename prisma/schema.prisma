@@ -163,6 +163,15 @@ model SiteStats {
   totalVisits Int    @default(0)
 }
 
+model VisitStat {
+  id      String   @id @default(cuid())
+  date    DateTime
+  country String
+  count   Int      @default(0)
+
+  @@unique([date, country])
+}
+
 model Conversation {
   id        String    @id @default(cuid())
   createdAt DateTime  @default(now())

@@ -51,6 +51,12 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             </span>
           )}
         </Link>
+        <Link
+          href="/admin/estadisticas"
+          className="border-b-2 border-transparent px-1 pb-3 text-sm font-medium text-zinc-600 hover:border-orange-600 hover:text-zinc-900"
+        >
+          Estadísticas
+        </Link>
       </nav>
       <div className="mt-6">{children}</div>
     </div>
