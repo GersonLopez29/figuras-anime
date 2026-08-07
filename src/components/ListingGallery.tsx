@@ -16,7 +16,7 @@ export default function ListingGallery({ images, title, imageFit = "cover" }: Li
 
   return (
     <div>
-      <div className="relative aspect-square w-full overflow-hidden rounded-lg border border-zinc-200 bg-zinc-100">
+      <div className="relative aspect-square w-full overflow-hidden rounded-xl border border-zinc-200 bg-zinc-100 shadow-sm">
         {active ? (
           <Image
             src={active.url}
@@ -40,13 +40,14 @@ export default function ListingGallery({ images, title, imageFit = "cover" }: Li
               key={img.id}
               type="button"
               onClick={() => setActiveIndex(index)}
-              className={`relative aspect-square overflow-hidden rounded-md border-2 transition ${
+              aria-label={`Ver imagen ${index + 1}`}
+              className={`relative aspect-square overflow-hidden rounded-lg border-2 bg-zinc-100 transition ${
                 index === activeIndex
-                  ? "border-orange-600"
-                  : "border-transparent hover:border-zinc-300"
+                  ? "border-orange-600 shadow-sm"
+                  : "border-transparent opacity-80 hover:border-zinc-300 hover:opacity-100"
               }`}
             >
-              <Image src={img.url} alt="" fill className={fitClass} />
+              <Image src={img.url} alt="" fill className={fitClass} sizes="20vw" />
             </button>
           ))}
         </div>

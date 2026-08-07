@@ -87,16 +87,26 @@ export default async function Home({ searchParams }: HomeProps) {
       {bienvenida && <WelcomeBanner name={bienvenida} />}
 
       {showHero && (
-        <section className="bg-orange-50">
-          <div className="mx-auto max-w-6xl px-4 py-16 text-center sm:text-left">
-            <p className="text-sm font-semibold uppercase tracking-wide text-red-600">
+        <section className="relative overflow-hidden bg-gradient-to-br from-orange-50 via-orange-50 to-red-50">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-orange-200/40 blur-3xl"
+          />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute -bottom-24 left-1/3 h-64 w-64 rounded-full bg-red-200/30 blur-3xl"
+          />
+          <div className="relative mx-auto max-w-6xl px-4 py-16 text-center sm:text-left">
+            <p className="inline-block rounded-full bg-white/70 px-3 py-1 text-sm font-semibold uppercase tracking-wide text-red-600 shadow-sm ring-1 ring-red-100">
               ¡Coleccionar nunca fue tan fácil!
             </p>
-            <h1 className="mt-2 max-w-2xl text-3xl font-extrabold text-zinc-900 sm:text-4xl">
+            <h1 className="mt-4 max-w-2xl text-3xl font-extrabold tracking-tight text-zinc-900 sm:text-5xl">
               Compra y vende{" "}
-              <span className="text-orange-600">figuras de anime</span>
+              <span className="bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">
+                figuras de anime
+              </span>
             </h1>
-            <p className="mt-3 max-w-xl text-sm text-zinc-600 sm:text-base">
+            <p className="mt-4 max-w-xl text-sm text-zinc-600 sm:text-base">
               Naruto, Dragon Ball Z, One Piece y muchas más. Publica las figuras que ya
               no usas o encuentra tu próxima pieza de colección, y coordina todo directo
               por WhatsApp.
@@ -104,13 +114,13 @@ export default async function Home({ searchParams }: HomeProps) {
             <div className="mt-7 flex flex-col gap-3 sm:flex-row">
               <a
                 href={sellCtaHref}
-                className="inline-block rounded-full bg-red-600 px-6 py-3 text-sm font-bold text-white hover:bg-red-700"
+                className="inline-block rounded-full bg-red-600 px-6 py-3 text-sm font-bold text-white shadow-md shadow-red-600/20 transition hover:-translate-y-0.5 hover:bg-red-700 hover:shadow-lg"
               >
                 Empieza a vender
               </a>
               <a
                 href="#catalogo"
-                className="inline-block rounded-full border border-orange-300 bg-white px-6 py-3 text-sm font-bold text-orange-700 hover:bg-orange-100"
+                className="inline-block rounded-full border border-orange-300 bg-white px-6 py-3 text-sm font-bold text-orange-700 transition hover:-translate-y-0.5 hover:bg-orange-100"
               >
                 Explorar catálogo
               </a>
@@ -122,34 +132,23 @@ export default async function Home({ searchParams }: HomeProps) {
       {showHero && (
         <section className="border-b border-zinc-200 bg-white">
           <div className="mx-auto max-w-6xl px-4 py-10">
-            <div className="grid gap-8 sm:grid-cols-3">
-              <div className="flex flex-col items-center text-center sm:items-start sm:text-left">
-                <span className="flex h-14 w-14 items-center justify-center rounded-full bg-orange-50 text-2xl">
-                  📸
-                </span>
-                <h3 className="mt-3 font-semibold text-zinc-900">1. Publica</h3>
-                <p className="mt-1 text-sm text-zinc-500">
-                  Sube fotos de tu figura, ponle precio y categoría.
-                </p>
-              </div>
-              <div className="flex flex-col items-center text-center sm:items-start sm:text-left">
-                <span className="flex h-14 w-14 items-center justify-center rounded-full bg-orange-50 text-2xl">
-                  💬
-                </span>
-                <h3 className="mt-3 font-semibold text-zinc-900">2. Conecta</h3>
-                <p className="mt-1 text-sm text-zinc-500">
-                  Los interesados te escriben directo a tu WhatsApp.
-                </p>
-              </div>
-              <div className="flex flex-col items-center text-center sm:items-start sm:text-left">
-                <span className="flex h-14 w-14 items-center justify-center rounded-full bg-orange-50 text-2xl">
-                  🤝
-                </span>
-                <h3 className="mt-3 font-semibold text-zinc-900">3. Vende</h3>
-                <p className="mt-1 text-sm text-zinc-500">
-                  Coordinan la entrega y el pago entre ustedes.
-                </p>
-              </div>
+            <div className="grid gap-4 sm:grid-cols-3">
+              {[
+                { icon: "📸", title: "1. Publica", text: "Sube fotos de tu figura, ponle precio y categoría." },
+                { icon: "💬", title: "2. Conecta", text: "Los interesados te escriben directo a tu WhatsApp." },
+                { icon: "🤝", title: "3. Vende", text: "Coordinan la entrega y el pago entre ustedes." },
+              ].map((step) => (
+                <div
+                  key={step.title}
+                  className="flex flex-col items-center rounded-2xl border border-zinc-100 p-5 text-center transition hover:-translate-y-0.5 hover:border-orange-200 hover:shadow-md sm:items-start sm:text-left"
+                >
+                  <span className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-orange-100 to-red-50 text-2xl ring-1 ring-orange-100">
+                    {step.icon}
+                  </span>
+                  <h3 className="mt-3 font-semibold text-zinc-900">{step.title}</h3>
+                  <p className="mt-1 text-sm text-zinc-500">{step.text}</p>
+                </div>
+              ))}
             </div>
           </div>
         </section>

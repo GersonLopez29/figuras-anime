@@ -127,7 +127,7 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
       <div className="mt-4 grid gap-8 sm:grid-cols-2">
         <ListingGallery images={listing.images} title={listing.title} />
 
-        <div>
+        <div className="rounded-2xl border border-zinc-100 bg-white p-5 shadow-sm sm:p-6">
           <div className="flex flex-wrap items-center gap-2">
             <span className="inline-block rounded-full bg-zinc-100 px-3 py-1 text-xs font-medium text-zinc-600">
               {listing.category}
@@ -145,22 +145,18 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
                 </span>
               </span>
             )}
-          </div>
-
-          {listing.sold && (
-            <div className="mt-2">
+            {listing.sold && (
               <span className="inline-block rounded-full bg-zinc-800 px-3 py-1 text-xs font-semibold text-white">
                 Vendido
               </span>
-            </div>
-          )}
-
-          <div className="mt-2 flex items-center gap-1 text-xs text-zinc-400">
-            <span aria-hidden="true">👁️</span>
-            {views} {views === 1 ? "vista" : "vistas"}
+            )}
+            <span className="ml-auto flex items-center gap-1 text-xs text-zinc-400">
+              <span aria-hidden="true">👁️</span>
+              {views} {views === 1 ? "vista" : "vistas"}
+            </span>
           </div>
 
-          <div className="mt-3 flex items-start justify-between gap-3">
+          <div className="mt-4 flex items-start justify-between gap-3">
             <h1 className="text-2xl font-bold text-zinc-900">{listing.title}</h1>
             {currentUser && (
               <FavoriteButton
@@ -202,14 +198,19 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
 
           <Link
             href={`/vendedor/${listing.user.id}`}
-            className="mt-4 block rounded-lg border border-zinc-200 p-3 hover:border-orange-300"
+            className="mt-4 flex items-center gap-3 rounded-xl border border-zinc-200 p-3 transition hover:border-orange-300 hover:bg-orange-50/40"
           >
-            <p className="text-sm text-zinc-500">
-              Vendido por{" "}
-              <span className="font-medium text-zinc-900">{listing.user.name}</span>
-            </p>
-            <div className="mt-1">
-              <StarRating rating={averageRating} reviewCount={reviewCount} />
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-orange-100 to-red-50 text-sm font-bold text-orange-700 ring-1 ring-orange-100">
+              {listing.user.name.slice(0, 1).toUpperCase()}
+            </span>
+            <div>
+              <p className="text-sm text-zinc-500">
+                Vendido por{" "}
+                <span className="font-medium text-zinc-900">{listing.user.name}</span>
+              </p>
+              <div className="mt-0.5">
+                <StarRating rating={averageRating} reviewCount={reviewCount} />
+              </div>
             </div>
           </Link>
 
@@ -225,8 +226,9 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
                 href={whatsappLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex w-full items-center justify-center gap-2 rounded-full bg-green-600 px-4 py-3 text-sm font-bold text-white hover:bg-green-700"
+                className="flex w-full items-center justify-center gap-2 rounded-full bg-green-600 px-4 py-3 text-sm font-bold text-white shadow-md shadow-green-600/20 transition hover:-translate-y-0.5 hover:bg-green-700 hover:shadow-lg"
               >
+                <span aria-hidden="true">💬</span>
                 Contactar por WhatsApp
               </a>
               {currentUser && currentUser.id !== listing.user.id && (
