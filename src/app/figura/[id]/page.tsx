@@ -135,21 +135,28 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
             <span className="inline-block rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700">
               {getConditionIcon(listing.condition)} {getConditionLabel(listing.condition)}
             </span>
-            {listing.sold && (
-              <span className="inline-block rounded-full bg-zinc-800 px-3 py-1 text-xs font-semibold text-white">
-                Vendido
-              </span>
-            )}
-            {!listing.sold && !!activeDiscount && (
-              <span className="inline-block rounded-full bg-green-600 px-3 py-1 text-xs font-bold text-white">
-                Oferta
-              </span>
-            )}
-            <span className="inline-flex items-center gap-1 text-xs text-zinc-400">
-              <span aria-hidden="true">👁️</span>
-              {views} {views === 1 ? "vista" : "vistas"}
-            </span>
           </div>
+
+          {(listing.sold || (!listing.sold && !!activeDiscount)) && (
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              {listing.sold && (
+                <span className="inline-block rounded-full bg-zinc-800 px-3 py-1 text-xs font-semibold text-white">
+                  Vendido
+                </span>
+              )}
+              {!listing.sold && !!activeDiscount && (
+                <span className="inline-block rounded-full bg-green-600 px-3 py-1 text-xs font-bold text-white">
+                  Oferta
+                </span>
+              )}
+            </div>
+          )}
+
+          <div className="mt-2 flex items-center gap-1 text-xs text-zinc-400">
+            <span aria-hidden="true">👁️</span>
+            {views} {views === 1 ? "vista" : "vistas"}
+          </div>
+
           <div className="mt-3 flex items-start justify-between gap-3">
             <h1 className="text-2xl font-bold text-zinc-900">{listing.title}</h1>
             {currentUser && (

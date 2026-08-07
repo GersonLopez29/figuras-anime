@@ -60,11 +60,6 @@ export default function ListingCard({
             Oferta
           </span>
         )}
-        {!sold && condition && (
-          <span className="absolute right-2 bottom-2 rounded-full bg-white/90 px-2.5 py-1 text-xs font-semibold text-zinc-700 shadow-sm backdrop-blur">
-            {isNewCondition(condition) ? "🆕 Nueva" : "♻️ Usada"}
-          </span>
-        )}
         {typeof isFavorited === "boolean" && (
           <FavoriteButton listingId={id} initialFavorited={isFavorited} />
         )}
@@ -78,6 +73,11 @@ export default function ListingCard({
       </div>
       <div className="p-3">
         <h3 className="line-clamp-1 text-sm font-medium text-zinc-900">{title}</h3>
+        {condition && (
+          <span className="mt-1 inline-block rounded-full bg-blue-50 px-2 py-0.5 text-[11px] font-medium text-blue-700">
+            {isNewCondition(condition) ? "🆕 Nueva" : "♻️ Usada"}
+          </span>
+        )}
         {hasDiscount ? (
           <p className="mt-1 flex items-center gap-1.5">
             <span className="text-xs text-zinc-400 line-through">{formatPrice(price)}</span>
