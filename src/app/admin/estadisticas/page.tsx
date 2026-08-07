@@ -147,7 +147,7 @@ export default async function AdminEstadisticasPage() {
           <div className="mt-4 space-y-2.5">
             {topCountries.map((c) => (
               <div key={c.country} className="flex items-center gap-3">
-                <span className="w-32 shrink-0 truncate text-sm text-zinc-700">
+                <span className="w-20 shrink-0 truncate text-sm text-zinc-700 sm:w-32">
                   {getCountryFlag(c.country)} {getCountryName(c.country)}
                 </span>
                 <div className="h-3 flex-1 overflow-hidden rounded-full bg-zinc-100">
@@ -163,7 +163,7 @@ export default async function AdminEstadisticasPage() {
             ))}
             {otherCount > 0 && (
               <div className="flex items-center gap-3">
-                <span className="w-32 shrink-0 truncate text-sm text-zinc-500">
+                <span className="w-20 shrink-0 truncate text-sm text-zinc-500 sm:w-32">
                   🌎 Otros países
                 </span>
                 <div className="h-3 flex-1 overflow-hidden rounded-full bg-zinc-100">
