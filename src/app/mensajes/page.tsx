@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/session";
@@ -45,13 +46,14 @@ export default async function MensajesPage() {
                 href={`/mensajes/${c.id}`}
                 className="flex items-center gap-3 px-4 py-3 hover:bg-zinc-50"
               >
-                <div className="h-11 w-11 shrink-0 overflow-hidden rounded-full bg-zinc-100">
+                <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full bg-zinc-100">
                   {c.listing.images[0] && (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
+                    <Image
                       src={c.listing.images[0].url}
                       alt=""
-                      className="h-full w-full object-cover"
+                      fill
+                      sizes="44px"
+                      className="object-cover"
                     />
                   )}
                 </div>

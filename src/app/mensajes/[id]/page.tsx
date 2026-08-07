@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/session";
@@ -50,13 +51,14 @@ export default async function ConversacionPage({ params }: MensajePageProps) {
         href={`/figura/${conversation.listing.id}`}
         className="mt-3 flex items-center gap-3 rounded-lg border border-zinc-200 bg-white p-3 hover:border-orange-300"
       >
-        <div className="h-12 w-12 shrink-0 overflow-hidden rounded-md bg-zinc-100">
+        <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-md bg-zinc-100">
           {conversation.listing.images[0] && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+            <Image
               src={conversation.listing.images[0].url}
               alt=""
-              className="h-full w-full object-cover"
+              fill
+              sizes="48px"
+              className="object-cover"
             />
           )}
         </div>
