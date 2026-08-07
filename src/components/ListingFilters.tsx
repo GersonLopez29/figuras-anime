@@ -19,7 +19,7 @@ export default function ListingFilters({ estado, oferta, category, q }: ListingF
   }
 
   function pillClass(active: boolean) {
-    return `shrink-0 rounded-full px-4 py-1.5 text-sm font-medium transition ${
+    return `shrink-0 rounded-full px-4 py-2 text-sm font-medium transition ${
       active
         ? "bg-orange-600 text-white"
         : "border border-zinc-300 text-zinc-600 hover:border-orange-300"
