@@ -75,12 +75,23 @@ export default async function VendedorPage({ params }: VendedorPageProps) {
       )
     : null;
 
+  const memberSince = seller.createdAt.toLocaleDateString("es-PE", {
+    month: "long",
+    year: "numeric",
+  });
+
   return (
     <div className="mx-auto max-w-3xl px-4 py-10">
-      <div className="rounded-lg border border-zinc-200 bg-white p-6">
-        <h1 className="text-2xl font-bold text-zinc-900">{seller.name}</h1>
-        <div className="mt-2">
-          <StarRating rating={averageRating} reviewCount={reviewCount} size="md" />
+      <div className="flex items-center gap-4 rounded-2xl border border-zinc-100 bg-white p-6 shadow-sm">
+        <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-orange-100 to-red-50 text-2xl font-bold text-orange-700 ring-1 ring-orange-100">
+          {seller.name.slice(0, 1).toUpperCase()}
+        </span>
+        <div>
+          <h1 className="text-2xl font-bold text-zinc-900">{seller.name}</h1>
+          <p className="text-xs text-zinc-400">Miembro desde {memberSince}</p>
+          <div className="mt-1.5">
+            <StarRating rating={averageRating} reviewCount={reviewCount} size="md" />
+          </div>
         </div>
       </div>
 
@@ -132,17 +143,22 @@ export default async function VendedorPage({ params }: VendedorPageProps) {
             <p className="text-sm text-zinc-400">Todavía no tiene reseñas.</p>
           ) : (
             seller.reviewsReceived.map((review) => (
-              <div key={review.id} className="rounded-lg border border-zinc-200 bg-white p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-zinc-900">{review.author.name}</p>
-                    <StarRating rating={review.rating} />
+              <div key={review.id} className="flex gap-3 rounded-2xl border border-zinc-100 bg-white p-4 shadow-sm">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-zinc-100 text-xs font-bold text-zinc-500 ring-1 ring-zinc-200">
+                  {review.author.name.slice(0, 1).toUpperCase()}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center justify-between gap-2">
+                    <div>
+                      <p className="text-sm font-medium text-zinc-900">{review.author.name}</p>
+                      <StarRating rating={review.rating} />
+                    </div>
+                    {currentUser?.id === review.authorId && (
+                      <DeleteReviewButton reviewId={review.id} />
+                    )}
                   </div>
-                  {currentUser?.id === review.authorId && (
-                    <DeleteReviewButton reviewId={review.id} />
-                  )}
+                  <p className="mt-2 text-sm text-zinc-700">{review.comment}</p>
                 </div>
-                <p className="mt-2 text-sm text-zinc-700">{review.comment}</p>
               </div>
             ))
           )}
