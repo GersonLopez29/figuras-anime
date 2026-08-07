@@ -38,7 +38,7 @@ export default async function MisFigurasPage() {
           Todavía no has publicado ninguna figura.
         </p>
       ) : (
-        <div className="mt-6 divide-y divide-zinc-200 rounded-lg border border-zinc-200 bg-white">
+        <div className="mt-6 divide-y divide-zinc-100 rounded-2xl border border-zinc-100 bg-white shadow-sm">
           {listings.map((listing) => {
             const activeDiscount = getActiveDiscountAmount(
               listing.discountAmount,
@@ -47,10 +47,10 @@ export default async function MisFigurasPage() {
             return (
             <div
               key={listing.id}
-              className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:gap-4"
+              className="flex flex-col gap-3 p-4 transition hover:bg-orange-50/30 sm:flex-row sm:items-center sm:gap-4"
             >
               <div className="flex min-w-0 flex-1 items-center gap-4">
-                <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-md bg-zinc-100">
+                <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-zinc-100">
                   {listing.images[0] ? (
                     <Image
                       src={listing.images[0].url}
@@ -102,11 +102,11 @@ export default async function MisFigurasPage() {
                 </div>
               </div>
 
-              <div className="flex flex-wrap items-center gap-3 sm:shrink-0 sm:justify-end">
+              <div className="flex flex-wrap items-center gap-2 sm:shrink-0 sm:justify-end">
                 <ToggleSoldButton listingId={listing.id} sold={listing.sold} />
                 <Link
                   href={`/mis-figuras/${listing.id}/editar`}
-                  className="text-sm font-medium text-zinc-600 hover:text-zinc-900"
+                  className="rounded-full border border-zinc-200 px-3 py-1.5 text-sm font-medium text-zinc-600 transition hover:border-zinc-300 hover:bg-zinc-50"
                 >
                   Editar
                 </Link>

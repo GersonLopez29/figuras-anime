@@ -66,7 +66,7 @@ export default function DiscountControl({
             <button
               type="button"
               onClick={() => setEditing(true)}
-              className="text-sm font-medium text-zinc-600 hover:text-zinc-900"
+              className="rounded-full border border-zinc-200 px-3 py-1 text-sm font-medium text-zinc-600 transition hover:border-zinc-300 hover:bg-zinc-50"
             >
               Editar
             </button>
@@ -74,7 +74,7 @@ export default function DiscountControl({
               type="button"
               disabled={loading}
               onClick={() => applyDiscount(null)}
-              className="text-sm font-medium text-red-600 hover:text-red-800 disabled:opacity-60"
+              className="rounded-full border border-red-200 px-3 py-1 text-sm font-medium text-red-600 transition hover:border-red-300 hover:bg-red-50 disabled:opacity-60"
             >
               Quitar
             </button>
@@ -83,7 +83,7 @@ export default function DiscountControl({
           <button
             type="button"
             onClick={() => setEditing(true)}
-            className="text-sm font-medium text-green-700 hover:text-green-900"
+            className="rounded-full border border-green-200 px-3 py-1 text-sm font-medium text-green-700 transition hover:bg-green-50"
           >
             Agregar descuento
           </button>

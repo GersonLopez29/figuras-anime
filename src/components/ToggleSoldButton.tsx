@@ -31,8 +31,10 @@ export default function ToggleSoldButton({ listingId, sold }: ToggleSoldButtonPr
       type="button"
       onClick={handleClick}
       disabled={loading}
-      className={`text-sm font-medium disabled:opacity-60 ${
-        sold ? "text-zinc-600 hover:text-zinc-900" : "text-green-700 hover:text-green-900"
+      className={`rounded-full border px-3 py-1.5 text-sm font-medium transition disabled:opacity-60 ${
+        sold
+          ? "border-zinc-200 text-zinc-600 hover:bg-zinc-50"
+          : "border-green-200 text-green-700 hover:bg-green-50"
       }`}
     >
       {loading ? "Guardando..." : sold ? "Marcar como disponible" : "Marcar como vendido"}
