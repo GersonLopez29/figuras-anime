@@ -26,7 +26,7 @@ export default function DeletePostButton({ postId }: { postId: string }) {
     <button
       onClick={handleDelete}
       disabled={loading}
-      className="text-sm font-medium text-red-600 hover:text-red-800 disabled:opacity-60"
+      className="rounded-full border border-red-200 px-3 py-1.5 text-sm font-medium text-red-600 transition hover:border-red-300 hover:bg-red-50 disabled:opacity-60"
     >
       {loading ? "Eliminando..." : "Eliminar publicación"}
     </button>

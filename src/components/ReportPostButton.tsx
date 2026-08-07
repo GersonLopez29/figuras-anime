@@ -44,7 +44,7 @@ export default function ReportPostButton({ postId }: { postId: string }) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="text-xs font-medium text-zinc-400 hover:text-red-600"
+        className="rounded-full border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600"
       >
         🚩 Reportar publicación (ej. foto robada)
       </button>

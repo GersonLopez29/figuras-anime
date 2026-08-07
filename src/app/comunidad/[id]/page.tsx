@@ -89,12 +89,17 @@ export default async function ComunidadDetailPage({ params }: ComunidadDetailPag
       <div className="mt-4 grid gap-8 sm:grid-cols-2">
         <ListingGallery images={post.images} title={post.caption} imageFit="contain" />
 
-        <div>
-          <p className="text-sm text-zinc-500">
-            Publicado por{" "}
-            <span className="font-medium text-zinc-900">{post.author.name}</span>
-          </p>
-          <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-zinc-700">
+        <div className="rounded-2xl border border-zinc-100 bg-white p-5 shadow-sm sm:p-6">
+          <div className="flex items-center gap-3">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-fuchsia-100 to-orange-50 text-sm font-bold text-fuchsia-700 ring-1 ring-fuchsia-100">
+              {post.author.name.slice(0, 1).toUpperCase()}
+            </span>
+            <p className="text-sm text-zinc-500">
+              Publicado por{" "}
+              <span className="font-medium text-zinc-900">{post.author.name}</span>
+            </p>
+          </div>
+          <p className="mt-4 whitespace-pre-line text-sm leading-relaxed text-zinc-700">
             {post.caption}
           </p>
 
@@ -108,7 +113,7 @@ export default async function ComunidadDetailPage({ params }: ComunidadDetailPag
             />
           </div>
 
-          <div className="mt-3 flex items-center gap-4">
+          <div className="mt-4 flex items-center gap-4 border-t border-zinc-100 pt-4">
             {(isOwnPost || isAdmin(currentUser)) && (
               <DeletePostButton postId={post.id} />
             )}
@@ -117,7 +122,7 @@ export default async function ComunidadDetailPage({ params }: ComunidadDetailPag
         </div>
       </div>
 
-      <div className="mt-10">
+      <div className="mt-10 rounded-2xl border border-zinc-100 bg-white p-5 shadow-sm sm:p-6">
         <h2 className="text-lg font-semibold text-zinc-900">
           Comentarios ({post.comments.length})
         </h2>
@@ -135,19 +140,24 @@ export default async function ComunidadDetailPage({ params }: ComunidadDetailPag
           </p>
         )}
 
-        <div className="mt-6 space-y-4">
+        <div className="mt-6 space-y-3">
           {post.comments.length === 0 ? (
             <p className="text-sm text-zinc-400">Todavía no hay comentarios.</p>
           ) : (
             post.comments.map((comment) => (
-              <div key={comment.id} className="rounded-lg border border-zinc-200 bg-white p-4">
-                <div className="flex items-center justify-between">
-                  <p className="text-sm font-medium text-zinc-900">{comment.author.name}</p>
-                  {(currentUser?.id === comment.authorId || isAdmin(currentUser)) && (
-                    <DeleteCommentButton commentId={comment.id} />
-                  )}
+              <div key={comment.id} className="flex gap-3 rounded-lg border border-zinc-100 bg-zinc-50/60 p-3">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white text-xs font-bold text-zinc-500 ring-1 ring-zinc-200">
+                  {comment.author.name.slice(0, 1).toUpperCase()}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="truncate text-sm font-medium text-zinc-900">{comment.author.name}</p>
+                    {(currentUser?.id === comment.authorId || isAdmin(currentUser)) && (
+                      <DeleteCommentButton commentId={comment.id} />
+                    )}
+                  </div>
+                  <p className="mt-0.5 text-sm text-zinc-700">{comment.text}</p>
                 </div>
-                <p className="mt-1 text-sm text-zinc-700">{comment.text}</p>
               </div>
             ))
           )}
