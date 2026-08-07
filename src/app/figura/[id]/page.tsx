@@ -135,20 +135,23 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
             <span className="inline-block rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700">
               {getConditionIcon(listing.condition)} {getConditionLabel(listing.condition)}
             </span>
-          </div>
-
-          {(listing.sold || (!listing.sold && !!activeDiscount)) && (
-            <div className="mt-2 flex flex-wrap items-center gap-2">
-              {listing.sold && (
-                <span className="inline-block rounded-full bg-zinc-800 px-3 py-1 text-xs font-semibold text-white">
-                  Vendido
+            {!listing.sold && !!activeDiscount && (
+              <>
+                <span aria-hidden="true" className="text-sm text-zinc-300">
+                  /
                 </span>
-              )}
-              {!listing.sold && !!activeDiscount && (
                 <span className="inline-block rounded-full bg-green-600 px-3 py-1 text-xs font-bold text-white">
                   Oferta
                 </span>
-              )}
+              </>
+            )}
+          </div>
+
+          {listing.sold && (
+            <div className="mt-2">
+              <span className="inline-block rounded-full bg-zinc-800 px-3 py-1 text-xs font-semibold text-white">
+                Vendido
+              </span>
             </div>
           )}
 
