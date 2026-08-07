@@ -31,10 +31,10 @@ export default async function AdminComunidadPage() {
       {sorted.length === 0 ? (
         <p className="mt-4 text-sm text-zinc-500">Todavía no hay publicaciones.</p>
       ) : (
-        <div className="mt-4 divide-y divide-zinc-200 rounded-lg border border-zinc-200 bg-white">
+        <div className="mt-4 divide-y divide-zinc-100 rounded-2xl border border-zinc-100 bg-white shadow-sm">
           {sorted.map((post) => (
-            <div key={post.id} className="flex gap-4 p-4">
-              <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-md bg-zinc-100">
+            <div key={post.id} className="flex gap-4 p-4 transition hover:bg-orange-50/30">
+              <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-zinc-100">
                 {post.images[0] ? (
                   <Image
                     src={post.images[0].url}

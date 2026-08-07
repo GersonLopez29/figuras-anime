@@ -96,7 +96,7 @@ export default function CategoryManager({ categories }: { categories: CategoryRo
 
   return (
     <div>
-      <div className="flex flex-wrap items-end gap-2 rounded-lg border border-zinc-200 bg-white p-4">
+      <div className="flex flex-wrap items-end gap-2 rounded-2xl border border-zinc-100 bg-white p-4 shadow-sm">
         <div>
           <label className="block text-xs font-medium text-zinc-600">Ícono</label>
           <input
@@ -129,11 +129,11 @@ export default function CategoryManager({ categories }: { categories: CategoryRo
       </div>
       {createError && <p className="mt-1.5 text-xs text-red-600">{createError}</p>}
 
-      <div className="mt-4 divide-y divide-zinc-200 rounded-lg border border-zinc-200 bg-white">
+      <div className="mt-4 divide-y divide-zinc-100 rounded-2xl border border-zinc-100 bg-white shadow-sm">
         {categories.map((cat) => {
           const isEditing = editingId === cat.id;
           return (
-            <div key={cat.id} className="p-4">
+            <div key={cat.id} className="p-4 transition hover:bg-orange-50/30">
               {isEditing ? (
                 <div className="flex flex-wrap items-end gap-2">
                   <input
@@ -178,11 +178,11 @@ export default function CategoryManager({ categories }: { categories: CategoryRo
                       {cat.listingCount} figura{cat.listingCount === 1 ? "" : "s"}
                     </span>
                   </div>
-                  <div className="flex gap-3">
+                  <div className="flex gap-2">
                     <button
                       type="button"
                       onClick={() => startEdit(cat)}
-                      className="text-sm font-medium text-zinc-600 hover:text-zinc-900"
+                      className="rounded-full border border-zinc-200 px-3 py-1.5 text-sm font-medium text-zinc-600 transition hover:border-zinc-300 hover:bg-zinc-50"
                     >
                       Editar
                     </button>
@@ -190,7 +190,7 @@ export default function CategoryManager({ categories }: { categories: CategoryRo
                       type="button"
                       onClick={() => handleDelete(cat)}
                       disabled={rowLoading === cat.id}
-                      className="text-sm font-medium text-red-600 hover:text-red-800 disabled:opacity-60"
+                      className="rounded-full border border-red-200 px-3 py-1.5 text-sm font-medium text-red-600 transition hover:border-red-300 hover:bg-red-50 disabled:opacity-60"
                     >
                       {rowLoading === cat.id ? "Eliminando..." : "Eliminar"}
                     </button>

@@ -34,8 +34,10 @@ export default function BlockUserButton({
     <button
       onClick={toggle}
       disabled={loading}
-      className={`text-sm font-medium disabled:opacity-60 ${
-        isBlocked ? "text-green-700 hover:text-green-900" : "text-amber-700 hover:text-amber-900"
+      className={`rounded-full border px-3 py-1.5 text-sm font-medium transition disabled:opacity-60 ${
+        isBlocked
+          ? "border-green-200 text-green-700 hover:bg-green-50"
+          : "border-amber-200 text-amber-700 hover:bg-amber-50"
       }`}
     >
       {loading ? "Guardando..." : isBlocked ? "Desbloquear" : "Bloquear"}

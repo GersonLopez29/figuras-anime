@@ -57,7 +57,7 @@ export default async function AdminEstadisticasPage() {
   return (
     <div className="space-y-8">
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-        <div className="rounded-lg border border-zinc-200 bg-white p-4">
+        <div className="rounded-2xl border border-zinc-100 bg-white shadow-sm p-4">
           <p className="text-xs font-medium uppercase tracking-wide text-zinc-400">
             Visitas totales
           </p>
@@ -65,13 +65,13 @@ export default async function AdminEstadisticasPage() {
             {(siteStats?.totalVisits ?? 0).toLocaleString("es-PE")}
           </p>
         </div>
-        <div className="rounded-lg border border-zinc-200 bg-white p-4">
+        <div className="rounded-2xl border border-zinc-100 bg-white shadow-sm p-4">
           <p className="text-xs font-medium uppercase tracking-wide text-zinc-400">Hoy</p>
           <p className="mt-1 text-3xl font-bold text-zinc-900">
             {todayCount.toLocaleString("es-PE")}
           </p>
         </div>
-        <div className="rounded-lg border border-zinc-200 bg-white p-4">
+        <div className="rounded-2xl border border-zinc-100 bg-white shadow-sm p-4">
           <p className="text-xs font-medium uppercase tracking-wide text-zinc-400">
             Últimos 7 días
           </p>
@@ -81,7 +81,7 @@ export default async function AdminEstadisticasPage() {
         </div>
       </div>
 
-      <div className="rounded-lg border border-zinc-200 bg-white p-4">
+      <div className="rounded-2xl border border-zinc-100 bg-white shadow-sm p-4">
         <h3 className="text-sm font-semibold text-zinc-900">
           Visitas por día (últimos {DAYS} días)
         </h3>
@@ -138,7 +138,7 @@ export default async function AdminEstadisticasPage() {
         </details>
       </div>
 
-      <div className="rounded-lg border border-zinc-200 bg-white p-4">
+      <div className="rounded-2xl border border-zinc-100 bg-white shadow-sm p-4">
         <h3 className="text-sm font-semibold text-zinc-900">Visitas por país</h3>
 
         {topCountries.length === 0 ? (

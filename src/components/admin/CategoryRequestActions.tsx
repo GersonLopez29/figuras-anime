@@ -31,7 +31,7 @@ export default function CategoryRequestActions({ requestId }: CategoryRequestAct
         type="button"
         onClick={() => resolve("approve")}
         disabled={loading !== null}
-        className="text-sm font-medium text-green-700 hover:text-green-900 disabled:opacity-60"
+        className="rounded-full border border-green-200 px-3 py-1.5 text-sm font-medium text-green-700 transition hover:bg-green-50 disabled:opacity-60"
       >
         {loading === "approve" ? "Agregando..." : "Agregar categoría"}
       </button>
@@ -39,7 +39,7 @@ export default function CategoryRequestActions({ requestId }: CategoryRequestAct
         type="button"
         onClick={() => resolve("reject")}
         disabled={loading !== null}
-        className="text-sm font-medium text-zinc-500 hover:text-red-600 disabled:opacity-60"
+        className="rounded-full border border-zinc-200 px-3 py-1.5 text-sm font-medium text-zinc-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600 disabled:opacity-60"
       >
         {loading === "reject" ? "Rechazando..." : "Rechazar"}
       </button>

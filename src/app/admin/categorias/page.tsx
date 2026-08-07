@@ -44,7 +44,7 @@ export default async function AdminCategoriasPage() {
         {pending.length === 0 ? (
           <p className="mt-4 text-sm text-zinc-500">No hay solicitudes pendientes.</p>
         ) : (
-          <div className="mt-4 divide-y divide-zinc-200 rounded-lg border border-zinc-200 bg-white">
+          <div className="mt-4 divide-y divide-zinc-100 rounded-2xl border border-zinc-100 bg-white shadow-sm">
             {pending.map((req) => (
               <div key={req.id} className="flex items-start justify-between gap-4 p-4">
                 <div className="min-w-0 flex-1">
@@ -64,7 +64,7 @@ export default async function AdminCategoriasPage() {
       {resolved.length > 0 && (
         <div>
           <h2 className="text-lg font-semibold text-zinc-900">Resueltas recientemente</h2>
-          <div className="mt-4 divide-y divide-zinc-200 rounded-lg border border-zinc-200 bg-white">
+          <div className="mt-4 divide-y divide-zinc-100 rounded-2xl border border-zinc-100 bg-white shadow-sm">
             {resolved.map((req) => (
               <div key={req.id} className="flex items-center justify-between gap-4 p-4">
                 <div className="min-w-0 flex-1">
