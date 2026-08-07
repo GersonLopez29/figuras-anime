@@ -136,14 +136,14 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
               {getConditionIcon(listing.condition)} {getConditionLabel(listing.condition)}
             </span>
             {!listing.sold && !!activeDiscount && (
-              <>
+              <span className="inline-flex items-center gap-2">
                 <span aria-hidden="true" className="text-sm text-zinc-300">
                   /
                 </span>
                 <span className="inline-block rounded-full bg-green-600 px-3 py-1 text-xs font-bold text-white">
                   Oferta
                 </span>
-              </>
+              </span>
             )}
           </div>
 
