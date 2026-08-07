@@ -9,6 +9,10 @@ import BannerCarousel from "@/components/BannerCarousel";
 import Pagination from "@/components/Pagination";
 import { getActiveDiscountAmount } from "@/lib/format";
 
+const BANNER_OFFERS_LIMIT = 3;
+const BANNER_LATEST_LIMIT = 4;
+const BANNER_SLIDES_LIMIT = 5;
+
 const PAGE_SIZE = 24;
 
 type HomeProps = {
@@ -75,6 +79,58 @@ export default async function Home({ searchParams }: HomeProps) {
 
   const showHero = !category && !q && !estado && !oferta && page === 1;
 
+  const [offerListings, latestListings] = showHero
+    ? await Promise.all([
+        prisma.listing.findMany({
+          where: {
+            sold: false,
+            discountAmount: { not: null },
+            discountExpiresAt: { gt: new Date() },
+          },
+          include: { images: { take: 1 } },
+          orderBy: { discountExpiresAt: "asc" },
+          take: BANNER_OFFERS_LIMIT,
+        }),
+        prisma.listing.findMany({
+          where: { sold: false },
+          include: { images: { take: 1 } },
+          orderBy: { createdAt: "desc" },
+          take: BANNER_LATEST_LIMIT,
+        }),
+      ])
+    : [[], []];
+
+  const offerIds = new Set(offerListings.map((l) => l.id));
+  const bannerSlides = [
+    ...offerListings.map((l) => ({
+      id: l.id,
+      title: l.title,
+      price: l.price,
+      discountAmount: getActiveDiscountAmount(l.discountAmount, l.discountExpiresAt),
+      imageUrl: l.images[0]?.url,
+      isOffer: true,
+    })),
+    ...latestListings
+      .filter((l) => !offerIds.has(l.id))
+      .map((l) => ({
+        id: l.id,
+        title: l.title,
+        price: l.price,
+        discountAmount: null as number | null,
+        imageUrl: l.images[0]?.url,
+        isOffer: false,
+      })),
+  ]
+    .filter((s) => !!s.imageUrl)
+    .slice(0, BANNER_SLIDES_LIMIT) as {
+    id: string;
+    title: string;
+    price: number;
+    discountAmount: number | null;
+    imageUrl: string;
+    isOffer: boolean;
+  }[];
+
   const filterLabels: string[] = [];
   if (category) filterLabels.push(category);
   if (estado === "nuevo") filterLabels.push("Nuevas");
@@ -87,7 +143,7 @@ export default async function Home({ searchParams }: HomeProps) {
     <div>
       {bienvenida && <WelcomeBanner name={bienvenida} />}
 
-      {showHero && <BannerCarousel />}
+      {showHero && bannerSlides.length > 0 && <BannerCarousel slides={bannerSlides} />}
 
       {showHero && (
         <section className="relative overflow-hidden bg-gradient-to-br from-orange-50 via-orange-50 to-red-50">
