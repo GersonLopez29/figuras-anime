@@ -11,7 +11,8 @@ export default function Footer({ totalVisits, categories }: FooterProps) {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="mt-16 rounded-t-3xl border-t border-zinc-200 bg-white">
+    <footer className="mt-16 overflow-hidden rounded-t-3xl border-t border-zinc-200 bg-white">
+      <div aria-hidden="true" className="h-1 bg-gradient-to-r from-red-600 via-orange-500 to-fuchsia-500" />
       <div className="mx-auto max-w-6xl px-4 py-12">
         <div className="grid gap-8 sm:grid-cols-3">
           <div>
@@ -34,7 +35,7 @@ export default function Footer({ totalVisits, categories }: FooterProps) {
                 <li key={cat.name}>
                   <Link
                     href={`/?categoria=${encodeURIComponent(cat.name)}`}
-                    className="text-sm text-zinc-600 hover:text-orange-600"
+                    className="inline-block text-sm text-zinc-600 transition hover:translate-x-0.5 hover:text-orange-600"
                   >
                     {cat.icon} {cat.name}
                   </Link>
@@ -49,22 +50,22 @@ export default function Footer({ totalVisits, categories }: FooterProps) {
             </h3>
             <ul className="mt-3 space-y-2">
               <li>
-                <Link href="/" className="text-sm text-zinc-600 hover:text-orange-600">
+                <Link href="/" className="inline-block text-sm text-zinc-600 transition hover:translate-x-0.5 hover:text-orange-600">
                   Explorar catálogo
                 </Link>
               </li>
               <li>
-                <Link href="/publicar" className="text-sm text-zinc-600 hover:text-orange-600">
+                <Link href="/publicar" className="inline-block text-sm text-zinc-600 transition hover:translate-x-0.5 hover:text-orange-600">
                   Publicar una figura
                 </Link>
               </li>
               <li>
-                <Link href="/comunidad" className="text-sm text-zinc-600 hover:text-orange-600">
+                <Link href="/comunidad" className="inline-block text-sm text-zinc-600 transition hover:translate-x-0.5 hover:text-orange-600">
                   Comunidad de coleccionistas
                 </Link>
               </li>
               <li>
-                <Link href="/registro" className="text-sm text-zinc-600 hover:text-orange-600">
+                <Link href="/registro" className="inline-block text-sm text-zinc-600 transition hover:translate-x-0.5 hover:text-orange-600">
                   Crear cuenta
                 </Link>
               </li>
@@ -72,12 +73,12 @@ export default function Footer({ totalVisits, categories }: FooterProps) {
           </div>
         </div>
 
-        <div className="mt-10 flex flex-col items-center gap-1 border-t border-zinc-100 pt-6 text-center text-xs text-zinc-400">
+        <div className="mt-10 flex flex-col items-center gap-2 border-t border-zinc-100 pt-6 text-center text-xs text-zinc-400 sm:flex-row sm:justify-between">
           <p>FigurasAnime © {year} — Compra y venta entre coleccionistas</p>
-          <p className="flex items-center gap-1">
+          <span className="inline-flex items-center gap-1 rounded-full bg-zinc-50 px-2.5 py-1 font-medium text-zinc-500 ring-1 ring-zinc-100">
             <span aria-hidden="true">📊</span>
             {totalVisits.toLocaleString("es-PE")} visitas totales
-          </p>
+          </span>
         </div>
       </div>
     </footer>

@@ -22,7 +22,7 @@ export default function MobileMenu({ isLoggedIn, userName, isAdmin, unreadCount 
         onClick={() => setOpen((v) => !v)}
         aria-label={open ? "Cerrar menú" : "Abrir menú"}
         aria-expanded={open}
-        className="flex h-9 w-9 items-center justify-center rounded-md text-zinc-700 hover:bg-zinc-100"
+        className="flex h-9 w-9 items-center justify-center rounded-full text-zinc-700 transition hover:bg-zinc-100"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -53,12 +53,12 @@ export default function MobileMenu({ isLoggedIn, userName, isAdmin, unreadCount 
             onClick={() => setOpen(false)}
             className="fixed inset-0 z-30 cursor-default"
           />
-          <div className="absolute inset-x-0 top-full z-40 border-b border-zinc-200 bg-white shadow-lg">
-            <nav className="flex flex-col px-4 py-2">
+          <div className="absolute inset-x-0 top-full z-40 rounded-b-2xl border-b border-zinc-100 bg-white shadow-lg">
+            <nav className="flex flex-col gap-0.5 px-3 py-3">
               <Link
                 href="/comunidad"
                 onClick={() => setOpen(false)}
-                className="my-1 flex items-center gap-1.5 rounded-full bg-gradient-to-r from-fuchsia-500 to-orange-500 px-3.5 py-2 text-sm font-bold text-white shadow-sm"
+                className="mb-1 flex items-center gap-1.5 rounded-full bg-gradient-to-r from-fuchsia-500 to-orange-500 px-3.5 py-2.5 text-sm font-bold text-white shadow-sm"
               >
                 <span aria-hidden="true">✨</span>
                 Comunidad
@@ -69,26 +69,26 @@ export default function MobileMenu({ isLoggedIn, userName, isAdmin, unreadCount 
                   <Link
                     href="/mis-figuras"
                     onClick={() => setOpen(false)}
-                    className="rounded-md px-2 py-2.5 text-sm font-medium text-zinc-700 hover:bg-zinc-50"
+                    className="rounded-xl px-3 py-2.5 text-sm font-medium text-zinc-700 transition hover:bg-zinc-50"
                   >
                     Mis figuras
                   </Link>
                   <Link
                     href="/favoritos"
                     onClick={() => setOpen(false)}
-                    className="rounded-md px-2 py-2.5 text-sm font-medium text-zinc-700 hover:bg-zinc-50"
+                    className="rounded-xl px-3 py-2.5 text-sm font-medium text-zinc-700 transition hover:bg-zinc-50"
                   >
                     Favoritos
                   </Link>
                   <MessagesNavLink
                     initialCount={unreadCount}
                     onClick={() => setOpen(false)}
-                    className="flex items-center rounded-md px-2 py-2.5 text-sm font-medium text-zinc-700 hover:bg-zinc-50"
+                    className="flex items-center rounded-xl px-3 py-2.5 text-sm font-medium text-zinc-700 transition hover:bg-zinc-50"
                   />
                   <Link
                     href="/publicar"
                     onClick={() => setOpen(false)}
-                    className="rounded-md px-2 py-2.5 text-sm font-medium text-orange-600 hover:bg-orange-50"
+                    className="rounded-xl px-3 py-2.5 text-sm font-medium text-orange-600 transition hover:bg-orange-50"
                   >
                     Publicar figura
                   </Link>
@@ -96,16 +96,15 @@ export default function MobileMenu({ isLoggedIn, userName, isAdmin, unreadCount 
                     <Link
                       href="/admin"
                       onClick={() => setOpen(false)}
-                      className="rounded-md px-2 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50"
+                      className="rounded-xl px-3 py-2.5 text-sm font-medium text-red-600 transition hover:bg-red-50"
                     >
                       Panel admin
                     </Link>
                   )}
-                  <div className="my-1 border-t border-zinc-100" />
-                  {userName && (
-                    <p className="px-2 py-1.5 text-xs text-zinc-400">Hola, {userName}</p>
-                  )}
-                  <div className="px-2 py-1.5">
+                  <div className="mt-1 flex items-center justify-between rounded-xl bg-zinc-50 px-3 py-2">
+                    {userName && (
+                      <p className="text-xs text-zinc-500">Hola, {userName}</p>
+                    )}
                     <LogoutButton />
                   </div>
                 </>
@@ -114,14 +113,14 @@ export default function MobileMenu({ isLoggedIn, userName, isAdmin, unreadCount 
                   <Link
                     href="/login"
                     onClick={() => setOpen(false)}
-                    className="rounded-md px-2 py-2.5 text-sm font-medium text-zinc-700 hover:bg-zinc-50"
+                    className="rounded-xl px-3 py-2.5 text-sm font-medium text-zinc-700 transition hover:bg-zinc-50"
                   >
                     Iniciar sesión
                   </Link>
                   <Link
                     href="/registro"
                     onClick={() => setOpen(false)}
-                    className="rounded-md px-2 py-2.5 text-sm font-medium text-orange-600 hover:bg-orange-50"
+                    className="rounded-xl px-3 py-2.5 text-sm font-medium text-orange-600 transition hover:bg-orange-50"
                   >
                     Registrarme
                   </Link>
