@@ -49,9 +49,9 @@ export default async function ConversacionPage({ params }: MensajePageProps) {
 
       <Link
         href={`/figura/${conversation.listing.id}`}
-        className="mt-3 flex items-center gap-3 rounded-lg border border-zinc-200 bg-white p-3 hover:border-orange-300"
+        className="mt-3 flex items-center gap-3 rounded-2xl border border-zinc-100 bg-white p-3 shadow-sm transition hover:border-orange-300"
       >
-        <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-md bg-zinc-100">
+        <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-zinc-100">
           {conversation.listing.images[0] && (
             <Image
               src={conversation.listing.images[0].url}

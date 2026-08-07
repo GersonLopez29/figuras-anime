@@ -83,8 +83,8 @@ export default function ConversationThread({
   }
 
   return (
-    <div className="mt-4 flex flex-1 flex-col overflow-hidden rounded-lg border border-zinc-200 bg-white">
-      <div className="flex-1 space-y-2 overflow-y-auto p-4">
+    <div className="mt-4 flex flex-1 flex-col overflow-hidden rounded-2xl border border-zinc-100 bg-white shadow-sm">
+      <div className="flex-1 space-y-2 overflow-y-auto bg-zinc-50/50 p-4">
         {messages.length === 0 ? (
           <p className="text-center text-sm text-zinc-400">
             Envía el primer mensaje para iniciar la conversación.

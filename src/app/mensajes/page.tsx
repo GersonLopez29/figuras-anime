@@ -34,7 +34,7 @@ export default async function MensajesPage() {
           Todavía no tienes conversaciones. Escribe a un vendedor desde la página de una figura.
         </p>
       ) : (
-        <div className="mt-6 divide-y divide-zinc-100 overflow-hidden rounded-lg border border-zinc-200 bg-white">
+        <div className="mt-6 divide-y divide-zinc-100 overflow-hidden rounded-2xl border border-zinc-100 bg-white shadow-sm">
           {conversations.map((c) => {
             const otherUser = c.buyerId === user.id ? c.seller : c.buyer;
             const lastMessage = c.messages[0];
@@ -44,10 +44,12 @@ export default async function MensajesPage() {
               <Link
                 key={c.id}
                 href={`/mensajes/${c.id}`}
-                className="flex items-center gap-3 px-4 py-3 hover:bg-zinc-50"
+                className={`flex items-center gap-3 px-4 py-3 transition hover:bg-orange-50/40 ${
+                  unread ? "bg-orange-50/60" : ""
+                }`}
               >
-                <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full bg-zinc-100">
-                  {c.listing.images[0] && (
+                <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full bg-gradient-to-br from-orange-100 to-red-50 ring-1 ring-orange-100">
+                  {c.listing.images[0] ? (
                     <Image
                       src={c.listing.images[0].url}
                       alt=""
@@ -55,6 +57,10 @@ export default async function MensajesPage() {
                       sizes="44px"
                       className="object-cover"
                     />
+                  ) : (
+                    <span className="flex h-full w-full items-center justify-center text-sm font-bold text-orange-700">
+                      {otherUser.name.slice(0, 1).toUpperCase()}
+                    </span>
                   )}
                 </div>
                 <div className="min-w-0 flex-1">
