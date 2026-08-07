@@ -55,7 +55,7 @@ export default function DeleteUserButton({
 
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-sm rounded-lg bg-white p-5 shadow-xl">
+          <div className="max-h-[90vh] w-full max-w-sm overflow-y-auto rounded-lg bg-white p-5 shadow-xl">
             <h3 className="text-base font-bold text-zinc-900">Eliminar usuario</h3>
             <p className="mt-2 text-sm text-zinc-600">
               Esto borra permanentemente la cuenta de{" "}
@@ -84,7 +84,7 @@ export default function DeleteUserButton({
 
             {error && <p className="mt-2 text-xs text-red-600">{error}</p>}
 
-            <div className="mt-5 flex justify-end gap-2">
+            <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:justify-end">
               <button
                 type="button"
                 onClick={closeModal}
