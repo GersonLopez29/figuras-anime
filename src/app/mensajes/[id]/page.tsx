@@ -62,7 +62,7 @@ export default async function ConversacionPage({ params }: MensajePageProps) {
             />
           )}
         </div>
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-semibold text-zinc-900">
             {conversation.listing.title}
           </p>
