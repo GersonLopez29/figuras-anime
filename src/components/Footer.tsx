@@ -71,13 +71,26 @@ export default function Footer({ totalVisits, categories }: FooterProps) {
                   Crear cuenta
                 </Link>
               </li>
+              <li>
+                <Link href="/politica-privacidad" className="inline-block text-sm text-zinc-600 transition hover:translate-x-0.5 hover:text-orange-600">
+                  Política de Privacidad
+                </Link>
+              </li>
             </ul>
           </div>
         </div>
 
         <Separator className="mt-10" />
         <div className="flex flex-col items-center gap-2 pt-6 text-center text-xs text-muted-foreground sm:flex-row sm:justify-between">
-          <p>FigurasAnime © {year} — Compra y venta entre coleccionistas</p>
+          <div className="flex flex-col items-center gap-1 sm:flex-row sm:gap-3">
+            <p>FigurasAnime © {year} — Compra y venta entre coleccionistas</p>
+            <Link
+              href="/politica-privacidad"
+              className="underline-offset-2 hover:text-orange-600 hover:underline"
+            >
+              Política de Privacidad
+            </Link>
+          </div>
           <Badge variant="secondary" className="h-auto gap-1 px-2.5 py-1 font-medium">
             <span aria-hidden="true">📊</span>
             {totalVisits.toLocaleString("es-PE")} visitas totales
