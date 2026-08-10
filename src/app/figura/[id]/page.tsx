@@ -11,6 +11,11 @@ import ListingGallery from "@/components/ListingGallery";
 import StarRating from "@/components/StarRating";
 import FavoriteButton from "@/components/FavoriteButton";
 import MessageButton from "@/components/MessageButton";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 type FiguraPageProps = {
   params: Promise<{ id: string }>;
@@ -120,45 +125,32 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
-      <Link href="/" className="text-sm text-zinc-500 hover:text-zinc-800">
+      <Link href="/" className="text-sm text-muted-foreground hover:text-foreground">
         &larr; Volver al catálogo
       </Link>
 
       <div className="mt-4 grid gap-8 sm:grid-cols-2">
         <ListingGallery images={listing.images} title={listing.title} />
 
-        <div className="rounded-2xl border border-zinc-100 bg-white p-5 shadow-sm sm:p-6">
+        <Card className="p-5 shadow-sm sm:p-6">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="inline-block rounded-full bg-zinc-100 px-3 py-1 text-xs font-medium text-zinc-600">
-              {listing.category}
-            </span>
-            <span className="inline-block rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700">
+            <Badge variant="secondary">{listing.category}</Badge>
+            <Badge variant="outline" className="border-blue-200 bg-blue-50 text-blue-700">
               {getConditionIcon(listing.condition)} {getConditionLabel(listing.condition)}
-            </span>
+            </Badge>
             {!listing.sold && !!activeDiscount && (
-              <span className="inline-flex items-center gap-2">
-                <span aria-hidden="true" className="text-sm text-zinc-300">
-                  /
-                </span>
-                <span className="inline-block rounded-full bg-green-600 px-3 py-1 text-xs font-bold text-white">
-                  Oferta
-                </span>
-              </span>
+              <Badge className="bg-green-600 text-white">Oferta</Badge>
             )}
-            {listing.sold && (
-              <span className="inline-block rounded-full bg-zinc-800 px-3 py-1 text-xs font-semibold text-white">
-                Vendido
-              </span>
-            )}
+            {listing.sold && <Badge variant="secondary">Vendido</Badge>}
           </div>
 
-          <div className="mt-2 flex items-center gap-1 text-xs text-zinc-400">
+          <div className="mt-2 flex items-center gap-1 text-xs text-muted-foreground">
             <span aria-hidden="true">👁️</span>
             {views} {views === 1 ? "vista" : "vistas"}
           </div>
 
           <div className="mt-3 flex items-start justify-between gap-3">
-            <h1 className="text-2xl font-bold text-zinc-900">{listing.title}</h1>
+            <h1 className="text-2xl font-bold text-foreground">{listing.title}</h1>
             {currentUser && (
               <FavoriteButton
                 listingId={listing.id}
@@ -169,7 +161,7 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
           </div>
           {!listing.sold && activeDiscount ? (
             <p className="mt-2 flex items-baseline gap-2">
-              <span className="text-lg text-zinc-400 line-through">
+              <span className="text-lg text-muted-foreground line-through">
                 {formatPrice(listing.price)}
               </span>
               <span className="text-3xl font-bold text-green-700">
@@ -177,37 +169,41 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
               </span>
             </p>
           ) : (
-            <p className="mt-2 text-3xl font-bold text-orange-600">
+            <p className="mt-2 text-3xl font-bold text-primary">
               {formatPrice(listing.price)}
             </p>
           )}
 
           {!listing.sold && activeDiscount && (
-            <div className="mt-3 flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-4 py-2.5 text-sm text-green-800">
-              <span aria-hidden="true">⏰</span>
-              <span>
-                Oferta por tiempo limitado: válida hasta el {discountExpiresLabel} (
-                {discountDaysRemaining} {discountDaysRemaining === 1 ? "día" : "días"} restante
-                {discountDaysRemaining === 1 ? "" : "s"}).
-              </span>
-            </div>
+            <Alert className="mt-3 border-green-200 bg-green-50 text-green-800">
+              <AlertDescription className="flex items-center gap-2 text-green-800">
+                <span aria-hidden="true">⏰</span>
+                <span>
+                  Oferta por tiempo limitado: válida hasta el {discountExpiresLabel} (
+                  {discountDaysRemaining} {discountDaysRemaining === 1 ? "día" : "días"} restante
+                  {discountDaysRemaining === 1 ? "" : "s"}).
+                </span>
+              </AlertDescription>
+            </Alert>
           )}
 
-          <p className="mt-4 whitespace-pre-line text-sm leading-relaxed text-zinc-700">
+          <p className="mt-4 whitespace-pre-line text-sm leading-relaxed text-foreground/80">
             {listing.description}
           </p>
 
           <Link
             href={`/vendedor/${listing.user.id}`}
-            className="mt-4 flex items-center gap-3 rounded-xl border border-zinc-200 p-3 transition hover:border-orange-300 hover:bg-orange-50/40"
+            className="mt-4 flex items-center gap-3 rounded-xl border border-border p-3 transition hover:border-primary/40 hover:bg-primary/5"
           >
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-orange-100 to-red-50 text-sm font-bold text-orange-700 ring-1 ring-orange-100">
-              {listing.user.name.slice(0, 1).toUpperCase()}
-            </span>
+            <Avatar size="lg" className="ring-1 ring-orange-100">
+              <AvatarFallback className="bg-gradient-to-br from-orange-100 to-red-50 font-bold text-orange-700">
+                {listing.user.name.slice(0, 1).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
             <div>
-              <p className="text-sm text-zinc-500">
+              <p className="text-sm text-muted-foreground">
                 Vendido por{" "}
-                <span className="font-medium text-zinc-900">{listing.user.name}</span>
+                <span className="font-medium text-foreground">{listing.user.name}</span>
               </p>
               <div className="mt-0.5">
                 <StarRating rating={averageRating} reviewCount={reviewCount} />
@@ -216,48 +212,47 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
           </Link>
 
           {listing.sold ? (
-            <div className="mt-6 rounded-lg border border-zinc-200 bg-zinc-100 p-4 text-center">
-              <p className="text-sm font-medium text-zinc-600">
+            <Alert className="mt-6 text-center">
+              <AlertDescription className="justify-center text-center font-medium">
                 Este producto ya fue vendido.
-              </p>
-            </div>
+              </AlertDescription>
+            </Alert>
           ) : whatsappLink ? (
             <div className="mt-6">
-              <a
-                href={whatsappLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex w-full items-center justify-center gap-2 rounded-full bg-green-600 px-4 py-3 text-sm font-bold text-white shadow-md shadow-green-600/20 transition hover:-translate-y-0.5 hover:bg-green-700 hover:shadow-lg"
+              <Button
+                render={<a href={whatsappLink} target="_blank" rel="noopener noreferrer" />}
+                nativeButton={false}
+                size="lg"
+                className="w-full rounded-full bg-green-600 text-sm font-bold text-white shadow-md shadow-green-600/20 transition hover:-translate-y-0.5 hover:bg-green-700 hover:shadow-lg"
               >
                 <span aria-hidden="true">💬</span>
                 Contactar por WhatsApp
-              </a>
+              </Button>
               {currentUser && currentUser.id !== listing.user.id && (
                 <MessageButton listingId={listing.id} />
               )}
             </div>
           ) : (
-            <div className="mt-6 rounded-lg border border-zinc-200 bg-zinc-50 p-4 text-center">
-              <p className="text-sm text-zinc-600">
+            <Alert className="mt-6 text-center">
+              <AlertDescription className="justify-center text-center">
                 Inicia sesión para contactar al vendedor por WhatsApp.
-              </p>
+              </AlertDescription>
               <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:justify-center">
-                <Link
-                  href="/login"
-                  className="rounded-full bg-orange-600 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-700"
-                >
+                <Button render={<Link href="/login" />} nativeButton={false} className="rounded-full">
                   Iniciar sesión
-                </Link>
-                <Link
-                  href="/registro"
-                  className="rounded-full border border-orange-300 bg-white px-4 py-2 text-sm font-semibold text-orange-700 hover:bg-orange-50"
+                </Button>
+                <Button
+                  render={<Link href="/registro" />}
+                  nativeButton={false}
+                  variant="outline"
+                  className="rounded-full"
                 >
                   Crear cuenta
-                </Link>
+                </Button>
               </div>
-            </div>
+            </Alert>
           )}
-        </div>
+        </Card>
       </div>
     </div>
   );
