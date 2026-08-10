@@ -8,6 +8,9 @@ import ToggleSoldButton from "@/components/ToggleSoldButton";
 import DiscountControl from "@/components/DiscountControl";
 import { formatPrice, getFinalPrice, getActiveDiscountAmount } from "@/lib/format";
 import { getConditionLabel } from "@/lib/condition";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 export default async function MisFigurasPage() {
   const user = await getCurrentUser();
@@ -24,21 +27,18 @@ export default async function MisFigurasPage() {
   return (
     <div className="mx-auto max-w-4xl px-4 py-10">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-zinc-900">Mis figuras</h1>
-        <Link
-          href="/publicar"
-          className="rounded-full bg-orange-600 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-700"
-        >
+        <h1 className="text-2xl font-bold text-foreground">Mis figuras</h1>
+        <Button render={<Link href="/publicar" />} nativeButton={false} className="rounded-full">
           Publicar nueva
-        </Link>
+        </Button>
       </div>
 
       {listings.length === 0 ? (
-        <p className="mt-10 text-sm text-zinc-500">
+        <p className="mt-10 text-sm text-muted-foreground">
           Todavía no has publicado ninguna figura.
         </p>
       ) : (
-        <div className="mt-6 divide-y divide-zinc-100 rounded-2xl border border-zinc-100 bg-white shadow-sm">
+        <Card className="mt-6 gap-0 divide-y divide-border py-0 shadow-sm">
           {listings.map((listing) => {
             const activeDiscount = getActiveDiscountAmount(
               listing.discountAmount,
@@ -47,10 +47,10 @@ export default async function MisFigurasPage() {
             return (
             <div
               key={listing.id}
-              className="flex flex-col gap-3 p-4 transition hover:bg-orange-50/30 sm:flex-row sm:items-center sm:gap-4"
+              className="flex flex-col gap-3 p-4 transition hover:bg-primary/5 sm:flex-row sm:items-center sm:gap-4"
             >
               <div className="flex min-w-0 flex-1 items-center gap-4">
-                <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-zinc-100">
+                <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-muted">
                   {listing.images[0] ? (
                     <Image
                       src={listing.images[0].url}
@@ -65,17 +65,13 @@ export default async function MisFigurasPage() {
                   <div className="flex items-center gap-2">
                     <Link
                       href={`/figura/${listing.id}`}
-                      className="line-clamp-1 text-sm font-medium text-zinc-900 hover:underline"
+                      className="line-clamp-1 text-sm font-medium text-foreground hover:underline"
                     >
                       {listing.title}
                     </Link>
-                    {listing.sold && (
-                      <span className="shrink-0 rounded bg-zinc-800 px-1.5 py-0.5 text-xs font-medium text-white">
-                        Vendido
-                      </span>
-                    )}
+                    {listing.sold && <Badge variant="secondary">Vendido</Badge>}
                   </div>
-                  <p className="text-sm text-zinc-500">
+                  <p className="text-sm text-muted-foreground">
                     {activeDiscount ? (
                       <>
                         <span className="mr-1.5 line-through">{formatPrice(listing.price)}</span>
@@ -88,7 +84,7 @@ export default async function MisFigurasPage() {
                     )}{" "}
                     · {listing.category} · {getConditionLabel(listing.condition)}
                   </p>
-                  <p className="flex items-center gap-1 text-xs text-zinc-400">
+                  <p className="flex items-center gap-1 text-xs text-muted-foreground">
                     <span aria-hidden="true">👁️</span>
                     {listing.views} {listing.views === 1 ? "vista" : "vistas"}
                   </p>
@@ -104,18 +100,21 @@ export default async function MisFigurasPage() {
 
               <div className="flex flex-wrap items-center gap-2 sm:shrink-0 sm:justify-end">
                 <ToggleSoldButton listingId={listing.id} sold={listing.sold} />
-                <Link
-                  href={`/mis-figuras/${listing.id}/editar`}
-                  className="rounded-full border border-zinc-200 px-3 py-1.5 text-sm font-medium text-zinc-600 transition hover:border-zinc-300 hover:bg-zinc-50"
+                <Button
+                  render={<Link href={`/mis-figuras/${listing.id}/editar`} />}
+                  nativeButton={false}
+                  variant="outline"
+                  size="sm"
+                  className="rounded-full"
                 >
                   Editar
-                </Link>
+                </Button>
                 <DeleteListingButton listingId={listing.id} />
               </div>
             </div>
             );
           })}
-        </div>
+        </Card>
       )}
     </div>
   );

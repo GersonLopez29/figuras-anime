@@ -13,10 +13,10 @@ export default async function PublicarPage() {
 
   return (
     <div className="mx-auto max-w-xl px-4 py-10">
-      <h1 className="text-2xl font-bold text-zinc-900">Publicar una figura</h1>
-      <p className="mt-1 text-sm text-zinc-500">
+      <h1 className="text-2xl font-bold text-foreground">Publicar una figura</h1>
+      <p className="mt-1 text-sm text-muted-foreground">
         Los compradores te contactarán por WhatsApp al número{" "}
-        <span className="font-medium text-zinc-700">{user.whatsapp}</span>.
+        <span className="font-medium text-foreground/80">{user.whatsapp}</span>.
       </p>
 
       <div className="mt-8">

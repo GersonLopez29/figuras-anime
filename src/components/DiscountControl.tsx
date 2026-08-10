@@ -3,6 +3,9 @@
 import { useRouter } from "next/navigation";
 import { useState, FormEvent } from "react";
 import { formatPrice, getDaysRemaining } from "@/lib/format";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 type DiscountControlProps = {
   listingId: string;
@@ -59,34 +62,34 @@ export default function DiscountControl({
       <div className="flex flex-wrap items-center gap-2">
         {discountAmount ? (
           <>
-            <span className="rounded-full bg-green-100 px-2.5 py-1 text-xs font-semibold text-green-700">
+            <Badge className="bg-green-100 text-green-700 hover:bg-green-100">
               Descuento de {formatPrice(discountAmount)} · vence en {daysRemaining}{" "}
               {daysRemaining === 1 ? "día" : "días"}
-            </span>
-            <button
-              type="button"
-              onClick={() => setEditing(true)}
-              className="rounded-full border border-zinc-200 px-3 py-1 text-sm font-medium text-zinc-600 transition hover:border-zinc-300 hover:bg-zinc-50"
-            >
+            </Badge>
+            <Button type="button" variant="outline" size="sm" onClick={() => setEditing(true)} className="rounded-full">
               Editar
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
+              variant="outline"
+              size="sm"
               disabled={loading}
               onClick={() => applyDiscount(null)}
-              className="rounded-full border border-red-200 px-3 py-1 text-sm font-medium text-red-600 transition hover:border-red-300 hover:bg-red-50 disabled:opacity-60"
+              className="rounded-full border-red-200 text-destructive hover:border-red-300 hover:bg-red-50"
             >
               Quitar
-            </button>
+            </Button>
           </>
         ) : (
-          <button
+          <Button
             type="button"
+            variant="outline"
+            size="sm"
             onClick={() => setEditing(true)}
-            className="rounded-full border border-green-200 px-3 py-1 text-sm font-medium text-green-700 transition hover:bg-green-50"
+            className="rounded-full border-green-200 text-green-700 hover:bg-green-50"
           >
             Agregar descuento
-          </button>
+          </Button>
         )}
       </div>
     );
@@ -95,7 +98,7 @@ export default function DiscountControl({
   return (
     <form onSubmit={handleSubmit} className="flex w-full flex-col items-start gap-1 sm:items-end">
       <div className="flex flex-wrap items-center gap-2">
-        <input
+        <Input
           type="number"
           inputMode="decimal"
           min="0.01"
@@ -104,29 +107,27 @@ export default function DiscountControl({
           value={value}
           onChange={(e) => setValue(e.target.value)}
           placeholder="Monto en S/"
-          className="w-28 rounded-full border border-zinc-300 px-3 py-1.5 text-sm focus:border-orange-500 focus:outline-none"
+          className="w-28 rounded-full"
         />
-        <button
-          type="submit"
-          disabled={loading}
-          className="rounded-full bg-orange-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-orange-700 disabled:opacity-60"
-        >
+        <Button type="submit" size="sm" disabled={loading} className="rounded-full">
           {loading ? "..." : "Aplicar"}
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
+          variant="ghost"
+          size="sm"
           onClick={() => {
             setEditing(false);
             setError(null);
             setValue(discountAmount ? String(discountAmount) : "");
           }}
-          className="px-1 py-1.5 text-sm font-medium text-zinc-500 hover:text-zinc-800"
+          className="text-muted-foreground"
         >
           Cancelar
-        </button>
+        </Button>
       </div>
-      <p className="text-xs text-zinc-400">El descuento durará 1 semana desde que lo apliques.</p>
-      {error && <p className="text-xs text-red-600">{error}</p>}
+      <p className="text-xs text-muted-foreground">El descuento durará 1 semana desde que lo apliques.</p>
+      {error && <p className="text-xs text-destructive">{error}</p>}
     </form>
   );
 }

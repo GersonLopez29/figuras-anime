@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
 
 type ToggleSoldButtonProps = {
   listingId: string;
@@ -27,17 +28,15 @@ export default function ToggleSoldButton({ listingId, sold }: ToggleSoldButtonPr
   }
 
   return (
-    <button
+    <Button
       type="button"
+      variant="outline"
+      size="sm"
       onClick={handleClick}
       disabled={loading}
-      className={`rounded-full border px-3 py-1.5 text-sm font-medium transition disabled:opacity-60 ${
-        sold
-          ? "border-zinc-200 text-zinc-600 hover:bg-zinc-50"
-          : "border-green-200 text-green-700 hover:bg-green-50"
-      }`}
+      className={`rounded-full ${sold ? "text-muted-foreground" : "border-green-200 text-green-700 hover:bg-green-50"}`}
     >
       {loading ? "Guardando..." : sold ? "Marcar como disponible" : "Marcar como vendido"}
-    </button>
+    </Button>
   );
 }
