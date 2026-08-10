@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { X } from "lucide-react";
 
 type WelcomeBannerProps = {
   name: string;
@@ -33,14 +35,16 @@ export default function WelcomeBanner({ name }: WelcomeBannerProps) {
           🎉 ¡Bienvenido/a, <span className="font-semibold">{name}</span>! Tu cuenta se creó
           con éxito, ya puedes empezar a publicar tus figuras.
         </p>
-        <button
+        <Button
           type="button"
+          variant="ghost"
+          size="icon-sm"
           onClick={dismiss}
           aria-label="Cerrar mensaje"
-          className="shrink-0 text-green-700 hover:text-green-900"
+          className="shrink-0 text-green-700 hover:bg-green-100 hover:text-green-900"
         >
-          ✕
-        </button>
+          <X className="h-4 w-4" />
+        </Button>
       </div>
     </div>
   );

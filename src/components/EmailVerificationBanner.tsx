@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
 
 export default function EmailVerificationBanner() {
   const [status, setStatus] = useState<"idle" | "loading" | "sent" | "error">("idle");
@@ -20,14 +21,15 @@ export default function EmailVerificationBanner() {
           <>
             <span aria-hidden="true">📧</span>
             <span>Confirma tu correo para verificar tu cuenta.</span>
-            <button
+            <Button
               type="button"
+              variant="link"
               onClick={handleResend}
               disabled={status === "loading"}
-              className="font-semibold underline hover:text-amber-900 disabled:opacity-60"
+              className="h-auto p-0 font-semibold text-amber-800 underline hover:text-amber-900"
             >
               {status === "loading" ? "Enviando..." : "Reenviar correo"}
-            </button>
+            </Button>
             {status === "error" && (
               <span className="text-red-700">No se pudo reenviar, intenta de nuevo.</span>
             )}

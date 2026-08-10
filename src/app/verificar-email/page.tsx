@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 type VerificarEmailPageProps = {
   searchParams: Promise<{ token?: string }>;
@@ -48,16 +50,15 @@ export default async function VerificarEmailPage({ searchParams }: VerificarEmai
   const { title, body } = MESSAGES[status];
 
   return (
-    <div className="mx-auto max-w-md px-4 py-20 text-center">
-      <p className="text-4xl">{status === "ok" ? "✅" : "✉️"}</p>
-      <h1 className="mt-4 text-2xl font-bold text-zinc-900">{title}</h1>
-      <p className="mt-3 text-sm text-zinc-600">{body}</p>
-      <Link
-        href="/"
-        className="mt-6 inline-block rounded-full bg-orange-600 px-6 py-2.5 text-sm font-semibold text-white hover:bg-orange-700"
-      >
-        Ir al inicio
-      </Link>
+    <div className="mx-auto max-w-md px-4 py-20">
+      <Card className="items-center p-8 text-center shadow-sm">
+        <p className="text-4xl">{status === "ok" ? "✅" : "✉️"}</p>
+        <h1 className="mt-4 text-2xl font-bold text-foreground">{title}</h1>
+        <p className="mt-3 text-sm text-muted-foreground">{body}</p>
+        <Button render={<Link href="/" />} nativeButton={false} className="mt-6 rounded-full">
+          Ir al inicio
+        </Button>
+      </Card>
     </div>
   );
 }

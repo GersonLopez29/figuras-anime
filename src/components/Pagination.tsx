@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 type PaginationProps = {
   page: number;
@@ -36,33 +37,27 @@ export default function Pagination({
   return (
     <div className="mt-8 flex items-center justify-center gap-4">
       {hasPrev ? (
-        <Link
-          href={hrefFor(page - 1)}
-          className="rounded-full border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-700 hover:border-orange-400 hover:text-orange-600"
-        >
+        <Button render={<Link href={hrefFor(page - 1)} />} nativeButton={false} variant="outline" className="rounded-full">
           Anterior
-        </Link>
+        </Button>
       ) : (
-        <span className="rounded-full border border-zinc-200 px-4 py-2 text-sm font-medium text-zinc-300">
+        <Button disabled variant="outline" className="rounded-full">
           Anterior
-        </span>
+        </Button>
       )}
 
-      <span className="text-sm text-zinc-500">
+      <span className="text-sm text-muted-foreground">
         Página {page} de {totalPages}
       </span>
 
       {hasNext ? (
-        <Link
-          href={hrefFor(page + 1)}
-          className="rounded-full border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-700 hover:border-orange-400 hover:text-orange-600"
-        >
+        <Button render={<Link href={hrefFor(page + 1)} />} nativeButton={false} variant="outline" className="rounded-full">
           Siguiente
-        </Link>
+        </Button>
       ) : (
-        <span className="rounded-full border border-zinc-200 px-4 py-2 text-sm font-medium text-zinc-300">
+        <Button disabled variant="outline" className="rounded-full">
           Siguiente
-        </span>
+        </Button>
       )}
     </div>
   );
