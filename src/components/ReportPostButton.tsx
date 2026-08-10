@@ -1,6 +1,10 @@
 "use client";
 
 import { useState, FormEvent } from "react";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function ReportPostButton({ postId }: { postId: string }) {
   const [open, setOpen] = useState(false);
@@ -33,7 +37,7 @@ export default function ReportPostButton({ postId }: { postId: string }) {
 
   if (done) {
     return (
-      <p className="text-xs font-medium text-zinc-500">
+      <p className="text-xs font-medium text-muted-foreground">
         ✓ Gracias, un administrador revisará esta publicación.
       </p>
     );
@@ -41,45 +45,50 @@ export default function ReportPostButton({ postId }: { postId: string }) {
 
   if (!open) {
     return (
-      <button
+      <Button
         type="button"
+        variant="outline"
+        size="sm"
         onClick={() => setOpen(true)}
-        className="rounded-full border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600"
+        className="h-auto whitespace-normal rounded-full text-xs font-medium text-muted-foreground hover:border-destructive/30 hover:bg-destructive/5 hover:text-destructive"
       >
         🚩 Reportar publicación (ej. foto robada)
-      </button>
+      </Button>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-lg border border-zinc-200 bg-zinc-50 p-3">
-      <label className="block text-xs font-medium text-zinc-600">
+    <form onSubmit={handleSubmit} className="rounded-lg border border-border bg-muted/50 p-3">
+      <Label htmlFor="report-reason" className="text-xs">
         ¿Por qué reportas esta publicación?
-      </label>
-      <textarea
+      </Label>
+      <Textarea
+        id="report-reason"
         required
         rows={2}
         value={reason}
         onChange={(e) => setReason(e.target.value)}
         placeholder="Ej: estas fotos no son de esta persona, las tomó de otra cuenta..."
-        className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-xs focus:border-red-500 focus:outline-none"
+        className="mt-1 text-xs"
       />
-      {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
+      {error && (
+        <Alert variant="destructive" className="mt-1">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
       <div className="mt-2 flex gap-2">
-        <button
-          type="submit"
-          disabled={loading}
-          className="rounded-full bg-red-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-700 disabled:opacity-60"
-        >
+        <Button type="submit" size="sm" variant="destructive" disabled={loading} className="rounded-full">
           {loading ? "Enviando..." : "Enviar reporte"}
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
+          variant="ghost"
+          size="sm"
           onClick={() => setOpen(false)}
-          className="rounded-full px-3 py-1.5 text-xs font-medium text-zinc-500 hover:text-zinc-700"
+          className="rounded-full text-muted-foreground"
         >
           Cancelar
-        </button>
+        </Button>
       </div>
     </form>
   );

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db";
 import CommunityPostCard from "@/components/CommunityPostCard";
+import { Button } from "@/components/ui/button";
 
 export default async function ComunidadPage() {
   const posts = await prisma.collectionPost.findMany({
@@ -26,19 +27,21 @@ export default async function ComunidadPage() {
               <p className="inline-block rounded-full bg-white/70 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-fuchsia-600 shadow-sm ring-1 ring-fuchsia-100">
                 🎏 Comunidad
               </p>
-              <h1 className="mt-3 text-2xl font-extrabold tracking-tight text-zinc-900 sm:text-3xl">
+              <h1 className="mt-3 text-2xl font-extrabold tracking-tight text-foreground sm:text-3xl">
                 Comunidad de coleccionistas
               </h1>
-              <p className="mt-1 text-sm text-zinc-600">
+              <p className="mt-1 text-sm text-muted-foreground">
                 Muestra tu colección, comenta las de otros y califícalas con estrellas.
               </p>
             </div>
-            <Link
-              href="/comunidad/publicar"
-              className="inline-block shrink-0 rounded-full bg-orange-600 px-5 py-2.5 text-center text-sm font-bold text-white shadow-md shadow-orange-600/20 transition hover:-translate-y-0.5 hover:bg-orange-700 hover:shadow-lg"
+            <Button
+              render={<Link href="/comunidad/publicar" />}
+              nativeButton={false}
+              size="lg"
+              className="shrink-0 rounded-full"
             >
               Publicar mi colección
-            </Link>
+            </Button>
           </div>
         </div>
       </section>
@@ -46,7 +49,7 @@ export default async function ComunidadPage() {
       <div className="mx-auto max-w-6xl px-4 py-8">
 
       {posts.length === 0 ? (
-        <p className="mt-16 text-center text-sm text-zinc-400">
+        <p className="mt-16 text-center text-sm text-muted-foreground">
           Todavía no hay publicaciones. ¡Sé el primero en mostrar tu colección!
         </p>
       ) : (

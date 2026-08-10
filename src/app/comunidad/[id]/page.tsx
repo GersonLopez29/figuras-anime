@@ -9,6 +9,9 @@ import CommentForm from "@/components/CommentForm";
 import DeleteCommentButton from "@/components/DeleteCommentButton";
 import DeletePostButton from "@/components/DeletePostButton";
 import ReportPostButton from "@/components/ReportPostButton";
+import { Card } from "@/components/ui/card";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 type ComunidadDetailPageProps = {
   params: Promise<{ id: string }>;
@@ -82,24 +85,26 @@ export default async function ComunidadDetailPage({ params }: ComunidadDetailPag
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
-      <Link href="/comunidad" className="text-sm text-zinc-500 hover:text-zinc-800">
+      <Link href="/comunidad" className="text-sm text-muted-foreground hover:text-foreground">
         &larr; Volver a la comunidad
       </Link>
 
       <div className="mt-4 grid gap-8 sm:grid-cols-2">
         <ListingGallery images={post.images} title={post.caption} imageFit="contain" />
 
-        <div className="rounded-2xl border border-zinc-100 bg-white p-5 shadow-sm sm:p-6">
+        <Card className="p-5 shadow-sm sm:p-6">
           <div className="flex items-center gap-3">
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-fuchsia-100 to-orange-50 text-sm font-bold text-fuchsia-700 ring-1 ring-fuchsia-100">
-              {post.author.name.slice(0, 1).toUpperCase()}
-            </span>
-            <p className="text-sm text-zinc-500">
+            <Avatar size="lg" className="ring-1 ring-fuchsia-100">
+              <AvatarFallback className="bg-gradient-to-br from-fuchsia-100 to-orange-50 font-bold text-fuchsia-700">
+                {post.author.name.slice(0, 1).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+            <p className="text-sm text-muted-foreground">
               Publicado por{" "}
-              <span className="font-medium text-zinc-900">{post.author.name}</span>
+              <span className="font-medium text-foreground">{post.author.name}</span>
             </p>
           </div>
-          <p className="mt-4 whitespace-pre-line text-sm leading-relaxed text-zinc-700">
+          <p className="mt-4 whitespace-pre-line text-sm leading-relaxed text-foreground/80">
             {post.caption}
           </p>
 
@@ -113,17 +118,17 @@ export default async function ComunidadDetailPage({ params }: ComunidadDetailPag
             />
           </div>
 
-          <div className="mt-4 flex items-center gap-4 border-t border-zinc-100 pt-4">
+          <div className="mt-4 flex items-center gap-4 border-t border-border pt-4">
             {(isOwnPost || isAdmin(currentUser)) && (
               <DeletePostButton postId={post.id} />
             )}
             {currentUser && !isOwnPost && <ReportPostButton postId={post.id} />}
           </div>
-        </div>
+        </Card>
       </div>
 
-      <div className="mt-10 rounded-2xl border border-zinc-100 bg-white p-5 shadow-sm sm:p-6">
-        <h2 className="text-lg font-semibold text-zinc-900">
+      <Card className="mt-10 p-5 shadow-sm sm:p-6">
+        <h2 className="text-lg font-semibold text-foreground">
           Comentarios ({post.comments.length})
         </h2>
 
@@ -132,37 +137,39 @@ export default async function ComunidadDetailPage({ params }: ComunidadDetailPag
             <CommentForm postId={post.id} />
           </div>
         ) : (
-          <p className="mt-4 rounded-lg border border-dashed border-zinc-300 p-4 text-sm text-zinc-500">
-            <Link href="/login" className="font-medium text-orange-600 hover:underline">
-              Inicia sesión
-            </Link>{" "}
-            para comentar.
-          </p>
+          <Alert className="mt-4">
+            <AlertDescription>
+              <Link href="/login" className="font-medium text-primary hover:underline">
+                Inicia sesión
+              </Link>{" "}
+              para comentar.
+            </AlertDescription>
+          </Alert>
         )}
 
         <div className="mt-6 space-y-3">
           {post.comments.length === 0 ? (
-            <p className="text-sm text-zinc-400">Todavía no hay comentarios.</p>
+            <p className="text-sm text-muted-foreground">Todavía no hay comentarios.</p>
           ) : (
             post.comments.map((comment) => (
-              <div key={comment.id} className="flex gap-3 rounded-lg border border-zinc-100 bg-zinc-50/60 p-3">
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white text-xs font-bold text-zinc-500 ring-1 ring-zinc-200">
-                  {comment.author.name.slice(0, 1).toUpperCase()}
-                </span>
+              <div key={comment.id} className="flex gap-3 rounded-lg border border-border bg-muted/40 p-3">
+                <Avatar className="shrink-0">
+                  <AvatarFallback>{comment.author.name.slice(0, 1).toUpperCase()}</AvatarFallback>
+                </Avatar>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between gap-2">
-                    <p className="truncate text-sm font-medium text-zinc-900">{comment.author.name}</p>
+                    <p className="truncate text-sm font-medium text-foreground">{comment.author.name}</p>
                     {(currentUser?.id === comment.authorId || isAdmin(currentUser)) && (
                       <DeleteCommentButton commentId={comment.id} />
                     )}
                   </div>
-                  <p className="mt-0.5 text-sm text-zinc-700">{comment.text}</p>
+                  <p className="mt-0.5 text-sm text-foreground/80">{comment.text}</p>
                 </div>
               </div>
             ))
           )}
         </div>
-      </div>
+      </Card>
     </div>
   );
 }

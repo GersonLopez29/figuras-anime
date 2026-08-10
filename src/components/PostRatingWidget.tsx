@@ -48,19 +48,19 @@ export default function PostRatingWidget({
   }
 
   return (
-    <div className="rounded-lg border border-zinc-200 bg-white p-4">
+    <div className="rounded-lg bg-muted/50 p-4">
       <StarRating rating={averageRating} reviewCount={ratingCount} size="md" label="calificación" />
 
       {canRate && (
         <div className="mt-3">
-          <p className="text-xs font-medium text-zinc-500">
+          <p className="text-xs font-medium text-muted-foreground">
             {userValue > 0 ? "Tu calificación" : "Califica esta colección"}
           </p>
           <div className="mt-1">
             <StarPicker value={userValue} onChange={submitRating} />
           </div>
-          {loading && <p className="mt-1 text-xs text-zinc-400">Guardando...</p>}
-          {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
+          {loading && <p className="mt-1 text-xs text-muted-foreground">Guardando...</p>}
+          {error && <p className="mt-1 text-xs text-destructive">{error}</p>}
         </div>
       )}
     </div>
