@@ -24,6 +24,14 @@ export async function GET(
     return NextResponse.json({ error: "Publicación no encontrada" }, { status: 404 });
   }
 
+  // El WhatsApp del vendedor solo va en la respuesta si hay sesión —
+  // misma regla que ya aplica la página de la figura para mostrar el botón de contacto.
+  const currentUser = await getCurrentUser();
+  if (!currentUser) {
+    const { whatsapp: _whatsapp, ...userWithoutContact } = listing.user;
+    return NextResponse.json({ ...listing, user: userWithoutContact });
+  }
+
   return NextResponse.json(listing);
 }
 

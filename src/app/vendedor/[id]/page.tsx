@@ -40,14 +40,34 @@ export default async function VendedorPage({ params }: VendedorPageProps) {
 
   const seller = await prisma.user.findUnique({
     where: { id },
-    include: {
+    select: {
+      id: true,
+      name: true,
+      createdAt: true,
       reviewsReceived: {
-        include: { author: { select: { name: true } } },
         orderBy: { createdAt: "desc" },
+        select: {
+          id: true,
+          rating: true,
+          comment: true,
+          authorId: true,
+          author: { select: { name: true } },
+        },
       },
       listings: {
-        include: { images: { take: 1 } },
         orderBy: { createdAt: "desc" },
+        select: {
+          id: true,
+          title: true,
+          price: true,
+          discountAmount: true,
+          discountExpiresAt: true,
+          category: true,
+          condition: true,
+          sold: true,
+          views: true,
+          images: { take: 1, select: { url: true } },
+        },
       },
     },
   });
