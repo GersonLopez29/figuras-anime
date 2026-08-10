@@ -129,6 +129,8 @@ model Review {
   author    User     @relation("ReviewsWritten", fields: [authorId], references: [id], onDelete: Cascade)
   sellerId  String
   seller    User     @relation("ReviewsReceived", fields: [sellerId], references: [id], onDelete: Cascade)
+
+  @@unique([authorId, sellerId])
 }
 
 model Listing {

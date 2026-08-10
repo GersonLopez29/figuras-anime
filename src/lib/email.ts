@@ -1,6 +1,15 @@
 import { Resend } from "resend";
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
+
+function escapeHtml(value: string) {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
 const FROM = process.env.RESEND_FROM_EMAIL ?? "FigurasAnime <onboarding@resend.dev>";
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://figuras-anime.vercel.app";
 
@@ -35,7 +44,7 @@ export async function sendVerificationEmail(to: string, name: string, token: str
     to,
     "Confirma tu correo en FigurasAnime",
     wrapper(
-      `¡Hola ${name}!`,
+      `¡Hola ${escapeHtml(name)}!`,
       `
         <p style="font-size: 14px; color: #3f3f46; line-height: 1.6;">
           Gracias por registrarte en FigurasAnime. Confirma tu correo para activar tu cuenta:
@@ -66,7 +75,7 @@ export async function sendCategoryRequestResolvedEmail(
       approved ? "¡Buenas noticias!" : "Sobre tu solicitud",
       `
         <p style="font-size: 14px; color: #3f3f46; line-height: 1.6;">
-          Hola ${name}, tu solicitud para la categoría <strong>${categoryName}</strong>
+          Hola ${escapeHtml(name)}, tu solicitud para la categoría <strong>${escapeHtml(categoryName)}</strong>
           ${approved
             ? "fue aprobada y ya está disponible para todos los vendedores."
             : "fue rechazada por el administrador."}
@@ -92,13 +101,13 @@ export async function sendNewReviewEmail(
     to,
     `${reviewerName} te dejó una reseña en FigurasAnime`,
     wrapper(
-      `¡Hola ${sellerName}!`,
+      `¡Hola ${escapeHtml(sellerName)}!`,
       `
         <p style="font-size: 14px; color: #3f3f46; line-height: 1.6;">
-          <strong>${reviewerName}</strong> te dejó una nueva reseña:
+          <strong>${escapeHtml(reviewerName)}</strong> te dejó una nueva reseña:
         </p>
         <p style="font-size: 16px; margin: 8px 0;">${stars}</p>
-        <p style="font-size: 14px; color: #3f3f46; font-style: italic;">"${comment}"</p>
+        <p style="font-size: 14px; color: #3f3f46; font-style: italic;">"${escapeHtml(comment)}"</p>
         <a href="${SITE_URL}/vendedor/${sellerId}" style="display: inline-block; margin-top: 12px; background: #ea580c; color: white; padding: 10px 20px; border-radius: 999px; text-decoration: none; font-weight: 600; font-size: 14px;">
           Ver mi perfil
         </a>

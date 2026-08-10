@@ -39,12 +39,20 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Vendedor no encontrado" }, { status: 404 });
   }
 
-  const review = await prisma.review.create({
-    data: { sellerId, authorId: user.id, rating, comment },
+  const existingReview = await prisma.review.findUnique({
+    where: { authorId_sellerId: { authorId: user.id, sellerId } },
+  });
+
+  const review = await prisma.review.upsert({
+    where: { authorId_sellerId: { authorId: user.id, sellerId } },
+    update: { rating, comment },
+    create: { sellerId, authorId: user.id, rating, comment },
     include: { author: { select: { name: true } } },
   });
 
-  await sendNewReviewEmail(seller.email, seller.name, user.name, rating, comment, seller.id);
+  if (!existingReview) {
+    await sendNewReviewEmail(seller.email, seller.name, user.name, rating, comment, seller.id);
+  }
 
-  return NextResponse.json(review, { status: 201 });
+  return NextResponse.json(review, { status: existingReview ? 200 : 201 });
 }
