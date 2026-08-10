@@ -2,6 +2,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { prisma } from "@/lib/db";
 import DeleteCommunityPostButton from "@/components/admin/DeleteCommunityPostButton";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default async function AdminComunidadPage() {
   const posts = await prisma.collectionPost.findMany({
@@ -19,22 +22,22 @@ export default async function AdminComunidadPage() {
 
   return (
     <div>
-      <h2 className="text-lg font-semibold text-zinc-900">
+      <h2 className="flex items-center gap-2 text-lg font-semibold text-foreground">
         Publicaciones de comunidad ({posts.length})
         {reportedCount > 0 && (
-          <span className="ml-2 rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-semibold text-red-700">
+          <Badge className="bg-red-100 text-red-700 hover:bg-red-100">
             {reportedCount} con reportes
-          </span>
+          </Badge>
         )}
       </h2>
 
       {sorted.length === 0 ? (
-        <p className="mt-4 text-sm text-zinc-500">Todavía no hay publicaciones.</p>
+        <p className="mt-4 text-sm text-muted-foreground">Todavía no hay publicaciones.</p>
       ) : (
-        <div className="mt-4 divide-y divide-zinc-100 rounded-2xl border border-zinc-100 bg-white shadow-sm">
+        <Card className="mt-4 gap-0 divide-y divide-border py-0 shadow-sm">
           {sorted.map((post) => (
-            <div key={post.id} className="flex gap-4 p-4 transition hover:bg-orange-50/30">
-              <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-zinc-100">
+            <div key={post.id} className="flex gap-4 p-4 transition hover:bg-primary/5">
+              <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-muted">
                 {post.images[0] ? (
                   <Image
                     src={post.images[0].url}
@@ -49,36 +52,38 @@ export default async function AdminComunidadPage() {
                 <div className="flex items-center justify-between gap-2">
                   <Link
                     href={`/comunidad/${post.id}`}
-                    className="line-clamp-1 text-sm font-medium text-zinc-900 hover:underline"
+                    className="line-clamp-1 text-sm font-medium text-foreground hover:underline"
                   >
                     {post.caption}
                   </Link>
                   <DeleteCommunityPostButton postId={post.id} />
                 </div>
-                <p className="text-xs text-zinc-400">
+                <p className="text-xs text-muted-foreground">
                   Publicado por {post.author.name} ({post.author.email}) · {post._count.comments}{" "}
                   comentarios · {post._count.ratings} calificaciones
                 </p>
 
                 {post.reports.length > 0 && (
-                  <div className="mt-2 rounded-md bg-red-50 p-2">
-                    <p className="text-xs font-semibold text-red-700">
-                      🚩 {post.reports.length} reporte{post.reports.length === 1 ? "" : "s"}
-                    </p>
-                    <ul className="mt-1 space-y-0.5">
-                      {post.reports.map((report) => (
-                        <li key={report.id} className="text-xs text-red-600">
-                          <span className="font-medium">{report.reporter.name}:</span>{" "}
-                          {report.reason}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                  <Alert variant="destructive" className="mt-2">
+                    <AlertDescription>
+                      <p className="font-semibold text-destructive">
+                        🚩 {post.reports.length} reporte{post.reports.length === 1 ? "" : "s"}
+                      </p>
+                      <ul className="mt-1 space-y-0.5">
+                        {post.reports.map((report) => (
+                          <li key={report.id}>
+                            <span className="font-medium">{report.reporter.name}:</span>{" "}
+                            {report.reason}
+                          </li>
+                        ))}
+                      </ul>
+                    </AlertDescription>
+                  </Alert>
                 )}
               </div>
             </div>
           ))}
-        </div>
+        </Card>
       )}
     </div>
   );

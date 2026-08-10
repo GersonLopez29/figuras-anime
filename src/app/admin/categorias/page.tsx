@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/db";
 import CategoryRequestActions from "@/components/admin/CategoryRequestActions";
 import CategoryManager from "@/components/admin/CategoryManager";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 export default async function AdminCategoriasPage() {
   const [pending, resolved, categories, listingCounts] = await Promise.all([
@@ -32,67 +34,64 @@ export default async function AdminCategoriasPage() {
   return (
     <div className="space-y-10">
       <div>
-        <h2 className="text-lg font-semibold text-zinc-900">
+        <h2 className="flex items-center gap-2 text-lg font-semibold text-foreground">
           Solicitudes de categoría
           {pending.length > 0 && (
-            <span className="ml-2 rounded-full bg-orange-100 px-2.5 py-0.5 text-xs font-semibold text-orange-700">
+            <Badge className="bg-orange-100 text-orange-700 hover:bg-orange-100">
               {pending.length} pendiente{pending.length === 1 ? "" : "s"}
-            </span>
+            </Badge>
           )}
         </h2>
 
         {pending.length === 0 ? (
-          <p className="mt-4 text-sm text-zinc-500">No hay solicitudes pendientes.</p>
+          <p className="mt-4 text-sm text-muted-foreground">No hay solicitudes pendientes.</p>
         ) : (
-          <div className="mt-4 divide-y divide-zinc-100 rounded-2xl border border-zinc-100 bg-white shadow-sm">
+          <Card className="mt-4 gap-0 divide-y divide-border py-0 shadow-sm">
             {pending.map((req) => (
               <div key={req.id} className="flex items-start justify-between gap-4 p-4">
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium text-zinc-900">{req.name}</p>
-                  <p className="mt-1 text-sm text-zinc-600">{req.message}</p>
-                  <p className="mt-1 text-xs text-zinc-400">
+                  <p className="text-sm font-medium text-foreground">{req.name}</p>
+                  <p className="mt-1 text-sm text-muted-foreground">{req.message}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">
                     Solicitado por {req.requester.name} ({req.requester.email})
                   </p>
                 </div>
                 <CategoryRequestActions requestId={req.id} />
               </div>
             ))}
-          </div>
+          </Card>
         )}
       </div>
 
       {resolved.length > 0 && (
         <div>
-          <h2 className="text-lg font-semibold text-zinc-900">Resueltas recientemente</h2>
-          <div className="mt-4 divide-y divide-zinc-100 rounded-2xl border border-zinc-100 bg-white shadow-sm">
+          <h2 className="text-lg font-semibold text-foreground">Resueltas recientemente</h2>
+          <Card className="mt-4 gap-0 divide-y divide-border py-0 shadow-sm">
             {resolved.map((req) => (
               <div key={req.id} className="flex items-center justify-between gap-4 p-4">
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium text-zinc-900">{req.name}</p>
-                  <p className="text-xs text-zinc-400">
+                  <p className="text-sm font-medium text-foreground">{req.name}</p>
+                  <p className="text-xs text-muted-foreground">
                     Solicitado por {req.requester.name} ({req.requester.email})
                   </p>
                 </div>
-                <span
-                  className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-                    req.status === "approved"
-                      ? "bg-green-100 text-green-700"
-                      : "bg-zinc-100 text-zinc-600"
-                  }`}
+                <Badge
+                  variant="secondary"
+                  className={req.status === "approved" ? "bg-green-100 text-green-700 hover:bg-green-100" : ""}
                 >
                   {req.status === "approved" ? "Agregada" : "Rechazada"}
-                </span>
+                </Badge>
               </div>
             ))}
-          </div>
+          </Card>
         </div>
       )}
 
       <div>
-        <h2 className="text-lg font-semibold text-zinc-900">
+        <h2 className="text-lg font-semibold text-foreground">
           Categorías actuales ({categories.length})
         </h2>
-        <p className="mt-1 text-sm text-zinc-500">
+        <p className="mt-1 text-sm text-muted-foreground">
           Crea, renombra o elimina las categorías disponibles para todos los vendedores.
         </p>
         <div className="mt-4">

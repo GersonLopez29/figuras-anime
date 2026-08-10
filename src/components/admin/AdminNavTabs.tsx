@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Badge } from "@/components/ui/badge";
 
 type AdminNavTabsProps = {
   pendingCategoryRequests: number;
@@ -23,26 +24,22 @@ export default function AdminNavTabs({ pendingCategoryRequests }: AdminNavTabsPr
       {TABS.map((tab) => {
         const active = pathname === tab.href;
         return (
-          <Link
+          <Badge
             key={tab.href}
-            href={tab.href}
-            className={`flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition ${
-              active
-                ? "bg-orange-600 text-white shadow-sm"
-                : "border border-zinc-200 text-zinc-600 hover:border-orange-300 hover:text-zinc-900"
-            }`}
+            render={<Link href={tab.href} />}
+            variant={active ? "default" : "outline"}
+            className="h-auto shrink-0 gap-1.5 rounded-full px-4 py-2 text-sm font-medium"
           >
             {tab.label}
             {tab.href === "/admin/categorias" && pendingCategoryRequests > 0 && (
-              <span
-                className={`rounded-full px-1.5 py-0.5 text-xs font-semibold ${
-                  active ? "bg-white/20 text-white" : "bg-orange-100 text-orange-700"
-                }`}
+              <Badge
+                variant={active ? "outline" : "secondary"}
+                className={`h-auto px-1.5 py-0.5 text-xs ${active ? "border-white/30 bg-white/20 text-white" : ""}`}
               >
                 {pendingCategoryRequests}
-              </span>
+              </Badge>
             )}
-          </Link>
+          </Badge>
         );
       })}
     </nav>

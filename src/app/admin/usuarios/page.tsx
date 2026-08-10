@@ -3,6 +3,16 @@ import { getCurrentUser } from "@/lib/session";
 import { prisma } from "@/lib/db";
 import BlockUserButton from "@/components/admin/BlockUserButton";
 import DeleteUserButton from "@/components/admin/DeleteUserButton";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from "@/components/ui/table";
 
 const COMMUNITY_POSTS_PREVIEW = 3;
 
@@ -23,77 +33,73 @@ export default async function AdminUsuariosPage() {
 
   return (
     <div>
-      <h2 className="text-lg font-semibold text-zinc-900">
+      <h2 className="text-lg font-semibold text-foreground">
         Usuarios registrados ({users.length})
       </h2>
 
-      <div className="mt-4 overflow-x-auto rounded-2xl border border-zinc-100 bg-white shadow-sm">
-        <table className="w-full text-left text-sm">
-          <thead className="border-b border-zinc-100 bg-zinc-50/70 text-xs uppercase tracking-wide text-zinc-500">
-            <tr>
-              <th className="px-4 py-3">Nombre</th>
-              <th className="px-4 py-3">Correo</th>
-              <th className="px-4 py-3">WhatsApp</th>
-              <th className="px-4 py-3">Figuras</th>
-              <th className="px-4 py-3">Publicaciones en comunidad</th>
-              <th className="px-4 py-3">Estado</th>
-              <th className="px-4 py-3">Registrado</th>
-              <th className="px-4 py-3">Acciones</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-zinc-100">
+      <Card className="mt-4 gap-0 overflow-hidden py-0 shadow-sm">
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-muted/50 text-xs uppercase tracking-wide text-muted-foreground">
+              <TableHead>Nombre</TableHead>
+              <TableHead>Correo</TableHead>
+              <TableHead>WhatsApp</TableHead>
+              <TableHead>Figuras</TableHead>
+              <TableHead>Publicaciones en comunidad</TableHead>
+              <TableHead>Estado</TableHead>
+              <TableHead>Registrado</TableHead>
+              <TableHead>Acciones</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {users.map((user) => (
-              <tr key={user.id} className="transition hover:bg-orange-50/30">
-                <td className="px-4 py-3 font-medium text-zinc-900">
+              <TableRow key={user.id}>
+                <TableCell className="font-medium text-foreground">
                   {user.name}
                   {user.role === "admin" && (
-                    <span className="ml-2 rounded bg-orange-100 px-1.5 py-0.5 text-xs font-medium text-orange-700">
+                    <Badge variant="secondary" className="ml-2">
                       admin
-                    </span>
+                    </Badge>
                   )}
-                </td>
-                <td className="px-4 py-3 text-zinc-600">{user.email}</td>
-                <td className="px-4 py-3 text-zinc-600">{user.whatsapp}</td>
-                <td className="px-4 py-3 text-zinc-600">{user._count.listings}</td>
-                <td className="px-4 py-3">
+                </TableCell>
+                <TableCell className="text-muted-foreground">{user.email}</TableCell>
+                <TableCell className="text-muted-foreground">{user.whatsapp}</TableCell>
+                <TableCell className="text-muted-foreground">{user._count.listings}</TableCell>
+                <TableCell className="whitespace-normal">
                   {user._count.collectionPosts === 0 ? (
-                    <span className="text-xs text-zinc-400">Sin publicaciones</span>
+                    <span className="text-xs text-muted-foreground">Sin publicaciones</span>
                   ) : (
                     <div className="space-y-1">
                       {user.collectionPosts.map((post) => (
                         <Link
                           key={post.id}
                           href={`/comunidad/${post.id}`}
-                          className="block max-w-[14rem] truncate text-xs text-orange-600 hover:underline"
+                          className="block max-w-[14rem] truncate text-xs text-primary hover:underline"
                         >
                           {post.caption}
                         </Link>
                       ))}
                       {user._count.collectionPosts > COMMUNITY_POSTS_PREVIEW && (
-                        <p className="text-xs text-zinc-400">
+                        <p className="text-xs text-muted-foreground">
                           +{user._count.collectionPosts - COMMUNITY_POSTS_PREVIEW} más
                         </p>
                       )}
                     </div>
                   )}
-                </td>
-                <td className="px-4 py-3">
+                </TableCell>
+                <TableCell>
                   {user.isBlocked ? (
-                    <span className="rounded bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">
-                      Bloqueado
-                    </span>
+                    <Badge className="bg-red-100 text-red-700 hover:bg-red-100">Bloqueado</Badge>
                   ) : (
-                    <span className="rounded bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
-                      Activo
-                    </span>
+                    <Badge className="bg-green-100 text-green-700 hover:bg-green-100">Activo</Badge>
                   )}
-                </td>
-                <td className="px-4 py-3 text-zinc-500">
+                </TableCell>
+                <TableCell className="text-muted-foreground">
                   {user.createdAt.toLocaleDateString("es-PE")}
-                </td>
-                <td className="px-4 py-3">
+                </TableCell>
+                <TableCell>
                   {user.id === currentUser?.id ? (
-                    <span className="text-xs text-zinc-400">Esta es tu cuenta</span>
+                    <span className="text-xs text-muted-foreground">Esta es tu cuenta</span>
                   ) : (
                     <div className="flex items-center gap-3">
                       <BlockUserButton userId={user.id} isBlocked={user.isBlocked} />
@@ -104,12 +110,12 @@ export default async function AdminUsuariosPage() {
                       />
                     </div>
                   )}
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
-      </div>
+          </TableBody>
+        </Table>
+      </Card>
     </div>
   );
 }

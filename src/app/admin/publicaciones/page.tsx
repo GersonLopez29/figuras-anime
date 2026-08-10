@@ -6,6 +6,8 @@ import { getCategoryNames } from "@/lib/categories";
 import DeleteListingButton from "@/components/DeleteListingButton";
 import ToggleSoldButton from "@/components/ToggleSoldButton";
 import CategorySelect from "@/components/CategorySelect";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 export default async function AdminPublicacionesPage() {
   const [listings, categoryNames] = await Promise.all([
@@ -21,17 +23,17 @@ export default async function AdminPublicacionesPage() {
 
   return (
     <div>
-      <h2 className="text-lg font-semibold text-zinc-900">
+      <h2 className="text-lg font-semibold text-foreground">
         Publicaciones ({listings.length})
       </h2>
 
       {listings.length === 0 ? (
-        <p className="mt-4 text-sm text-zinc-500">Todavía no hay publicaciones.</p>
+        <p className="mt-4 text-sm text-muted-foreground">Todavía no hay publicaciones.</p>
       ) : (
-        <div className="mt-4 divide-y divide-zinc-100 rounded-2xl border border-zinc-100 bg-white shadow-sm">
+        <Card className="mt-4 gap-0 divide-y divide-border py-0 shadow-sm">
           {listings.map((listing) => (
-            <div key={listing.id} className="flex items-center gap-4 p-4 transition hover:bg-orange-50/30">
-              <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-zinc-100">
+            <div key={listing.id} className="flex items-center gap-4 p-4 transition hover:bg-primary/5">
+              <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-muted">
                 {listing.images[0] ? (
                   <Image
                     src={listing.images[0].url}
@@ -46,18 +48,14 @@ export default async function AdminPublicacionesPage() {
                 <div className="flex items-center gap-2">
                   <Link
                     href={`/figura/${listing.id}`}
-                    className="line-clamp-1 text-sm font-medium text-zinc-900 hover:underline"
+                    className="line-clamp-1 text-sm font-medium text-foreground hover:underline"
                   >
                     {listing.title}
                   </Link>
-                  {listing.sold && (
-                    <span className="shrink-0 rounded bg-zinc-800 px-1.5 py-0.5 text-xs font-medium text-white">
-                      Vendido
-                    </span>
-                  )}
+                  {listing.sold && <Badge variant="secondary">Vendido</Badge>}
                 </div>
-                <p className="text-sm text-zinc-500">{formatPrice(listing.price)}</p>
-                <p className="text-xs text-zinc-400">
+                <p className="text-sm text-muted-foreground">{formatPrice(listing.price)}</p>
+                <p className="text-xs text-muted-foreground">
                   Publicado por {listing.user.name} ({listing.user.email}) ·{" "}
                   <span className="inline-flex items-center gap-0.5">
                     <span aria-hidden="true">👁️</span>
@@ -77,7 +75,7 @@ export default async function AdminPublicacionesPage() {
               </div>
             </div>
           ))}
-        </div>
+        </Card>
       )}
     </div>
   );

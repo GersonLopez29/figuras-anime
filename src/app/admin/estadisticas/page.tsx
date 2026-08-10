@@ -1,5 +1,14 @@
 import { prisma } from "@/lib/db";
 import { getCountryName, getCountryFlag } from "@/lib/geo";
+import { Card } from "@/components/ui/card";
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from "@/components/ui/table";
 
 const DAYS = 30;
 const TOP_COUNTRIES = 8;
@@ -57,32 +66,32 @@ export default async function AdminEstadisticasPage() {
   return (
     <div className="space-y-8">
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-        <div className="rounded-2xl border border-zinc-100 bg-white shadow-sm p-4">
-          <p className="text-xs font-medium uppercase tracking-wide text-zinc-400">
+        <Card className="p-4 shadow-sm">
+          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
             Visitas totales
           </p>
-          <p className="mt-1 text-3xl font-bold text-zinc-900">
+          <p className="mt-1 text-3xl font-bold text-foreground tabular-nums">
             {(siteStats?.totalVisits ?? 0).toLocaleString("es-PE")}
           </p>
-        </div>
-        <div className="rounded-2xl border border-zinc-100 bg-white shadow-sm p-4">
-          <p className="text-xs font-medium uppercase tracking-wide text-zinc-400">Hoy</p>
-          <p className="mt-1 text-3xl font-bold text-zinc-900">
+        </Card>
+        <Card className="p-4 shadow-sm">
+          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Hoy</p>
+          <p className="mt-1 text-3xl font-bold text-foreground tabular-nums">
             {todayCount.toLocaleString("es-PE")}
           </p>
-        </div>
-        <div className="rounded-2xl border border-zinc-100 bg-white shadow-sm p-4">
-          <p className="text-xs font-medium uppercase tracking-wide text-zinc-400">
+        </Card>
+        <Card className="p-4 shadow-sm">
+          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
             Últimos 7 días
           </p>
-          <p className="mt-1 text-3xl font-bold text-zinc-900">
+          <p className="mt-1 text-3xl font-bold text-foreground tabular-nums">
             {last7.toLocaleString("es-PE")}
           </p>
-        </div>
+        </Card>
       </div>
 
-      <div className="rounded-2xl border border-zinc-100 bg-white shadow-sm p-4">
-        <h3 className="text-sm font-semibold text-zinc-900">
+      <Card className="p-4 shadow-sm">
+        <h3 className="text-sm font-semibold text-foreground">
           Visitas por día (últimos {DAYS} días)
         </h3>
 
@@ -101,7 +110,7 @@ export default async function AdminEstadisticasPage() {
             ))}
           </div>
           <div
-            className="mt-1 flex justify-between text-[11px] text-zinc-400"
+            className="mt-1 flex justify-between text-[11px] text-muted-foreground"
             style={{ minWidth: `${days.length * 13}px` }}
           >
             <span>{formatDayLabel(days[0].date)}</span>
@@ -110,69 +119,69 @@ export default async function AdminEstadisticasPage() {
         </div>
 
         <details className="mt-4">
-          <summary className="cursor-pointer text-xs font-medium text-zinc-500 hover:text-zinc-800">
+          <summary className="cursor-pointer text-xs font-medium text-muted-foreground hover:text-foreground">
             Ver tabla de datos
           </summary>
-          <div className="mt-2 max-h-64 overflow-y-auto rounded border border-zinc-100">
-            <table className="w-full text-left text-xs">
-              <thead className="sticky top-0 bg-zinc-50 text-zinc-500">
-                <tr>
-                  <th className="px-3 py-1.5">Fecha</th>
-                  <th className="px-3 py-1.5">Visitas</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-zinc-100">
+          <div className="mt-2 max-h-64 overflow-y-auto rounded border border-border">
+            <Table>
+              <TableHeader>
+                <TableRow className="sticky top-0 bg-muted text-muted-foreground">
+                  <TableHead className="h-auto py-1.5 text-xs">Fecha</TableHead>
+                  <TableHead className="h-auto py-1.5 text-xs">Visitas</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
                 {[...days].reverse().map((d) => (
-                  <tr key={d.date.getTime()}>
-                    <td className="px-3 py-1.5 text-zinc-600">
+                  <TableRow key={d.date.getTime()}>
+                    <TableCell className="py-1.5 text-xs text-muted-foreground">
                       {d.date.toLocaleDateString("es-PE", { timeZone: "UTC" })}
-                    </td>
-                    <td className="px-3 py-1.5 font-medium tabular-nums text-zinc-900">
+                    </TableCell>
+                    <TableCell className="py-1.5 text-xs font-medium tabular-nums text-foreground">
                       {d.count}
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 ))}
-              </tbody>
-            </table>
+              </TableBody>
+            </Table>
           </div>
         </details>
-      </div>
+      </Card>
 
-      <div className="rounded-2xl border border-zinc-100 bg-white shadow-sm p-4">
-        <h3 className="text-sm font-semibold text-zinc-900">Visitas por país</h3>
+      <Card className="p-4 shadow-sm">
+        <h3 className="text-sm font-semibold text-foreground">Visitas por país</h3>
 
         {topCountries.length === 0 ? (
-          <p className="mt-3 text-sm text-zinc-400">Todavía no hay datos suficientes.</p>
+          <p className="mt-3 text-sm text-muted-foreground">Todavía no hay datos suficientes.</p>
         ) : (
           <div className="mt-4 space-y-2.5">
             {topCountries.map((c) => (
               <div key={c.country} className="flex items-center gap-3">
-                <span className="w-20 shrink-0 truncate text-sm text-zinc-700 sm:w-32">
+                <span className="w-20 shrink-0 truncate text-sm text-foreground/80 sm:w-32">
                   {getCountryFlag(c.country)} {getCountryName(c.country)}
                 </span>
-                <div className="h-3 flex-1 overflow-hidden rounded-full bg-zinc-100">
+                <div className="h-3 flex-1 overflow-hidden rounded-full bg-muted">
                   <div
                     className="h-full rounded-full bg-orange-500"
                     style={{ width: `${Math.max(2, (c.count / maxCountry) * 100)}%` }}
                   />
                 </div>
-                <span className="w-10 shrink-0 text-right text-sm font-medium tabular-nums text-zinc-900">
+                <span className="w-10 shrink-0 text-right text-sm font-medium tabular-nums text-foreground">
                   {c.count}
                 </span>
               </div>
             ))}
             {otherCount > 0 && (
               <div className="flex items-center gap-3">
-                <span className="w-20 shrink-0 truncate text-sm text-zinc-500 sm:w-32">
+                <span className="w-20 shrink-0 truncate text-sm text-muted-foreground sm:w-32">
                   🌎 Otros países
                 </span>
-                <div className="h-3 flex-1 overflow-hidden rounded-full bg-zinc-100">
+                <div className="h-3 flex-1 overflow-hidden rounded-full bg-muted">
                   <div
                     className="h-full rounded-full bg-zinc-400"
                     style={{ width: `${Math.max(2, (otherCount / maxCountry) * 100)}%` }}
                   />
                 </div>
-                <span className="w-10 shrink-0 text-right text-sm font-medium tabular-nums text-zinc-500">
+                <span className="w-10 shrink-0 text-right text-sm font-medium tabular-nums text-muted-foreground">
                   {otherCount}
                 </span>
               </div>
@@ -180,11 +189,11 @@ export default async function AdminEstadisticasPage() {
           </div>
         )}
 
-        <p className="mt-3 text-xs text-zinc-400">
+        <p className="mt-3 text-xs text-muted-foreground">
           {totalCountryVisits.toLocaleString("es-PE")} visitas con país identificado desde que
           se activó esta estadística.
         </p>
-      </div>
+      </Card>
     </div>
   );
 }

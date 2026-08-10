@@ -2,8 +2,80 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { Card } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 type CategoryRow = { id: string; name: string; icon: string; listingCount: number };
+
+function DeleteCategoryButton({
+  category,
+  onDelete,
+}: {
+  category: CategoryRow;
+  onDelete: (id: string) => Promise<string | null>;
+}) {
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleConfirm() {
+    setLoading(true);
+    const errorMessage = await onDelete(category.id);
+    setLoading(false);
+
+    if (errorMessage) {
+      setError(errorMessage);
+    } else {
+      setOpen(false);
+    }
+  }
+
+  return (
+    <AlertDialog open={open} onOpenChange={(next) => { setOpen(next); if (next) setError(null); }}>
+      <AlertDialogTrigger
+        render={
+          <Button
+            variant="outline"
+            size="sm"
+            className="rounded-full border-red-200 text-destructive hover:bg-red-50"
+          />
+        }
+      >
+        Eliminar
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>¿Eliminar la categoría &quot;{category.name}&quot;?</AlertDialogTitle>
+          <AlertDialogDescription>
+            {category.listingCount > 0
+              ? `Hay ${category.listingCount} figura${category.listingCount === 1 ? "" : "s"} usando esta categoría.`
+              : "Esta acción no se puede deshacer."}
+            {error && <span className="mt-1 block font-medium text-destructive">{error}</span>}
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancelar</AlertDialogCancel>
+          <AlertDialogAction variant="destructive" disabled={loading} onClick={handleConfirm}>
+            {loading ? "Eliminando..." : "Eliminar"}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+}
 
 export default function CategoryManager({ categories }: { categories: CategoryRow[] }) {
   const router = useRouter();
@@ -79,93 +151,90 @@ export default function CategoryManager({ categories }: { categories: CategoryRo
     router.refresh();
   }
 
-  async function handleDelete(cat: CategoryRow) {
-    if (!confirm(`¿Eliminar la categoría "${cat.name}"?`)) return;
-
-    setRowLoading(cat.id);
-    const res = await fetch(`/api/admin/categories/${cat.id}`, { method: "DELETE" });
+  async function handleDelete(id: string): Promise<string | null> {
+    setRowLoading(id);
+    const res = await fetch(`/api/admin/categories/${id}`, { method: "DELETE" });
     setRowLoading(null);
 
     if (res.ok) {
       router.refresh();
-    } else {
-      const data = await res.json().catch(() => ({}));
-      alert(data.error ?? "No se pudo eliminar la categoría");
+      return null;
     }
+    const data = await res.json().catch(() => ({}));
+    return data.error ?? "No se pudo eliminar la categoría";
   }
 
   return (
     <div>
-      <div className="flex flex-wrap items-end gap-2 rounded-2xl border border-zinc-100 bg-white p-4 shadow-sm">
-        <div>
-          <label className="block text-xs font-medium text-zinc-600">Ícono</label>
-          <input
+      <Card className="flex-row flex-wrap items-end gap-2 p-4 shadow-sm">
+        <div className="space-y-1">
+          <Label htmlFor="new-cat-icon" className="text-xs">Ícono</Label>
+          <Input
+            id="new-cat-icon"
             type="text"
             value={newIcon}
             onChange={(e) => setNewIcon(e.target.value)}
             maxLength={8}
-            className="mt-1 w-16 rounded-md border border-zinc-300 px-2 py-2 text-center text-sm focus:border-orange-500 focus:outline-none"
+            className="w-16 text-center"
           />
         </div>
-        <div className="flex-1">
-          <label className="block text-xs font-medium text-zinc-600">Nueva categoría</label>
-          <input
+        <div className="flex-1 space-y-1">
+          <Label htmlFor="new-cat-name" className="text-xs">Nueva categoría</Label>
+          <Input
+            id="new-cat-name"
             type="text"
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
             placeholder="Ej: Jujutsu Kaisen"
             maxLength={40}
-            className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-orange-500 focus:outline-none"
           />
         </div>
-        <button
-          type="button"
-          onClick={handleCreate}
-          disabled={creating}
-          className="rounded-full bg-orange-600 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-700 disabled:opacity-60"
-        >
+        <Button type="button" onClick={handleCreate} disabled={creating} className="rounded-full">
           {creating ? "Creando..." : "Crear"}
-        </button>
-      </div>
-      {createError && <p className="mt-1.5 text-xs text-red-600">{createError}</p>}
+        </Button>
+      </Card>
+      {createError && <p className="mt-1.5 text-xs text-destructive">{createError}</p>}
 
-      <div className="mt-4 divide-y divide-zinc-100 rounded-2xl border border-zinc-100 bg-white shadow-sm">
+      <Card className="mt-4 gap-0 divide-y divide-border py-0 shadow-sm">
         {categories.map((cat) => {
           const isEditing = editingId === cat.id;
           return (
-            <div key={cat.id} className="p-4 transition hover:bg-orange-50/30">
+            <div key={cat.id} className="p-4 transition hover:bg-primary/5">
               {isEditing ? (
                 <div className="flex flex-wrap items-end gap-2">
-                  <input
+                  <Input
                     type="text"
                     value={editIcon}
                     onChange={(e) => setEditIcon(e.target.value)}
                     maxLength={8}
-                    className="w-16 rounded-md border border-zinc-300 px-2 py-1.5 text-center text-sm focus:border-orange-500 focus:outline-none"
+                    className="w-16 text-center"
                   />
-                  <input
+                  <Input
                     type="text"
                     value={editName}
                     onChange={(e) => setEditName(e.target.value)}
                     maxLength={40}
-                    className="flex-1 rounded-md border border-zinc-300 px-3 py-1.5 text-sm focus:border-orange-500 focus:outline-none"
+                    className="flex-1"
                   />
-                  <button
+                  <Button
                     type="button"
+                    size="sm"
                     onClick={() => handleSaveEdit(cat.id)}
                     disabled={rowLoading === cat.id}
-                    className="rounded-full bg-orange-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-orange-700 disabled:opacity-60"
+                    className="rounded-full"
                   >
                     {rowLoading === cat.id ? "Guardando..." : "Guardar"}
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     type="button"
+                    variant="ghost"
+                    size="sm"
                     onClick={() => setEditingId(null)}
-                    className="rounded-full px-3 py-1.5 text-xs font-medium text-zinc-500 hover:text-zinc-700"
+                    className="rounded-full text-muted-foreground"
                   >
                     Cancelar
-                  </button>
-                  {editError && <p className="w-full text-xs text-red-600">{editError}</p>}
+                  </Button>
+                  {editError && <p className="w-full text-xs text-destructive">{editError}</p>}
                 </div>
               ) : (
                 <div className="flex items-center justify-between gap-4">
@@ -173,34 +242,29 @@ export default function CategoryManager({ categories }: { categories: CategoryRo
                     <span aria-hidden="true" className="text-lg">
                       {cat.icon}
                     </span>
-                    <span className="text-sm font-medium text-zinc-900">{cat.name}</span>
-                    <span className="text-xs text-zinc-400">
+                    <span className="text-sm font-medium text-foreground">{cat.name}</span>
+                    <span className="text-xs text-muted-foreground">
                       {cat.listingCount} figura{cat.listingCount === 1 ? "" : "s"}
                     </span>
                   </div>
                   <div className="flex gap-2">
-                    <button
+                    <Button
                       type="button"
+                      variant="outline"
+                      size="sm"
                       onClick={() => startEdit(cat)}
-                      className="rounded-full border border-zinc-200 px-3 py-1.5 text-sm font-medium text-zinc-600 transition hover:border-zinc-300 hover:bg-zinc-50"
+                      className="rounded-full"
                     >
                       Editar
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleDelete(cat)}
-                      disabled={rowLoading === cat.id}
-                      className="rounded-full border border-red-200 px-3 py-1.5 text-sm font-medium text-red-600 transition hover:border-red-300 hover:bg-red-50 disabled:opacity-60"
-                    >
-                      {rowLoading === cat.id ? "Eliminando..." : "Eliminar"}
-                    </button>
+                    </Button>
+                    <DeleteCategoryButton category={cat} onDelete={handleDelete} />
                   </div>
                 </div>
               )}
             </div>
           );
         })}
-      </div>
+      </Card>
     </div>
   );
 }

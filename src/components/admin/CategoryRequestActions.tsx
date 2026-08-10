@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
 
 type CategoryRequestActionsProps = {
   requestId: string;
@@ -27,22 +28,26 @@ export default function CategoryRequestActions({ requestId }: CategoryRequestAct
 
   return (
     <div className="flex gap-3">
-      <button
+      <Button
         type="button"
+        variant="outline"
+        size="sm"
         onClick={() => resolve("approve")}
         disabled={loading !== null}
-        className="rounded-full border border-green-200 px-3 py-1.5 text-sm font-medium text-green-700 transition hover:bg-green-50 disabled:opacity-60"
+        className="rounded-full border-green-200 text-green-700 hover:bg-green-50"
       >
         {loading === "approve" ? "Agregando..." : "Agregar categoría"}
-      </button>
-      <button
+      </Button>
+      <Button
         type="button"
+        variant="outline"
+        size="sm"
         onClick={() => resolve("reject")}
         disabled={loading !== null}
-        className="rounded-full border border-zinc-200 px-3 py-1.5 text-sm font-medium text-zinc-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600 disabled:opacity-60"
+        className="rounded-full text-muted-foreground hover:border-red-200 hover:bg-red-50 hover:text-destructive"
       >
         {loading === "reject" ? "Rechazando..." : "Rechazar"}
-      </button>
+      </Button>
     </div>
   );
 }

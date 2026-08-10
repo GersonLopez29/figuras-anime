@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
 
 export default function BlockUserButton({
   userId,
@@ -31,16 +32,18 @@ export default function BlockUserButton({
   }
 
   return (
-    <button
+    <Button
+      variant="outline"
+      size="sm"
       onClick={toggle}
       disabled={loading}
-      className={`rounded-full border px-3 py-1.5 text-sm font-medium transition disabled:opacity-60 ${
+      className={`rounded-full ${
         isBlocked
           ? "border-green-200 text-green-700 hover:bg-green-50"
           : "border-amber-200 text-amber-700 hover:bg-amber-50"
       }`}
     >
       {loading ? "Guardando..." : isBlocked ? "Desbloquear" : "Bloquear"}
-    </button>
+    </Button>
   );
 }
