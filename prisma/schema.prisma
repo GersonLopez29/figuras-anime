@@ -20,6 +20,8 @@ model User {
   whatsapp                   String
   role                       String            @default("user")
   isBlocked                  Boolean           @default(false)
+  failedLoginAttempts        Int               @default(0)
+  lockedUntil                DateTime?
   emailVerified              Boolean           @default(false)
   verificationToken          String?           @unique
   verificationTokenExpiresAt DateTime?
