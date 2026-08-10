@@ -1,9 +1,10 @@
 import Link from "next/link";
-import Image from "next/image";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/session";
 import { formatPrice } from "@/lib/format";
+import { Card } from "@/components/ui/card";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 export default async function MensajesPage() {
   const user = await getCurrentUser();
@@ -27,14 +28,14 @@ export default async function MensajesPage() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-10">
-      <h1 className="text-2xl font-bold text-zinc-900">Mensajes</h1>
+      <h1 className="text-2xl font-bold text-foreground">Mensajes</h1>
 
       {conversations.length === 0 ? (
-        <p className="mt-6 text-sm text-zinc-500">
+        <p className="mt-6 text-sm text-muted-foreground">
           Todavía no tienes conversaciones. Escribe a un vendedor desde la página de una figura.
         </p>
       ) : (
-        <div className="mt-6 divide-y divide-zinc-100 overflow-hidden rounded-2xl border border-zinc-100 bg-white shadow-sm">
+        <Card className="mt-6 gap-0 divide-y divide-border overflow-hidden py-0">
           {conversations.map((c) => {
             const otherUser = c.buyerId === user.id ? c.seller : c.buyer;
             const lastMessage = c.messages[0];
@@ -44,41 +45,32 @@ export default async function MensajesPage() {
               <Link
                 key={c.id}
                 href={`/mensajes/${c.id}`}
-                className={`flex items-center gap-3 px-4 py-3 transition hover:bg-orange-50/40 ${
-                  unread ? "bg-orange-50/60" : ""
+                className={`flex items-center gap-3 px-4 py-3 transition hover:bg-primary/5 ${
+                  unread ? "bg-primary/5" : ""
                 }`}
               >
-                <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full bg-gradient-to-br from-orange-100 to-red-50 ring-1 ring-orange-100">
-                  {c.listing.images[0] ? (
-                    <Image
-                      src={c.listing.images[0].url}
-                      alt=""
-                      fill
-                      sizes="44px"
-                      className="object-cover"
-                    />
-                  ) : (
-                    <span className="flex h-full w-full items-center justify-center text-sm font-bold text-orange-700">
-                      {otherUser.name.slice(0, 1).toUpperCase()}
-                    </span>
-                  )}
-                </div>
+                <Avatar className="h-11 w-11 shrink-0 ring-1 ring-orange-100">
+                  {c.listing.images[0] && <AvatarImage src={c.listing.images[0].url} alt="" />}
+                  <AvatarFallback className="bg-gradient-to-br from-orange-100 to-red-50 font-bold text-orange-700">
+                    {otherUser.name.slice(0, 1).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between gap-2">
-                    <p className="truncate text-sm font-semibold text-zinc-900">
+                    <p className="truncate text-sm font-semibold text-foreground">
                       {otherUser.name}
                     </p>
                     {unread && (
-                      <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-orange-600" />
+                      <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-primary" />
                     )}
                   </div>
-                  <p className="truncate text-xs text-zinc-500">
+                  <p className="truncate text-xs text-muted-foreground">
                     {c.listing.title} · {formatPrice(c.listing.price)}
                   </p>
                   {lastMessage && (
                     <p
                       className={`mt-0.5 truncate text-sm ${
-                        unread ? "font-medium text-zinc-800" : "text-zinc-500"
+                        unread ? "font-medium text-foreground/90" : "text-muted-foreground"
                       }`}
                     >
                       {lastMessage.senderId === user.id ? "Tú: " : ""}
@@ -89,7 +81,7 @@ export default async function MensajesPage() {
               </Link>
             );
           })}
-        </div>
+        </Card>
       )}
     </div>
   );

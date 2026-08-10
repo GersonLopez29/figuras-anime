@@ -5,6 +5,7 @@ import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/session";
 import { formatPrice } from "@/lib/format";
 import ConversationThread from "@/components/ConversationThread";
+import { Card } from "@/components/ui/card";
 
 type MensajePageProps = {
   params: Promise<{ id: string }>;
@@ -43,34 +44,33 @@ export default async function ConversacionPage({ params }: MensajePageProps) {
 
   return (
     <div className="mx-auto flex h-[calc(100dvh-4rem)] max-w-3xl flex-col px-4 py-4 sm:py-6">
-      <Link href="/mensajes" className="text-sm text-zinc-500 hover:text-zinc-800">
+      <Link href="/mensajes" className="text-sm text-muted-foreground hover:text-foreground">
         &larr; Mensajes
       </Link>
 
-      <Link
-        href={`/figura/${conversation.listing.id}`}
-        className="mt-3 flex items-center gap-3 rounded-2xl border border-zinc-100 bg-white p-3 shadow-sm transition hover:border-orange-300"
-      >
-        <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-zinc-100">
-          {conversation.listing.images[0] && (
-            <Image
-              src={conversation.listing.images[0].url}
-              alt=""
-              fill
-              sizes="48px"
-              className="object-cover"
-            />
-          )}
-        </div>
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-semibold text-zinc-900">
-            {conversation.listing.title}
-          </p>
-          <p className="text-xs text-zinc-500">
-            {formatPrice(conversation.listing.price)}
-            {conversation.listing.sold ? " · Vendido" : ""} · Chat con {otherUser.name}
-          </p>
-        </div>
+      <Link href={`/figura/${conversation.listing.id}`} className="mt-3 block">
+        <Card className="flex-row items-center gap-3 p-3 shadow-sm transition hover:ring-primary/30">
+          <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-muted">
+            {conversation.listing.images[0] && (
+              <Image
+                src={conversation.listing.images[0].url}
+                alt=""
+                fill
+                sizes="48px"
+                className="object-cover"
+              />
+            )}
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-semibold text-foreground">
+              {conversation.listing.title}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              {formatPrice(conversation.listing.price)}
+              {conversation.listing.sold ? " · Vendido" : ""} · Chat con {otherUser.name}
+            </p>
+          </div>
+        </Card>
       </Link>
 
       <ConversationThread

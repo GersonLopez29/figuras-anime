@@ -1,6 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState, FormEvent } from "react";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 type Message = {
   id: string;
@@ -83,10 +86,10 @@ export default function ConversationThread({
   }
 
   return (
-    <div className="mt-4 flex flex-1 flex-col overflow-hidden rounded-2xl border border-zinc-100 bg-white shadow-sm">
-      <div className="flex-1 space-y-2 overflow-y-auto bg-zinc-50/50 p-4">
+    <Card className="mt-4 flex-1 gap-0 overflow-hidden py-0 shadow-sm">
+      <div className="flex-1 space-y-2 overflow-y-auto bg-muted/30 p-4">
         {messages.length === 0 ? (
-          <p className="text-center text-sm text-zinc-400">
+          <p className="text-center text-sm text-muted-foreground">
             Envía el primer mensaje para iniciar la conversación.
           </p>
         ) : (
@@ -98,7 +101,7 @@ export default function ConversationThread({
                 className={`flex flex-col ${mine ? "items-end" : "items-start"}`}
               >
                 <p
-                  className={`mb-0.5 px-1 text-[11px] font-medium text-zinc-500 ${
+                  className={`mb-0.5 px-1 text-[11px] font-medium text-muted-foreground ${
                     mine ? "text-right" : "text-left"
                   }`}
                 >
@@ -107,14 +110,14 @@ export default function ConversationThread({
                 <div
                   className={`max-w-[85%] min-w-0 rounded-2xl px-3.5 py-2 text-sm sm:max-w-[75%] ${
                     mine
-                      ? "bg-orange-600 text-white"
-                      : "bg-zinc-100 text-zinc-900"
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted text-foreground"
                   }`}
                 >
                   <p className="whitespace-pre-line break-words">{m.text}</p>
                   <p
                     className={`mt-0.5 text-right text-[10px] ${
-                      mine ? "text-orange-100" : "text-zinc-400"
+                      mine ? "text-primary-foreground/70" : "text-muted-foreground"
                     }`}
                   >
                     {new Date(m.createdAt).toLocaleTimeString("es-PE", {
@@ -130,24 +133,20 @@ export default function ConversationThread({
         <div ref={bottomRef} />
       </div>
 
-      <form onSubmit={handleSubmit} className="flex gap-2 border-t border-zinc-100 p-3">
-        <input
+      <form onSubmit={handleSubmit} className="flex gap-2 border-t border-border p-3">
+        <Input
           type="text"
           required
           value={text}
           onChange={(e) => setText(e.target.value)}
           placeholder="Escribe un mensaje..."
-          className="w-full rounded-full border border-zinc-300 px-4 py-2 text-sm focus:border-orange-500 focus:outline-none"
+          className="rounded-full"
         />
-        <button
-          type="submit"
-          disabled={sending}
-          className="shrink-0 rounded-full bg-orange-600 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-700 disabled:opacity-60"
-        >
+        <Button type="submit" disabled={sending} className="shrink-0 rounded-full">
           Enviar
-        </button>
+        </Button>
       </form>
-      {error && <p className="px-3 pb-2 text-xs text-red-600">{error}</p>}
-    </div>
+      {error && <p className="px-3 pb-2 text-xs text-destructive">{error}</p>}
+    </Card>
   );
 }

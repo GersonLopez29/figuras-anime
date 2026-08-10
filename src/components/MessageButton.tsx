@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
 
 export default function MessageButton({ listingId }: { listingId: string }) {
   const router = useRouter();
@@ -33,16 +34,18 @@ export default function MessageButton({ listingId }: { listingId: string }) {
 
   return (
     <div>
-      <button
+      <Button
         type="button"
+        variant="outline"
         onClick={handleClick}
         disabled={loading}
-        className="mt-3 flex w-full items-center justify-center gap-2 rounded-full border border-orange-600 bg-white px-4 py-3 text-sm font-bold text-orange-700 hover:bg-orange-50 disabled:opacity-60"
+        size="lg"
+        className="mt-3 w-full rounded-full border-primary text-primary hover:bg-primary/5"
       >
         <span aria-hidden="true">💬</span>
         {loading ? "Abriendo chat..." : "Enviar mensaje"}
-      </button>
-      {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
+      </Button>
+      {error && <p className="mt-1 text-xs text-destructive">{error}</p>}
     </div>
   );
 }

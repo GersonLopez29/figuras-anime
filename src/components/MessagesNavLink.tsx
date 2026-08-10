@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { Badge } from "@/components/ui/badge";
 
 const POLL_INTERVAL_MS = 15000;
 
@@ -31,9 +32,9 @@ export default function MessagesNavLink({
     <Link href="/mensajes" onClick={onClick} className={className}>
       Mensajes
       {count > 0 && (
-        <span className="ml-1.5 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-orange-600 px-1 text-[11px] font-bold text-white">
+        <Badge className="ml-1.5 min-w-5 justify-center px-1 text-[11px]">
           {count > 9 ? "9+" : count}
-        </span>
+        </Badge>
       )}
     </Link>
   );
