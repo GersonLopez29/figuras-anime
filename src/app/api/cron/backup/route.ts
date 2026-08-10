@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
     siteStats,
     visitStats,
   ] = await Promise.all([
-    prisma.user.findMany(),
+    prisma.user.findMany({ omit: { passwordHash: true } }),
     prisma.listing.findMany(),
     prisma.listingImage.findMany(),
     prisma.favorite.findMany(),
@@ -75,7 +75,7 @@ export async function GET(request: NextRequest) {
   };
 
   await put(`${folder}/base-de-datos.json`, JSON.stringify(database, null, 2), {
-    access: "public",
+    access: "private",
     contentType: "application/json",
     addRandomSuffix: false,
   });
@@ -95,7 +95,7 @@ export async function GET(request: NextRequest) {
       const buffer = Buffer.from(await res.arrayBuffer());
       const ext = img.url.split(".").pop()?.split("?")[0] || "jpg";
       await put(`${folder}/imagenes/${img.kind}-${img.id}.${ext}`, buffer, {
-        access: "public",
+        access: "private",
         addRandomSuffix: false,
       });
       imagesCopied++;
