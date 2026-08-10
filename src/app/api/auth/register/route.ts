@@ -4,7 +4,7 @@ import { randomBytes } from "crypto";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { createSession } from "@/lib/session";
-import { sendVerificationEmail } from "@/lib/email";
+import { sendVerificationEmail, sendAccountExistsEmail } from "@/lib/email";
 
 const registerSchema = z.object({
   name: z.string().trim().min(2, "El nombre debe tener al menos 2 caracteres"),
@@ -31,10 +31,10 @@ export async function POST(request: Request) {
 
   const existing = await prisma.user.findUnique({ where: { email } });
   if (existing) {
-    return NextResponse.json(
-      { error: "Ya existe una cuenta con ese correo" },
-      { status: 409 }
-    );
+    // No revelamos por HTTP si el correo ya está registrado (evita enumeración de usuarios).
+    // Se le avisa al dueño real de la cuenta por correo en su lugar.
+    await sendAccountExistsEmail(existing.email, existing.name);
+    return NextResponse.json({ name, email });
   }
 
   const passwordHash = await bcrypt.hash(password, 10);
@@ -55,5 +55,5 @@ export async function POST(request: Request) {
   await createSession(user.id);
   await sendVerificationEmail(user.email, user.name, verificationToken);
 
-  return NextResponse.json({ id: user.id, name: user.name, email: user.email });
+  return NextResponse.json({ name: user.name, email: user.email });
 }

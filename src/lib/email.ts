@@ -60,6 +60,28 @@ export async function sendVerificationEmail(to: string, name: string, token: str
   );
 }
 
+export async function sendAccountExistsEmail(to: string, name: string) {
+  await sendEmail(
+    to,
+    "Ya tienes una cuenta en FigurasAnime",
+    wrapper(
+      `¡Hola ${escapeHtml(name)}!`,
+      `
+        <p style="font-size: 14px; color: #3f3f46; line-height: 1.6;">
+          Alguien intentó crear una cuenta en FigurasAnime usando este correo, pero ya tienes una.
+          Si fuiste tú, simplemente inicia sesión con tu contraseña habitual.
+        </p>
+        <a href="${SITE_URL}/login" style="display: inline-block; margin-top: 12px; background: #ea580c; color: white; padding: 10px 20px; border-radius: 999px; text-decoration: none; font-weight: 600; font-size: 14px;">
+          Iniciar sesión
+        </a>
+        <p style="margin-top: 16px; font-size: 12px; color: #71717a;">
+          Si no fuiste tú, puedes ignorar este correo.
+        </p>
+      `
+    )
+  );
+}
+
 export async function sendCategoryRequestResolvedEmail(
   to: string,
   name: string,
