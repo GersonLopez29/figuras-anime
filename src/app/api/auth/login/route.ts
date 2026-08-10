@@ -13,8 +13,8 @@ const loginSchema = z.object({
 // tome un tiempo similar tanto si el correo existe como si no.
 const DUMMY_HASH = "$2b$10$LahX//Z.Q6jW3blJvPPWrO7HeQHt2K7CQiP029FlPFI6/PJ4Uyh5m";
 
-const MAX_LOGIN_ATTEMPTS = 5;
-const LOCKOUT_MINUTES = 15;
+const MAX_LOGIN_ATTEMPTS = 3;
+const LOCKOUT_MINUTES = 30;
 
 export async function POST(request: Request) {
   const body = await request.json();
