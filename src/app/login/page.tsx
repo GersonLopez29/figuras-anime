@@ -3,6 +3,11 @@
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Card } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -50,48 +55,48 @@ export default function LoginPage() {
           </span>
         </Link>
 
-        <div className="mt-6 w-full rounded-2xl border border-zinc-100 bg-white p-6 shadow-sm sm:p-8">
-          <h1 className="text-xl font-bold text-zinc-900">Iniciar sesión</h1>
-          <p className="mt-1 text-sm text-zinc-500">Bienvenido de vuelta.</p>
+        <Card className="mt-6 w-full p-6 shadow-sm sm:p-8">
+          <h1 className="text-xl font-bold text-foreground">Iniciar sesión</h1>
+          <p className="mt-1 text-sm text-muted-foreground">Bienvenido de vuelta.</p>
 
           <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-zinc-700">Correo</label>
-              <input
+            <div className="space-y-1.5">
+              <Label htmlFor="email">Correo</Label>
+              <Input
+                id="email"
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 w-full rounded-xl border border-zinc-300 px-3 py-2.5 text-sm focus:border-orange-500 focus:outline-none focus:ring-4 focus:ring-orange-100"
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-zinc-700">Contraseña</label>
-              <input
+            <div className="space-y-1.5">
+              <Label htmlFor="password">Contraseña</Label>
+              <Input
+                id="password"
                 type="password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 w-full rounded-xl border border-zinc-300 px-3 py-2.5 text-sm focus:border-orange-500 focus:outline-none focus:ring-4 focus:ring-orange-100"
               />
             </div>
 
-            {error && <p className="text-sm text-red-600">{error}</p>}
+            {error && (
+              <Alert variant="destructive">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full rounded-full bg-orange-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-orange-600/20 transition hover:-translate-y-0.5 hover:bg-orange-700 hover:shadow-lg disabled:pointer-events-none disabled:opacity-60"
-            >
+            <Button type="submit" disabled={loading} className="w-full rounded-full">
               {loading ? "Ingresando..." : "Ingresar"}
-            </button>
+            </Button>
           </form>
-        </div>
+        </Card>
 
-        <p className="mt-6 text-sm text-zinc-500">
+        <p className="mt-6 text-sm text-muted-foreground">
           ¿No tienes cuenta?{" "}
-          <Link href="/registro" className="font-medium text-orange-600 hover:underline">
+          <Link href="/registro" className="font-medium text-primary hover:underline">
             Regístrate
           </Link>
         </p>

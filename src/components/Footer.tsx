@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 
 type CategoryOption = { name: string; icon: string };
 
@@ -73,12 +75,13 @@ export default function Footer({ totalVisits, categories }: FooterProps) {
           </div>
         </div>
 
-        <div className="mt-10 flex flex-col items-center gap-2 border-t border-zinc-100 pt-6 text-center text-xs text-zinc-400 sm:flex-row sm:justify-between">
+        <Separator className="mt-10" />
+        <div className="flex flex-col items-center gap-2 pt-6 text-center text-xs text-muted-foreground sm:flex-row sm:justify-between">
           <p>FigurasAnime © {year} — Compra y venta entre coleccionistas</p>
-          <span className="inline-flex items-center gap-1 rounded-full bg-zinc-50 px-2.5 py-1 font-medium text-zinc-500 ring-1 ring-zinc-100">
+          <Badge variant="secondary" className="h-auto gap-1 px-2.5 py-1 font-medium">
             <span aria-hidden="true">📊</span>
             {totalVisits.toLocaleString("es-PE")} visitas totales
-          </span>
+          </Badge>
         </div>
       </div>
     </footer>

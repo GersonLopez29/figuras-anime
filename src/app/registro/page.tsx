@@ -3,6 +3,11 @@
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Card } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function RegistroPage() {
   const router = useRouter();
@@ -52,79 +57,77 @@ export default function RegistroPage() {
           </span>
         </Link>
 
-        <div className="mt-6 w-full rounded-2xl border border-zinc-100 bg-white p-6 shadow-sm sm:p-8">
-          <h1 className="text-xl font-bold text-zinc-900">Crear cuenta</h1>
-          <p className="mt-1 text-sm text-zinc-500">
+        <Card className="mt-6 w-full p-6 shadow-sm sm:p-8">
+          <h1 className="text-xl font-bold text-foreground">Crear cuenta</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
             Regístrate para publicar y vender tus figuras.
           </p>
 
           <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-zinc-700">Nombre</label>
-              <input
+            <div className="space-y-1.5">
+              <Label htmlFor="name">Nombre</Label>
+              <Input
+                id="name"
                 type="text"
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="mt-1 w-full rounded-xl border border-zinc-300 px-3 py-2.5 text-sm focus:border-orange-500 focus:outline-none focus:ring-4 focus:ring-orange-100"
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-zinc-700">Correo</label>
-              <input
+            <div className="space-y-1.5">
+              <Label htmlFor="email">Correo</Label>
+              <Input
+                id="email"
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 w-full rounded-xl border border-zinc-300 px-3 py-2.5 text-sm focus:border-orange-500 focus:outline-none focus:ring-4 focus:ring-orange-100"
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-zinc-700">Contraseña</label>
-              <input
+            <div className="space-y-1.5">
+              <Label htmlFor="password">Contraseña</Label>
+              <Input
+                id="password"
                 type="password"
                 required
                 minLength={6}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 w-full rounded-xl border border-zinc-300 px-3 py-2.5 text-sm focus:border-orange-500 focus:outline-none focus:ring-4 focus:ring-orange-100"
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-zinc-700">
-                Número de WhatsApp
-              </label>
-              <input
+            <div className="space-y-1.5">
+              <Label htmlFor="whatsapp">Número de WhatsApp</Label>
+              <Input
+                id="whatsapp"
                 type="tel"
                 required
                 placeholder="Ej: +51987654321"
                 value={whatsapp}
                 onChange={(e) => setWhatsapp(e.target.value)}
-                className="mt-1 w-full rounded-xl border border-zinc-300 px-3 py-2.5 text-sm focus:border-orange-500 focus:outline-none focus:ring-4 focus:ring-orange-100"
               />
-              <p className="mt-1 text-xs text-zinc-400">
+              <p className="text-xs text-muted-foreground">
                 Incluye el código de país. Aquí te contactarán los compradores.
               </p>
             </div>
 
-            {error && <p className="text-sm text-red-600">{error}</p>}
+            {error && (
+              <Alert variant="destructive">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full rounded-full bg-orange-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-orange-600/20 transition hover:-translate-y-0.5 hover:bg-orange-700 hover:shadow-lg disabled:pointer-events-none disabled:opacity-60"
-            >
+            <Button type="submit" disabled={loading} className="w-full rounded-full">
               {loading ? "Creando cuenta..." : "Crear cuenta"}
-            </button>
+            </Button>
           </form>
-        </div>
+        </Card>
 
-        <p className="mt-6 text-sm text-zinc-500">
+        <p className="mt-6 text-sm text-muted-foreground">
           ¿Ya tienes cuenta?{" "}
-          <Link href="/login" className="font-medium text-orange-600 hover:underline">
+          <Link href="/login" className="font-medium text-primary hover:underline">
             Inicia sesión
           </Link>
         </p>

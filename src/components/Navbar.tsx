@@ -4,6 +4,8 @@ import { getCurrentUser, isAdmin } from "@/lib/session";
 import LogoutButton from "@/components/LogoutButton";
 import MobileMenu from "@/components/MobileMenu";
 import MessagesNavLink from "@/components/MessagesNavLink";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 export default async function Navbar() {
   const user = await getCurrentUser();
@@ -29,13 +31,13 @@ export default async function Navbar() {
         </Link>
 
         <nav className="hidden items-center gap-5 md:flex">
-          <Link
-            href="/comunidad"
-            className="flex items-center gap-1 rounded-full bg-gradient-to-r from-fuchsia-500 to-orange-500 px-3.5 py-1.5 text-sm font-bold text-white shadow-sm transition hover:shadow-md hover:brightness-105"
+          <Badge
+            render={<Link href="/comunidad" />}
+            className="h-auto gap-1 bg-gradient-to-r from-fuchsia-500 to-orange-500 px-3.5 py-1.5 text-sm font-bold text-white shadow-sm transition hover:shadow-md hover:brightness-105"
           >
             <span aria-hidden="true">✨</span>
             Comunidad
-          </Link>
+          </Badge>
           {user ? (
             <>
               <Link
@@ -62,14 +64,11 @@ export default async function Navbar() {
                   Panel admin
                 </Link>
               )}
-              <span className="text-sm text-zinc-400">Hola, {user.name}</span>
+              <span className="text-sm text-muted-foreground">Hola, {user.name}</span>
               <LogoutButton />
-              <Link
-                href="/publicar"
-                className="rounded-full bg-orange-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-orange-700"
-              >
+              <Button render={<Link href="/publicar" />} nativeButton={false} className="rounded-full">
                 Publicar figura
-              </Link>
+              </Button>
             </>
           ) : (
             <>
@@ -79,12 +78,9 @@ export default async function Navbar() {
               >
                 Iniciar sesión
               </Link>
-              <Link
-                href="/registro"
-                className="rounded-full bg-orange-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-orange-700"
-              >
+              <Button render={<Link href="/registro" />} nativeButton={false} className="rounded-full">
                 Registrarme
-              </Link>
+              </Button>
             </>
           )}
         </nav>
