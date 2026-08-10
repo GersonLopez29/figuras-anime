@@ -3,16 +3,20 @@ import { cookies } from "next/headers";
 import { prisma } from "@/lib/db";
 
 const SESSION_COOKIE = "session";
-const secret = new TextEncoder().encode(
-  process.env.SESSION_SECRET ?? "dev-only-insecure-secret"
-);
+
+function getSecret() {
+  if (!process.env.SESSION_SECRET) {
+    throw new Error("SESSION_SECRET no está configurado");
+  }
+  return new TextEncoder().encode(process.env.SESSION_SECRET);
+}
 
 export async function createSession(userId: string) {
   const token = await new SignJWT({ userId })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime("30d")
-    .sign(secret);
+    .sign(getSecret());
 
   const cookieStore = await cookies();
   cookieStore.set(SESSION_COOKIE, token, {
@@ -35,7 +39,7 @@ export async function getCurrentUser() {
   if (!token) return null;
 
   try {
-    const { payload } = await jwtVerify(token, secret);
+    const { payload } = await jwtVerify(token, getSecret());
     const userId = payload.userId as string;
     if (!userId) return null;
 
