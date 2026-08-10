@@ -1,6 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function CategoryRequestForm() {
   const [open, setOpen] = useState(false);
@@ -37,7 +42,7 @@ export default function CategoryRequestForm() {
 
   if (done) {
     return (
-      <p className="mt-1.5 text-xs font-medium text-zinc-500">
+      <p className="mt-1.5 text-xs font-medium text-muted-foreground">
         ✓ Solicitud enviada, un administrador la revisará.
       </p>
     );
@@ -45,63 +50,67 @@ export default function CategoryRequestForm() {
 
   if (!open) {
     return (
-      <button
+      <Button
         type="button"
+        variant="link"
         onClick={() => setOpen(true)}
-        className="mt-1.5 text-xs font-medium text-orange-600 hover:text-orange-800"
+        className="mt-1.5 h-auto whitespace-normal p-0 text-left text-xs"
       >
         ¿No encuentras tu categoría? Solicítala
-      </button>
+      </Button>
     );
   }
 
   return (
-    <div className="mt-2 rounded-lg border border-zinc-200 bg-zinc-50 p-3">
-      <div>
-        <label className="block text-xs font-medium text-zinc-600">
+    <div className="mt-2 rounded-lg border border-border bg-muted/50 p-3">
+      <div className="space-y-1">
+        <Label htmlFor="category-request-name" className="text-xs">
           Nombre de la categoría
-        </label>
-        <input
+        </Label>
+        <Input
+          id="category-request-name"
           type="text"
           required
           maxLength={40}
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="Ej: Jujutsu Kaisen"
-          className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-xs focus:border-orange-500 focus:outline-none"
+          className="text-xs"
         />
       </div>
-      <div className="mt-2">
-        <label className="block text-xs font-medium text-zinc-600">
+      <div className="mt-2 space-y-1">
+        <Label htmlFor="category-request-message" className="text-xs">
           Mensaje para el administrador
-        </label>
-        <textarea
+        </Label>
+        <Textarea
+          id="category-request-message"
           required
           rows={2}
           maxLength={300}
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           placeholder="Cuéntale por qué falta esta categoría"
-          className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-xs focus:border-orange-500 focus:outline-none"
+          className="text-xs"
         />
       </div>
-      {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
+      {error && (
+        <Alert variant="destructive" className="mt-1">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
       <div className="mt-2 flex gap-2">
-        <button
-          type="button"
-          onClick={handleSubmit}
-          disabled={loading}
-          className="rounded-full bg-orange-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-orange-700 disabled:opacity-60"
-        >
+        <Button type="button" size="sm" onClick={handleSubmit} disabled={loading} className="rounded-full">
           {loading ? "Enviando..." : "Enviar solicitud"}
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
+          variant="ghost"
+          size="sm"
           onClick={() => setOpen(false)}
-          className="rounded-full px-3 py-1.5 text-xs font-medium text-zinc-500 hover:text-zinc-700"
+          className="rounded-full text-muted-foreground"
         >
           Cancelar
-        </button>
+        </Button>
       </div>
     </div>
   );

@@ -2,6 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import { useState, FormEvent } from "react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 export default function CommentForm({ postId }: { postId: string }) {
   const router = useRouter();
@@ -33,23 +35,21 @@ export default function CommentForm({ postId }: { postId: string }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex gap-2">
-      <input
-        type="text"
-        required
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-        placeholder="Escribe un comentario..."
-        className="w-full rounded-full border border-zinc-300 px-4 py-2 text-sm focus:border-orange-500 focus:outline-none"
-      />
-      <button
-        type="submit"
-        disabled={loading}
-        className="shrink-0 rounded-full bg-orange-600 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-700 disabled:opacity-60"
-      >
-        {loading ? "..." : "Comentar"}
-      </button>
-      {error && <p className="text-xs text-red-600">{error}</p>}
+    <form onSubmit={handleSubmit}>
+      <div className="flex gap-2">
+        <Input
+          type="text"
+          required
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          placeholder="Escribe un comentario..."
+          className="rounded-full"
+        />
+        <Button type="submit" disabled={loading} className="shrink-0 rounded-full">
+          {loading ? "..." : "Comentar"}
+        </Button>
+      </div>
+      {error && <p className="mt-1 text-xs text-destructive">{error}</p>}
     </form>
   );
 }

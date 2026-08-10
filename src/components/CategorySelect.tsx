@@ -2,6 +2,13 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 type CategorySelectProps = {
   listingId: string;
@@ -34,17 +41,17 @@ export default function CategorySelect({ listingId, category, categories }: Cate
   }
 
   return (
-    <select
-      value={value}
-      disabled={loading}
-      onChange={(e) => handleChange(e.target.value)}
-      className="rounded-md border border-zinc-300 bg-white px-2 py-1 text-xs font-medium text-zinc-700 focus:border-orange-500 focus:outline-none disabled:opacity-60"
-    >
-      {categories.map((cat) => (
-        <option key={cat} value={cat}>
-          {cat}
-        </option>
-      ))}
-    </select>
+    <Select value={value} onValueChange={(v) => v && handleChange(v)} disabled={loading}>
+      <SelectTrigger size="sm" className="text-xs font-medium">
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
+        {categories.map((cat) => (
+          <SelectItem key={cat} value={cat}>
+            {cat}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   );
 }
