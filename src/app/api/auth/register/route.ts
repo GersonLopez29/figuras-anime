@@ -16,7 +16,30 @@ const registerSchema = z.object({
     .min(8, "Ingresa un número de WhatsApp válido con código de país"),
 });
 
+const MAX_REGISTER_ATTEMPTS_PER_IP = 5;
+const REGISTER_WINDOW_MINUTES = 60;
+
+function getClientIp(request: Request) {
+  return request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+}
+
 export async function POST(request: Request) {
+  const ip = getClientIp(request);
+  const windowStart = new Date(Date.now() - REGISTER_WINDOW_MINUTES * 60_000);
+
+  const recentAttempts = await prisma.registrationAttempt.count({
+    where: { ip, createdAt: { gte: windowStart } },
+  });
+
+  if (recentAttempts >= MAX_REGISTER_ATTEMPTS_PER_IP) {
+    return NextResponse.json(
+      { error: "Demasiados intentos de registro desde esta conexión. Intenta de nuevo en un rato." },
+      { status: 429 }
+    );
+  }
+
+  await prisma.registrationAttempt.create({ data: { ip } });
+
   const body = await request.json();
   const parsed = registerSchema.safeParse(body);
 
