@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Badge } from "@/components/ui/badge";
 
 type ListingFiltersProps = {
   estado?: "nuevo" | "usado";
@@ -6,6 +7,18 @@ type ListingFiltersProps = {
   category?: string;
   q?: string;
 };
+
+function Pill({ active, href, children }: { active: boolean; href: string; children: React.ReactNode }) {
+  return (
+    <Badge
+      variant={active ? "default" : "outline"}
+      className="h-auto shrink-0 rounded-full px-4 py-2 text-sm font-medium hover:border-primary/50"
+      render={<Link href={href} />}
+    >
+      {children}
+    </Badge>
+  );
+}
 
 export default function ListingFilters({ estado, oferta, category, q }: ListingFiltersProps) {
   function hrefFor(nextEstado: "nuevo" | "usado" | undefined, nextOferta: boolean) {
@@ -18,34 +31,20 @@ export default function ListingFilters({ estado, oferta, category, q }: ListingF
     return `${qs ? `/?${qs}` : "/"}#catalogo`;
   }
 
-  function pillClass(active: boolean) {
-    return `shrink-0 rounded-full px-4 py-2 text-sm font-medium transition ${
-      active
-        ? "bg-orange-600 text-white"
-        : "border border-zinc-300 text-zinc-600 hover:border-orange-300"
-    }`;
-  }
-
   return (
     <div className="flex gap-2 overflow-x-auto pb-1">
-      <Link href={hrefFor(undefined, false)} className={pillClass(!estado && !oferta)}>
+      <Pill active={!estado && !oferta} href={hrefFor(undefined, false)}>
         Todas
-      </Link>
-      <Link
-        href={hrefFor(estado === "nuevo" ? undefined : "nuevo", !!oferta)}
-        className={pillClass(estado === "nuevo")}
-      >
+      </Pill>
+      <Pill active={estado === "nuevo"} href={hrefFor(estado === "nuevo" ? undefined : "nuevo", !!oferta)}>
         🆕 Nuevas
-      </Link>
-      <Link
-        href={hrefFor(estado === "usado" ? undefined : "usado", !!oferta)}
-        className={pillClass(estado === "usado")}
-      >
+      </Pill>
+      <Pill active={estado === "usado"} href={hrefFor(estado === "usado" ? undefined : "usado", !!oferta)}>
         ♻️ Usadas
-      </Link>
-      <Link href={hrefFor(estado, !oferta)} className={pillClass(!!oferta)}>
+      </Pill>
+      <Pill active={!!oferta} href={hrefFor(estado, !oferta)}>
         🔥 En oferta
-      </Link>
+      </Pill>
     </div>
   );
 }
