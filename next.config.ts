@@ -4,7 +4,7 @@ const contentSecurityPolicy = [
   "default-src 'self'",
   "script-src 'self' 'unsafe-inline'",
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: https://*.public.blob.vercel-storage.com",
+  "img-src 'self' data: https://*.public.blob.vercel-storage.com https://flagcdn.com",
   "font-src 'self' data:",
   "connect-src 'self'",
   "frame-ancestors 'none'",

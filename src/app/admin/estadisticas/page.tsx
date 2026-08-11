@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db";
-import { getCountryName, getCountryFlag } from "@/lib/geo";
+import { getCountryName } from "@/lib/geo";
+import CountryFlag from "@/components/admin/CountryFlag";
 import { Card } from "@/components/ui/card";
 import {
   Table,
@@ -156,8 +157,8 @@ export default async function AdminEstadisticasPage() {
           <div className="mt-4 space-y-2.5">
             {topCountries.map((c) => (
               <div key={c.country} className="flex items-center gap-3">
-                <span className="w-20 shrink-0 truncate text-sm text-foreground/80 sm:w-32">
-                  {getCountryFlag(c.country)} {getCountryName(c.country)}
+                <span className="flex w-20 shrink-0 items-center gap-1.5 truncate text-sm text-foreground/80 sm:w-32">
+                  <CountryFlag code={c.country} /> {getCountryName(c.country)}
                 </span>
                 <div className="h-3 flex-1 overflow-hidden rounded-full bg-muted">
                   <div

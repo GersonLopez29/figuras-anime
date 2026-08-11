@@ -8,9 +8,3 @@ export function getCountryName(code: string) {
     return code;
   }
 }
-
-export function getCountryFlag(code: string) {
-  if (!code || code.length !== 2 || code === "XX") return "🌐";
-  const points = [...code.toUpperCase()].map((c) => 127397 + c.charCodeAt(0));
-  return String.fromCodePoint(...points);
-}
