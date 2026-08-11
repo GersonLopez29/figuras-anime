@@ -36,10 +36,10 @@ export default function CategoryFilter({ activeCategory, q, categories }: Catego
       <div className="flex gap-5 overflow-x-auto pb-1">
         <Link
           href={q ? `/?q=${encodeURIComponent(q)}` : "/"}
-          className="flex shrink-0 flex-col items-center gap-1.5 [perspective:600px]"
+          className="flex shrink-0 flex-col items-center gap-1.5"
         >
           <span
-            className={`category-coin flex h-16 w-16 items-center justify-center rounded-full text-2xl ${
+            className={`flex h-16 w-16 items-center justify-center rounded-full text-2xl ${
               !activeCategory
                 ? "bg-orange-600 text-white"
                 : "bg-orange-50 text-zinc-700 hover:bg-orange-100"
@@ -58,10 +58,10 @@ export default function CategoryFilter({ activeCategory, q, categories }: Catego
             <Link
               key={cat.name}
               href={`/?${params.toString()}`}
-              className="flex shrink-0 flex-col items-center gap-1.5 [perspective:600px]"
+              className="flex shrink-0 flex-col items-center gap-1.5"
             >
               <span
-                className={`category-coin relative flex h-16 w-16 items-center justify-center overflow-hidden rounded-full text-2xl ${
+                className={`relative flex h-16 w-16 items-center justify-center overflow-hidden rounded-full text-2xl ${
                   active ? "ring-2 ring-orange-600 ring-offset-2" : ""
                 } ${
                   cat.imageUrl
