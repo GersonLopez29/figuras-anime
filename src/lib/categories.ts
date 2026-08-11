@@ -4,10 +4,12 @@ export type CategoryOption = { name: string; icon: string };
 export type CategoryWithCoverImage = CategoryOption & { imageUrl: string | null };
 
 export async function getCategories(): Promise<CategoryOption[]> {
-  return prisma.category.findMany({
+  const categories = await prisma.category.findMany({
     orderBy: { createdAt: "asc" },
     select: { name: true, icon: true },
   });
+  // "Otras" es el cajón de sastre — siempre va al final, sin importar cuándo se creó.
+  return categories.sort((a, b) => Number(a.name === "Otras") - Number(b.name === "Otras"));
 }
 
 // Usa la foto real de la publicación activa más reciente de cada categoría
