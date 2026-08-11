@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/db";
-import { getCategories } from "@/lib/categories";
+import { getCategoriesWithCoverImage } from "@/lib/categories";
 import { getCurrentUser } from "@/lib/session";
 import ListingCard from "@/components/ListingCard";
 import CategoryFilter from "@/components/CategoryFilter";
@@ -31,7 +31,7 @@ type HomeProps = {
 export default async function Home({ searchParams }: HomeProps) {
   const { categoria, q, bienvenida, pagina, estado: rawEstado, oferta: rawOferta } =
     await searchParams;
-  const [categories, user] = await Promise.all([getCategories(), getCurrentUser()]);
+  const [categories, user] = await Promise.all([getCategoriesWithCoverImage(), getCurrentUser()]);
   const category = categories.some((c) => c.name === categoria) ? categoria : undefined;
   const estado = rawEstado === "nuevo" || rawEstado === "usado" ? rawEstado : undefined;
   const oferta = rawOferta === "1";
