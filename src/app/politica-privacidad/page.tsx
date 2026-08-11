@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 };
 
 const LAST_UPDATED = "10 de agosto de 2026";
-const CONTACT_EMAIL = "drkgerson@gmail.com";
+const CONTACT_EMAIL = "gersonownd@gmail.com";
 
 export default function PoliticaPrivacidadPage() {
   return (

@@ -76,6 +76,11 @@ export default function Footer({ totalVisits, categories }: FooterProps) {
                   Política de Privacidad
                 </Link>
               </li>
+              <li>
+                <Link href="/contacto" className="inline-block text-sm text-zinc-600 transition hover:translate-x-0.5 hover:text-orange-600">
+                  Contacto
+                </Link>
+              </li>
             </ul>
           </div>
         </div>
