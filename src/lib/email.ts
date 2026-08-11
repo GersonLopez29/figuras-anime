@@ -11,7 +11,7 @@ function escapeHtml(value: string) {
     .replace(/'/g, "&#39;");
 }
 const FROM = process.env.RESEND_FROM_EMAIL ?? "FigurasAnime <onboarding@resend.dev>";
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://figuras-anime.vercel.app";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://gerstore.club";
 
 async function sendEmail(to: string, subject: string, html: string) {
   if (!resend) {
