@@ -1,7 +1,6 @@
 import Link from "next/link";
-import Image from "next/image";
 
-type CategoryOption = { name: string; icon: string; imageUrl?: string | null };
+type CategoryOption = { name: string; icon: string };
 
 type CategoryFilterProps = {
   activeCategory?: string;
@@ -61,21 +60,13 @@ export default function CategoryFilter({ activeCategory, q, categories }: Catego
               className="flex shrink-0 flex-col items-center gap-1.5"
             >
               <span
-                className={`relative flex h-16 w-16 items-center justify-center overflow-hidden rounded-full text-2xl ${
-                  active ? "ring-2 ring-orange-600 ring-offset-2" : ""
-                } ${
-                  cat.imageUrl
-                    ? "bg-zinc-100"
-                    : active
-                      ? "bg-orange-600 text-white"
-                      : "bg-orange-50 text-zinc-700 hover:bg-orange-100"
+                className={`flex h-16 w-16 items-center justify-center rounded-full text-2xl ${
+                  active
+                    ? "bg-orange-600 text-white"
+                    : "bg-orange-50 text-zinc-700 hover:bg-orange-100"
                 }`}
               >
-                {cat.imageUrl ? (
-                  <Image src={cat.imageUrl} alt="" fill sizes="64px" className="object-cover" />
-                ) : (
-                  cat.icon
-                )}
+                {cat.icon}
               </span>
               <span className="max-w-[4.5rem] text-center text-xs font-medium text-zinc-700">
                 {cat.name}
