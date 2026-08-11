@@ -110,9 +110,24 @@ body {
     logo-shine 4s ease-in-out infinite 0.7s;
 }
 
+@keyframes coin-spin {
+  0% {
+    transform: rotateY(0deg);
+  }
+  100% {
+    transform: rotateY(360deg);
+  }
+}
+
+.category-coin {
+  animation: coin-spin 6s linear infinite;
+  backface-visibility: hidden;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .logo-pop,
-  .logo-shine {
+  .logo-shine,
+  .category-coin {
     animation: none;
   }
 }
