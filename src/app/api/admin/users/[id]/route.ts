@@ -4,9 +4,14 @@ import { prisma } from "@/lib/db";
 import { getCurrentUser, isAdmin } from "@/lib/session";
 import { deleteUploadedImage } from "@/lib/uploads";
 
-const patchSchema = z.object({
-  isBlocked: z.boolean(),
-});
+const patchSchema = z
+  .object({
+    isBlocked: z.boolean().optional(),
+    emailVerified: z.boolean().optional(),
+  })
+  .refine((data) => data.isBlocked !== undefined || data.emailVerified !== undefined, {
+    message: "No hay cambios para aplicar",
+  });
 
 export async function PATCH(
   request: NextRequest,
@@ -41,8 +46,14 @@ export async function PATCH(
 
   const updated = await prisma.user.update({
     where: { id },
-    data: { isBlocked: parsed.data.isBlocked },
-    select: { id: true, isBlocked: true },
+    data: {
+      ...(parsed.data.isBlocked !== undefined && { isBlocked: parsed.data.isBlocked }),
+      ...(parsed.data.emailVerified !== undefined && {
+        emailVerified: parsed.data.emailVerified,
+        ...(parsed.data.emailVerified && { verificationToken: null, verificationTokenExpiresAt: null }),
+      }),
+    },
+    select: { id: true, isBlocked: true, emailVerified: true },
   });
 
   return NextResponse.json(updated);

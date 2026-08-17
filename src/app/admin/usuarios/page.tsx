@@ -3,6 +3,7 @@ import { getCurrentUser } from "@/lib/session";
 import { prisma } from "@/lib/db";
 import BlockUserButton from "@/components/admin/BlockUserButton";
 import DeleteUserButton from "@/components/admin/DeleteUserButton";
+import VerifyEmailButton from "@/components/admin/VerifyEmailButton";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -88,11 +89,18 @@ export default async function AdminUsuariosPage() {
                   )}
                 </TableCell>
                 <TableCell>
-                  {user.isBlocked ? (
-                    <Badge className="bg-red-100 text-red-700 hover:bg-red-100">Bloqueado</Badge>
-                  ) : (
-                    <Badge className="bg-green-100 text-green-700 hover:bg-green-100">Activo</Badge>
-                  )}
+                  <div className="flex flex-wrap gap-1">
+                    {user.isBlocked ? (
+                      <Badge className="bg-red-100 text-red-700 hover:bg-red-100">Bloqueado</Badge>
+                    ) : (
+                      <Badge className="bg-green-100 text-green-700 hover:bg-green-100">Activo</Badge>
+                    )}
+                    {!user.emailVerified && (
+                      <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100">
+                        Correo sin verificar
+                      </Badge>
+                    )}
+                  </div>
                 </TableCell>
                 <TableCell className="text-muted-foreground">
                   {user.createdAt.toLocaleDateString("es-PE")}
@@ -102,6 +110,7 @@ export default async function AdminUsuariosPage() {
                     <span className="text-xs text-muted-foreground">Esta es tu cuenta</span>
                   ) : (
                     <div className="flex items-center gap-3">
+                      <VerifyEmailButton userId={user.id} emailVerified={user.emailVerified} />
                       <BlockUserButton userId={user.id} isBlocked={user.isBlocked} />
                       <DeleteUserButton
                         userId={user.id}
