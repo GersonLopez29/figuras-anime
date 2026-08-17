@@ -25,6 +25,8 @@ model User {
   emailVerified              Boolean           @default(false)
   verificationToken          String?           @unique
   verificationTokenExpiresAt DateTime?
+  resetToken                 String?           @unique
+  resetTokenExpiresAt        DateTime?
   createdAt                  DateTime          @default(now())
   listings                   Listing[]
   reviewsWritten             Review[]          @relation("ReviewsWritten")
@@ -225,6 +227,14 @@ model RegistrationAttempt {
 }
 
 model SuggestionAttempt {
+  id        String   @id @default(cuid())
+  ip        String
+  createdAt DateTime @default(now())
+
+  @@index([ip, createdAt])
+}
+
+model PasswordResetAttempt {
   id        String   @id @default(cuid())
   ip        String
   createdAt DateTime @default(now())

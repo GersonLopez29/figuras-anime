@@ -138,6 +138,28 @@ export async function sendNewReviewEmail(
   );
 }
 
+export async function sendPasswordResetEmail(to: string, name: string, token: string) {
+  const resetUrl = `${SITE_URL}/restablecer-password?token=${token}`;
+  await sendEmail(
+    to,
+    "Restablece tu contraseña en FigurasAnime",
+    wrapper(
+      `¡Hola ${escapeHtml(name)}!`,
+      `
+        <p style="font-size: 14px; color: #3f3f46; line-height: 1.6;">
+          Recibimos una solicitud para restablecer tu contraseña. Si fuiste tú, elige una nueva:
+        </p>
+        <a href="${resetUrl}" style="display: inline-block; margin-top: 12px; background: #ea580c; color: white; padding: 10px 20px; border-radius: 999px; text-decoration: none; font-weight: 600; font-size: 14px;">
+          Restablecer contraseña
+        </a>
+        <p style="margin-top: 16px; font-size: 12px; color: #71717a;">
+          Este enlace vence en 1 hora. Si no fuiste tú, puedes ignorar este correo — tu contraseña actual seguirá funcionando.
+        </p>
+      `
+    )
+  );
+}
+
 const SUGGESTIONS_INBOX = "gersonownd@gmail.com";
 
 export async function sendSuggestionEmail(message: string, fromName?: string, fromEmail?: string) {
