@@ -7,6 +7,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CursorTrail from "@/components/CursorTrail";
 import EmailVerificationBanner from "@/components/EmailVerificationBanner";
+import SuggestionButton from "@/components/SuggestionButton";
 import { registerSiteVisit } from "@/lib/siteStats";
 import { getCategories } from "@/lib/categories";
 import { getCurrentUser } from "@/lib/session";
@@ -46,6 +47,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
         {user && !user.emailVerified && <EmailVerificationBanner />}
         <main className="flex-1">{children}</main>
         <Footer totalVisits={totalVisits} categories={categories} />
+        <SuggestionButton />
         <Analytics />
         <SpeedInsights />
       </body>

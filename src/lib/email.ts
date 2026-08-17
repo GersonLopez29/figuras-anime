@@ -137,3 +137,21 @@ export async function sendNewReviewEmail(
     )
   );
 }
+
+const SUGGESTIONS_INBOX = "gersonownd@gmail.com";
+
+export async function sendSuggestionEmail(message: string, fromName?: string, fromEmail?: string) {
+  await sendEmail(
+    SUGGESTIONS_INBOX,
+    fromName ? `Sugerencia de ${fromName}` : "Nueva sugerencia en FigurasAnime",
+    wrapper(
+      "💡 Nueva sugerencia",
+      `
+        <p style="font-size: 14px; color: #3f3f46; line-height: 1.6; white-space: pre-wrap;">${escapeHtml(message)}</p>
+        <p style="margin-top: 16px; font-size: 12px; color: #71717a;">
+          De: ${escapeHtml(fromName || "Anónimo")}${fromEmail ? ` — ${escapeHtml(fromEmail)}` : ""}
+        </p>
+      `
+    )
+  );
+}
