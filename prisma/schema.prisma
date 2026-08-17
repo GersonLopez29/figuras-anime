@@ -38,6 +38,7 @@ model User {
   conversationsAsBuyer       Conversation[]    @relation("ConversationsAsBuyer")
   conversationsAsSeller      Conversation[]    @relation("ConversationsAsSeller")
   messages                   Message[]
+  whatsappClicks             WhatsAppClick[]
 }
 
 model Favorite {
@@ -153,6 +154,19 @@ model Listing {
   images            ListingImage[]
   favoritedBy       Favorite[]
   conversations     Conversation[]
+  whatsappClicks    WhatsAppClick[]
+}
+
+model WhatsAppClick {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listingId String
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@index([listingId])
+  @@index([userId])
 }
 
 model ListingImage {

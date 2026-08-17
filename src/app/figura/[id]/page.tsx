@@ -11,6 +11,7 @@ import ListingGallery from "@/components/ListingGallery";
 import StarRating from "@/components/StarRating";
 import FavoriteButton from "@/components/FavoriteButton";
 import MessageButton from "@/components/MessageButton";
+import WhatsAppContactButton from "@/components/WhatsAppContactButton";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -219,15 +220,7 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
             </Alert>
           ) : whatsappLink ? (
             <div className="mt-6">
-              <Button
-                render={<a href={whatsappLink} target="_blank" rel="noopener noreferrer" />}
-                nativeButton={false}
-                size="lg"
-                className="w-full rounded-full bg-green-600 text-sm font-bold text-white shadow-md shadow-green-600/20 transition hover:-translate-y-0.5 hover:bg-green-700 hover:shadow-lg"
-              >
-                <span aria-hidden="true">💬</span>
-                Contactar por WhatsApp
-              </Button>
+              <WhatsAppContactButton listingId={listing.id} whatsappLink={whatsappLink} />
               {currentUser && currentUser.id !== listing.user.id && (
                 <MessageButton listingId={listing.id} />
               )}

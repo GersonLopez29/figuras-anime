@@ -11,6 +11,7 @@ type AdminNavTabsProps = {
 const TABS = [
   { href: "/admin/usuarios", label: "Usuarios" },
   { href: "/admin/publicaciones", label: "Publicaciones" },
+  { href: "/admin/contactos", label: "Contactos" },
   { href: "/admin/comunidad", label: "Comunidad" },
   { href: "/admin/categorias", label: "Categorías" },
   { href: "/admin/estadisticas", label: "Estadísticas" },
