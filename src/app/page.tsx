@@ -6,6 +6,7 @@ import CategoryFilter from "@/components/CategoryFilter";
 import ListingFilters from "@/components/ListingFilters";
 import WelcomeBanner from "@/components/WelcomeBanner";
 import BannerCarousel from "@/components/BannerCarousel";
+import RecentlySoldBanner from "@/components/RecentlySoldBanner";
 import Pagination from "@/components/Pagination";
 import { getActiveDiscountAmount } from "@/lib/format";
 import { Button } from "@/components/ui/button";
@@ -14,6 +15,7 @@ import { Card } from "@/components/ui/card";
 const BANNER_OFFERS_LIMIT = 3;
 const BANNER_LATEST_LIMIT = 4;
 const BANNER_SLIDES_LIMIT = 5;
+const RECENTLY_SOLD_LIMIT = 8;
 
 const PAGE_SIZE = 24;
 
@@ -31,7 +33,16 @@ type HomeProps = {
 export default async function Home({ searchParams }: HomeProps) {
   const { categoria, q, bienvenida, pagina, estado: rawEstado, oferta: rawOferta } =
     await searchParams;
-  const [categories, user] = await Promise.all([getCategoriesWithCoverImage(), getCurrentUser()]);
+  const [categories, user, recentlySold] = await Promise.all([
+    getCategoriesWithCoverImage(),
+    getCurrentUser(),
+    prisma.listing.findMany({
+      where: { sold: true },
+      include: { images: { take: 1 } },
+      orderBy: { updatedAt: "desc" },
+      take: RECENTLY_SOLD_LIMIT,
+    }),
+  ]);
   const category = categories.some((c) => c.name === categoria) ? categoria : undefined;
   const estado = rawEstado === "nuevo" || rawEstado === "usado" ? rawEstado : undefined;
   const oferta = rawOferta === "1";
@@ -143,6 +154,15 @@ export default async function Home({ searchParams }: HomeProps) {
 
   return (
     <div>
+      <RecentlySoldBanner
+        items={recentlySold.map((l) => ({
+          id: l.id,
+          title: l.title,
+          price: l.price,
+          imageUrl: l.images[0]?.url,
+        }))}
+      />
+
       {bienvenida && <WelcomeBanner name={bienvenida} />}
 
       {showHero && (
