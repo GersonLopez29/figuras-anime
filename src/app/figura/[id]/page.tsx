@@ -12,6 +12,7 @@ import StarRating from "@/components/StarRating";
 import FavoriteButton from "@/components/FavoriteButton";
 import MessageButton from "@/components/MessageButton";
 import WhatsAppContactButton from "@/components/WhatsAppContactButton";
+import VerifyEmailToContact from "@/components/VerifyEmailToContact";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -105,9 +106,10 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
   const reviewCount = ratingAgg._count;
 
   const message = `Hola ${listing.user.name}, vi tu figura "${listing.title}" en FigurasAnime y me interesa. ¿Sigue disponible?`;
-  const whatsappLink = currentUser
+  const whatsappLink = currentUser?.emailVerified
     ? buildWhatsAppLink(listing.user.whatsapp, message)
     : null;
+  const needsEmailVerification = !!currentUser && !currentUser.emailVerified;
 
   const isFavorited = currentUser
     ? !!(await prisma.favorite.findUnique({
@@ -225,6 +227,8 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
                 <MessageButton listingId={listing.id} />
               )}
             </div>
+          ) : needsEmailVerification ? (
+            <VerifyEmailToContact />
           ) : (
             <Alert className="mt-6 text-center">
               <AlertDescription className="justify-center text-center">

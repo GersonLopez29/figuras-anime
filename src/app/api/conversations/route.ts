@@ -52,6 +52,12 @@ export async function POST(request: NextRequest) {
   if (!user) {
     return NextResponse.json({ error: "Debes iniciar sesión" }, { status: 401 });
   }
+  if (!user.emailVerified) {
+    return NextResponse.json(
+      { error: "Verifica tu correo antes de contactar a un vendedor" },
+      { status: 403 }
+    );
+  }
 
   const body = await request.json();
   const parsed = startConversationSchema.safeParse(body);

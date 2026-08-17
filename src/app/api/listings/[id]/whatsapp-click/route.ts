@@ -11,6 +11,12 @@ export async function POST(
   if (!user) {
     return NextResponse.json({ error: "Debes iniciar sesión" }, { status: 401 });
   }
+  if (!user.emailVerified) {
+    return NextResponse.json(
+      { error: "Verifica tu correo antes de contactar a un vendedor" },
+      { status: 403 }
+    );
+  }
 
   const listing = await prisma.listing.findUnique({ where: { id }, select: { userId: true } });
   if (!listing) {
