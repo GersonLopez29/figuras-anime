@@ -209,3 +209,11 @@ model RegistrationAttempt {
 
   @@index([ip, createdAt])
 }
+
+model SuggestionAttempt {
+  id        String   @id @default(cuid())
+  ip        String
+  createdAt DateTime @default(now())
+
+  @@index([ip, createdAt])
+}
