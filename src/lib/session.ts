@@ -1,5 +1,6 @@
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
+import { cache } from "react";
 import { prisma } from "@/lib/db";
 
 const SESSION_COOKIE = "session";
@@ -33,7 +34,7 @@ export async function destroySession() {
   cookieStore.delete(SESSION_COOKIE);
 }
 
-export async function getCurrentUser() {
+export const getCurrentUser = cache(async () => {
   const cookieStore = await cookies();
   const token = cookieStore.get(SESSION_COOKIE)?.value;
   if (!token) return null;
@@ -62,7 +63,7 @@ export async function getCurrentUser() {
   } catch {
     return null;
   }
-}
+});
 
 export function isAdmin(user: { role: string } | null) {
   return user?.role === "admin";
