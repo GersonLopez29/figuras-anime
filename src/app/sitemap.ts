@@ -28,6 +28,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/publicar`, changeFrequency: "monthly", priority: 0.5 },
     { url: `${SITE_URL}/registro`, changeFrequency: "monthly", priority: 0.3 },
     { url: `${SITE_URL}/contacto`, changeFrequency: "yearly", priority: 0.3 },
+    { url: `${SITE_URL}/sobre-nosotros`, changeFrequency: "yearly", priority: 0.3 },
+    { url: `${SITE_URL}/terminos-condiciones`, changeFrequency: "yearly", priority: 0.2 },
     { url: `${SITE_URL}/politica-privacidad`, changeFrequency: "yearly", priority: 0.2 },
   ];
 
