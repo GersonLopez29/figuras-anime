@@ -28,6 +28,9 @@ export const metadata: Metadata = {
   title: "FigurasAnime — Compra y venta de figuras de anime",
   description:
     "Marketplace para comprar y vender figuras de anime (Naruto, Dragon Ball Z y más) contactando directo por WhatsApp.",
+  other: {
+    "google-adsense-account": "ca-pub-3110338196429688",
+  },
 };
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
@@ -51,7 +54,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
         <SuggestionButton />
         <Script
           async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3110338196429688"
           crossOrigin="anonymous"
           strategy="afterInteractive"
         />
