@@ -32,6 +32,8 @@ export async function generateMetadata({ params }: FiguraPageProps): Promise<Met
       title: true,
       description: true,
       price: true,
+      discountAmount: true,
+      discountExpiresAt: true,
       images: { take: 1, select: { url: true } },
     },
   });
@@ -40,7 +42,9 @@ export async function generateMetadata({ params }: FiguraPageProps): Promise<Met
     return { title: "Figura no encontrada — FigurasAnime" };
   }
 
-  const title = `${listing.title} — ${formatPrice(listing.price)} | FigurasAnime`;
+  const activeDiscount = getActiveDiscountAmount(listing.discountAmount, listing.discountExpiresAt);
+  const displayPrice = activeDiscount ? getFinalPrice(listing.price, activeDiscount) : listing.price;
+  const title = `${listing.title} — ${formatPrice(displayPrice)} | FigurasAnime`;
   const description = listing.description.slice(0, 155);
   const image = listing.images[0]?.url;
 
@@ -182,7 +186,9 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
             <div className="flex shrink-0 gap-2">
               <ShareButton
                 title={listing.title}
-                text={`${listing.title} — ${formatPrice(listing.price)} en FigurasAnime`}
+                text={`${listing.title} — ${formatPrice(
+                  activeDiscount ? getFinalPrice(listing.price, activeDiscount) : listing.price
+                )} en FigurasAnime`}
                 url={`${process.env.NEXT_PUBLIC_SITE_URL ?? "https://gerstore.club"}/figura/${listing.id}`}
               />
               {currentUser && (
