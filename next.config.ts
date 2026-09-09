@@ -7,6 +7,7 @@ const contentSecurityPolicy = [
   "img-src 'self' data: blob: https://*.public.blob.vercel-storage.com https://flagcdn.com",
   "font-src 'self' data:",
   "connect-src 'self'",
+  "frame-src https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://www.google.com https://pagead2.googlesyndication.com",
   "frame-ancestors 'none'",
 ].join("; ");
 
