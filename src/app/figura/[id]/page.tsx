@@ -6,10 +6,11 @@ import { prisma } from "@/lib/db";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 import { formatPrice, getFinalPrice, getActiveDiscountAmount, getDaysRemaining } from "@/lib/format";
 import { getCurrentUser } from "@/lib/session";
-import { getConditionLabel, getConditionIcon } from "@/lib/condition";
+import { getConditionLabel, getConditionIcon, isNewCondition } from "@/lib/condition";
 import ListingGallery from "@/components/ListingGallery";
 import StarRating from "@/components/StarRating";
 import FavoriteButton from "@/components/FavoriteButton";
+import ShareButton from "@/components/ShareButton";
 import MessageButton from "@/components/MessageButton";
 import WhatsAppContactButton from "@/components/WhatsAppContactButton";
 import VerifyEmailToContact from "@/components/VerifyEmailToContact";
@@ -126,8 +127,32 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
       })
     : null;
 
+  const pageUrl = `${process.env.NEXT_PUBLIC_SITE_URL ?? "https://gerstore.club"}/figura/${listing.id}`;
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: listing.title,
+    description: listing.description,
+    image: listing.images.map((img) => img.url),
+    url: pageUrl,
+    itemCondition: isNewCondition(listing.condition)
+      ? "https://schema.org/NewCondition"
+      : "https://schema.org/UsedCondition",
+    offers: {
+      "@type": "Offer",
+      url: pageUrl,
+      priceCurrency: "PEN",
+      price: activeDiscount ? getFinalPrice(listing.price, activeDiscount) : listing.price,
+      availability: listing.sold ? "https://schema.org/SoldOut" : "https://schema.org/InStock",
+    },
+  };
+
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <Link href="/" className="text-sm text-muted-foreground hover:text-foreground">
         &larr; Volver al catálogo
       </Link>
@@ -154,13 +179,20 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
 
           <div className="mt-3 flex items-start justify-between gap-3">
             <h1 className="text-2xl font-bold text-foreground">{listing.title}</h1>
-            {currentUser && (
-              <FavoriteButton
-                listingId={listing.id}
-                initialFavorited={isFavorited}
-                variant="inline"
+            <div className="flex shrink-0 gap-2">
+              <ShareButton
+                title={listing.title}
+                text={`${listing.title} — ${formatPrice(listing.price)} en FigurasAnime`}
+                url={`${process.env.NEXT_PUBLIC_SITE_URL ?? "https://gerstore.club"}/figura/${listing.id}`}
               />
-            )}
+              {currentUser && (
+                <FavoriteButton
+                  listingId={listing.id}
+                  initialFavorited={isFavorited}
+                  variant="inline"
+                />
+              )}
+            </div>
           </div>
           {!listing.sold && activeDiscount ? (
             <p className="mt-2 flex items-baseline gap-2">
