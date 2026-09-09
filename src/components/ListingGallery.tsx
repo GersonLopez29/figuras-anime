@@ -24,7 +24,8 @@ export default function ListingGallery({ images, title, imageFit = "cover" }: Li
             fill
             className={fitClass}
             sizes="(min-width: 640px) 50vw, 100vw"
-            priority
+            loading="eager"
+            fetchPriority="high"
           />
         ) : (
           <div className="flex h-full items-center justify-center text-sm text-zinc-400">
