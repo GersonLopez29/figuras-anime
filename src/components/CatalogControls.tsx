@@ -1,9 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -15,34 +12,57 @@ import {
   ORDER_OPTIONS,
   PRODUCT_LINES,
   catalogHref,
+  priceRangeLabel,
   type CatalogOrder,
+  type PriceSummary,
   type CatalogState,
   type ProductLineSlug,
 } from "@/lib/catalog";
 
 const ALL_LINES = "todas";
+const ALL_PRICES = "todos";
 
-function parseInput(value: string): number | undefined {
-  if (value.trim() === "") return undefined;
-  const n = Number(value);
-  return Number.isFinite(n) && n >= 0 ? n : undefined;
+function priceKey(min?: number, max?: number): string {
+  return min === undefined && max === undefined ? ALL_PRICES : `${min ?? ""}_${max ?? ""}`;
 }
 
-export default function CatalogControls({ state }: { state: CatalogState }) {
+function parsePriceKey(key: string): { min?: number; max?: number } {
+  if (key === ALL_PRICES) return {};
+  const [rawMin, rawMax] = key.split("_");
+  return {
+    min: rawMin ? Number(rawMin) : undefined,
+    max: rawMax ? Number(rawMax) : undefined,
+  };
+}
+
+export default function CatalogControls({
+  state,
+  priceSummary,
+}: {
+  state: CatalogState;
+  priceSummary: PriceSummary | null;
+}) {
   const router = useRouter();
-  const [min, setMin] = useState(state.min !== undefined ? String(state.min) : "");
-  const [max, setMax] = useState(state.max !== undefined ? String(state.max) : "");
 
   function go(next: CatalogState) {
     router.push(catalogHref(next));
   }
 
-  function handlePriceSubmit(e: FormEvent) {
-    e.preventDefault();
-    go({ ...state, min: parseInput(min), max: parseInput(max) });
+  // Rangos calculados por el sistema; si la URL trae otro rango (un enlace
+  // antiguo, por ejemplo), se agrega como opción para que siga visible.
+  const priceOptions = (priceSummary?.buckets ?? []).map((b) => ({
+    key: priceKey(b.min, b.max),
+    label: b.label,
+  }));
+  const currentPriceKey = priceKey(state.min, state.max);
+  if (currentPriceKey !== ALL_PRICES && !priceOptions.some((o) => o.key === currentPriceKey)) {
+    priceOptions.push({ key: currentPriceKey, label: priceRangeLabel(state.min, state.max) ?? "" });
   }
-
-  const hasPrice = state.min !== undefined || state.max !== undefined;
+  const allPricesLabel = priceSummary
+    ? priceSummary.lowest === priceSummary.highest
+      ? `Todos los precios (S/ ${priceSummary.lowest})`
+      : `Todos los precios (S/ ${priceSummary.lowest} – S/ ${priceSummary.highest})`
+    : "Todos los precios";
 
   return (
     <div className="flex flex-wrap items-center gap-2">
@@ -89,47 +109,30 @@ export default function CatalogControls({ state }: { state: CatalogState }) {
         </SelectContent>
       </Select>
 
-      <form onSubmit={handlePriceSubmit} className="flex items-center gap-1.5">
-        <span className="text-sm text-muted-foreground">S/</span>
-        <Input
-          type="number"
-          inputMode="numeric"
-          min="0"
-          placeholder="Mín"
-          aria-label="Precio mínimo"
-          value={min}
-          onChange={(e) => setMin(e.target.value)}
-          className="h-9 w-20 rounded-full bg-white px-3"
-        />
-        <span className="text-sm text-muted-foreground">–</span>
-        <Input
-          type="number"
-          inputMode="numeric"
-          min="0"
-          placeholder="Máx"
-          aria-label="Precio máximo"
-          value={max}
-          onChange={(e) => setMax(e.target.value)}
-          className="h-9 w-20 rounded-full bg-white px-3"
-        />
-        <Button type="submit" variant="outline" className="h-9 rounded-full px-3">
-          Aplicar
-        </Button>
-        {hasPrice && (
-          <Button
-            type="button"
-            variant="ghost"
-            className="h-9 rounded-full px-2 text-muted-foreground"
-            onClick={() => {
-              setMin("");
-              setMax("");
-              go({ ...state, min: undefined, max: undefined });
-            }}
-          >
-            Quitar
-          </Button>
-        )}
-      </form>
+      {priceOptions.length > 0 && (
+        <Select
+          value={currentPriceKey}
+          onValueChange={(v) => v && go({ ...state, min: undefined, max: undefined, ...parsePriceKey(v) })}
+        >
+          <SelectTrigger aria-label="Rango de precio" className="h-9 rounded-full bg-white px-3">
+            <SelectValue>
+              {(v: string) =>
+                v === ALL_PRICES
+                  ? "💰 Todos los precios"
+                  : `💰 ${priceOptions.find((o) => o.key === v)?.label ?? "Precio"}`
+              }
+            </SelectValue>
+          </SelectTrigger>
+          <SelectContent alignItemWithTrigger={false} align="start" className="min-w-64">
+            <SelectItem value={ALL_PRICES}>{allPricesLabel}</SelectItem>
+            {priceOptions.map((o) => (
+              <SelectItem key={o.key} value={o.key}>
+                {o.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      )}
     </div>
   );
 }

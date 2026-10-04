@@ -11,7 +11,14 @@ import RecentlySoldBanner from "@/components/RecentlySoldBanner";
 import Pagination from "@/components/Pagination";
 import CatalogControls from "@/components/CatalogControls";
 import { getActiveDiscountAmount } from "@/lib/format";
-import { parseCatalogFilters, getProductLine, ORDER_OPTIONS, type CatalogState } from "@/lib/catalog";
+import {
+  parseCatalogFilters,
+  getProductLine,
+  computePriceSummary,
+  priceRangeLabel,
+  ORDER_OPTIONS,
+  type CatalogState,
+} from "@/lib/catalog";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
@@ -85,11 +92,18 @@ export default async function Home({ searchParams }: HomeProps) {
   ];
 
   // El rango y el orden por precio usan el precio publicado (sin descuento).
-  const where = {
+  // Todos los filtros menos el de precio: sirve para calcular los rangos de
+  // precio con las figuras que el comprador está viendo.
+  const whereWithoutPrice = {
     ...(category ? { category } : {}),
     ...(estado === "nuevo" ? { condition: "nuevo" } : {}),
     ...(estado === "usado" ? { condition: { notIn: ["nuevo", "open_box"] } } : {}),
     ...(oferta ? { discountAmount: { not: null }, discountExpiresAt: { gt: new Date() } } : {}),
+    ...(textFilters.length > 0 ? { AND: textFilters } : {}),
+  };
+
+  const where = {
+    ...whereWithoutPrice,
     ...(min !== undefined || max !== undefined
       ? {
           price: {
@@ -98,8 +112,16 @@ export default async function Home({ searchParams }: HomeProps) {
           },
         }
       : {}),
-    ...(textFilters.length > 0 ? { AND: textFilters } : {}),
   };
+
+  // El sistema detecta la figura disponible más barata y la más cara y arma
+  // los rangos de precio automáticamente; el comprador solo elige uno.
+  const availablePrices = await prisma.listing.findMany({
+    where: { ...whereWithoutPrice, sold: false },
+    select: { price: true },
+    orderBy: { price: "asc" },
+  });
+  const priceSummary = computePriceSummary(availablePrices.map((l) => l.price));
 
   const orderBy = [
     { sold: "asc" as const },
@@ -202,9 +224,8 @@ export default async function Home({ searchParams }: HomeProps) {
   if (estado === "usado") filterLabels.push("Usadas");
   if (oferta) filterLabels.push("En oferta");
   if (productLine) filterLabels.push(productLine.label);
-  if (min !== undefined && max !== undefined) filterLabels.push(`S/ ${min} – S/ ${max}`);
-  else if (min !== undefined) filterLabels.push(`Desde S/ ${min}`);
-  else if (max !== undefined) filterLabels.push(`Hasta S/ ${max}`);
+  const activePriceLabel = priceRangeLabel(min, max);
+  if (activePriceLabel) filterLabels.push(activePriceLabel);
   if (q) filterLabels.push(`"${q}"`);
   const heading =
     filterLabels.length > 0
@@ -316,7 +337,7 @@ export default async function Home({ searchParams }: HomeProps) {
         </div>
 
         <div className="mt-3">
-          <CatalogControls key={`${min ?? ""}-${max ?? ""}`} state={catalogState} />
+          <CatalogControls state={catalogState} priceSummary={priceSummary} />
         </div>
 
         <div className="mt-6 flex flex-wrap items-baseline justify-between gap-2">
