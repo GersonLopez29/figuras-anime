@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { getCategoriesWithCoverImage } from "@/lib/categories";
 import { getCurrentUser } from "@/lib/session";
@@ -8,7 +9,9 @@ import WelcomeBanner from "@/components/WelcomeBanner";
 import BannerCarousel from "@/components/BannerCarousel";
 import RecentlySoldBanner from "@/components/RecentlySoldBanner";
 import Pagination from "@/components/Pagination";
+import CatalogControls from "@/components/CatalogControls";
 import { getActiveDiscountAmount } from "@/lib/format";
+import { parseCatalogFilters, getProductLine, ORDER_OPTIONS, type CatalogState } from "@/lib/catalog";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
@@ -27,12 +30,16 @@ type HomeProps = {
     pagina?: string;
     estado?: string;
     oferta?: string;
+    orden?: string;
+    min?: string;
+    max?: string;
+    linea?: string;
   }>;
 };
 
 export default async function Home({ searchParams }: HomeProps) {
-  const { categoria, q, bienvenida, pagina, estado: rawEstado, oferta: rawOferta } =
-    await searchParams;
+  const { categoria, q: rawQ, bienvenida, pagina, ...rawFilters } = await searchParams;
+  const q = rawQ?.trim() || undefined;
   const [categories, user, recentlySold] = await Promise.all([
     getCategoriesWithCoverImage(),
     getCurrentUser(),
@@ -44,24 +51,67 @@ export default async function Home({ searchParams }: HomeProps) {
     }),
   ]);
   const category = categories.some((c) => c.name === categoria) ? categoria : undefined;
-  const estado = rawEstado === "nuevo" || rawEstado === "usado" ? rawEstado : undefined;
-  const oferta = rawOferta === "1";
+  const { estado, oferta, orden, min, max, linea } = parseCatalogFilters(rawFilters);
+  const productLine = getProductLine(linea);
+  const catalogState: CatalogState = { categoria: category, q, estado, oferta, orden, min, max, linea };
   const sellCtaHref = user ? "/publicar" : "/registro";
 
+  // Las búsquedas por texto no distinguen mayúsculas ("goku" encuentra "GOKU").
+  const textFilters = [
+    ...(q
+      ? [
+          {
+            OR: [
+              { title: { contains: q, mode: "insensitive" as const } },
+              { description: { contains: q, mode: "insensitive" as const } },
+            ],
+          },
+        ]
+      : []),
+    ...(productLine
+      ? [
+          {
+            OR: [
+              ...productLine.contains.map((word) => ({
+                title: { contains: word, mode: "insensitive" as const },
+              })),
+              ...productLine.startsWith.map((word) => ({
+                title: { startsWith: word, mode: "insensitive" as const },
+              })),
+            ],
+          },
+        ]
+      : []),
+  ];
+
+  // El rango y el orden por precio usan el precio publicado (sin descuento).
   const where = {
     ...(category ? { category } : {}),
     ...(estado === "nuevo" ? { condition: "nuevo" } : {}),
     ...(estado === "usado" ? { condition: { notIn: ["nuevo", "open_box"] } } : {}),
     ...(oferta ? { discountAmount: { not: null }, discountExpiresAt: { gt: new Date() } } : {}),
-    ...(q
+    ...(min !== undefined || max !== undefined
       ? {
-          OR: [
-            { title: { contains: q } },
-            { description: { contains: q } },
-          ],
+          price: {
+            ...(min !== undefined ? { gte: min } : {}),
+            ...(max !== undefined ? { lte: max } : {}),
+          },
         }
       : {}),
+    ...(textFilters.length > 0 ? { AND: textFilters } : {}),
   };
+
+  const orderBy = [
+    { sold: "asc" as const },
+    ...(orden === "precio_asc"
+      ? [{ price: "asc" as const }]
+      : orden === "precio_desc"
+        ? [{ price: "desc" as const }]
+        : orden === "vistas"
+          ? [{ views: "desc" as const }]
+          : []),
+    { createdAt: "desc" as const },
+  ];
 
   const totalCount = await prisma.listing.count({ where });
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
@@ -74,7 +124,7 @@ export default async function Home({ searchParams }: HomeProps) {
       images: { take: 1 },
       user: { select: { name: true } },
     },
-    orderBy: [{ sold: "asc" }, { createdAt: "desc" }],
+    orderBy,
     skip: (page - 1) * PAGE_SIZE,
     take: PAGE_SIZE,
   });
@@ -90,7 +140,9 @@ export default async function Home({ searchParams }: HomeProps) {
       )
     : null;
 
-  const showHero = !category && !q && !estado && !oferta && page === 1;
+  const hasFilters =
+    !!category || !!q || !!estado || oferta || !!linea || min !== undefined || max !== undefined;
+  const showHero = !hasFilters && !orden && page === 1;
 
   const [offerListings, latestListings] = showHero
     ? await Promise.all([
@@ -149,8 +201,17 @@ export default async function Home({ searchParams }: HomeProps) {
   if (estado === "nuevo") filterLabels.push("Nuevas");
   if (estado === "usado") filterLabels.push("Usadas");
   if (oferta) filterLabels.push("En oferta");
+  if (productLine) filterLabels.push(productLine.label);
+  if (min !== undefined && max !== undefined) filterLabels.push(`S/ ${min} – S/ ${max}`);
+  else if (min !== undefined) filterLabels.push(`Desde S/ ${min}`);
+  else if (max !== undefined) filterLabels.push(`Hasta S/ ${max}`);
   if (q) filterLabels.push(`"${q}"`);
-  const heading = filterLabels.length > 0 ? filterLabels.join(" · ") : "Recién publicadas";
+  const heading =
+    filterLabels.length > 0
+      ? filterLabels.join(" · ")
+      : orden
+        ? (ORDER_OPTIONS.find((o) => o.value === orden)?.label ?? "Catálogo")
+        : "Recién publicadas";
 
   return (
     <div>
@@ -225,22 +286,21 @@ export default async function Home({ searchParams }: HomeProps) {
 
       {showHero && (
         <section className="border-b border-zinc-200 bg-white">
-          <div className="mx-auto max-w-6xl px-4 py-10">
-            <div className="grid gap-4 sm:grid-cols-3">
+          <div className="mx-auto max-w-6xl px-4 py-6">
+            <div className="grid gap-3 sm:grid-cols-3">
               {[
                 { icon: "📸", title: "1. Publica", text: "Sube fotos de tu figura, ponle precio y categoría." },
                 { icon: "💬", title: "2. Conecta", text: "Los interesados te escriben directo a tu WhatsApp." },
                 { icon: "🤝", title: "3. Vende", text: "Coordinan la entrega y el pago entre ustedes." },
               ].map((step) => (
-                <Card
-                  key={step.title}
-                  className="items-center p-5 text-center transition hover:-translate-y-0.5 hover:shadow-md sm:items-start sm:text-left"
-                >
-                  <span className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-orange-100 to-red-50 text-2xl ring-1 ring-orange-100">
+                <Card key={step.title} className="flex-row items-center gap-4 p-4">
+                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-orange-100 to-red-50 text-xl ring-1 ring-orange-100">
                     {step.icon}
                   </span>
-                  <h3 className="mt-3 font-semibold text-foreground">{step.title}</h3>
-                  <p className="mt-1 text-sm text-muted-foreground">{step.text}</p>
+                  <div>
+                    <h3 className="font-semibold text-foreground">{step.title}</h3>
+                    <p className="mt-0.5 text-sm text-muted-foreground">{step.text}</p>
+                  </div>
                 </Card>
               ))}
             </div>
@@ -249,21 +309,35 @@ export default async function Home({ searchParams }: HomeProps) {
       )}
 
       <div id="catalogo" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-8">
-        <CategoryFilter activeCategory={category} q={q} categories={categories} />
+        <CategoryFilter state={catalogState} categories={categories} />
 
         <div className="mt-4">
-          <ListingFilters estado={estado} oferta={oferta} category={category} q={q} />
+          <ListingFilters state={catalogState} />
         </div>
 
-        <h2 className="mt-6 flex items-center gap-2 text-lg font-bold text-zinc-900">
-          <span aria-hidden="true">🔥</span>
-          {heading}
-        </h2>
+        <div className="mt-3">
+          <CatalogControls key={`${min ?? ""}-${max ?? ""}`} state={catalogState} />
+        </div>
+
+        <div className="mt-6 flex flex-wrap items-baseline justify-between gap-2">
+          <h2 className="flex items-center gap-2 text-lg font-bold text-zinc-900">
+            <span aria-hidden="true">🔥</span>
+            {heading}
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            {totalCount} {totalCount === 1 ? "figura" : "figuras"}
+          </p>
+        </div>
 
         {listings.length === 0 ? (
-          <p className="mt-16 text-center text-sm text-zinc-400">
-            No hay figuras publicadas todavía con ese criterio.
-          </p>
+          <div className="mt-16 text-center">
+            <p className="text-sm text-zinc-400">No hay figuras publicadas todavía con ese criterio.</p>
+            {hasFilters && (
+              <Link href="/#catalogo" className="mt-3 inline-block text-sm font-medium text-primary hover:underline">
+                Quitar filtros
+              </Link>
+            )}
+          </div>
         ) : (
           <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
             {listings.map((listing) => (
@@ -285,14 +359,7 @@ export default async function Home({ searchParams }: HomeProps) {
           </div>
         )}
 
-        <Pagination
-          page={page}
-          totalPages={totalPages}
-          categoria={category}
-          q={q}
-          estado={estado}
-          oferta={oferta}
-        />
+        <Pagination page={page} totalPages={totalPages} state={catalogState} />
       </div>
     </div>
   );

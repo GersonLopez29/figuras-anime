@@ -1,12 +1,6 @@
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
-
-type ListingFiltersProps = {
-  estado?: "nuevo" | "usado";
-  oferta?: boolean;
-  category?: string;
-  q?: string;
-};
+import { catalogHref, type CatalogState } from "@/lib/catalog";
 
 function Pill({ active, href, children }: { active: boolean; href: string; children: React.ReactNode }) {
   return (
@@ -20,29 +14,27 @@ function Pill({ active, href, children }: { active: boolean; href: string; child
   );
 }
 
-export default function ListingFilters({ estado, oferta, category, q }: ListingFiltersProps) {
-  function hrefFor(nextEstado: "nuevo" | "usado" | undefined, nextOferta: boolean) {
-    const params = new URLSearchParams();
-    if (category) params.set("categoria", category);
-    if (q) params.set("q", q);
-    if (nextEstado) params.set("estado", nextEstado);
-    if (nextOferta) params.set("oferta", "1");
-    const qs = params.toString();
-    return `${qs ? `/?${qs}` : "/"}#catalogo`;
-  }
+export default function ListingFilters({ state }: { state: CatalogState }) {
+  const { estado, oferta } = state;
 
   return (
-    <div className="flex gap-2 overflow-x-auto pb-1">
-      <Pill active={!estado && !oferta} href={hrefFor(undefined, false)}>
+    <div className="no-scrollbar flex gap-2 overflow-x-auto pb-1">
+      <Pill active={!estado && !oferta} href={catalogHref({ ...state, estado: undefined, oferta: false })}>
         Todas
       </Pill>
-      <Pill active={estado === "nuevo"} href={hrefFor(estado === "nuevo" ? undefined : "nuevo", !!oferta)}>
+      <Pill
+        active={estado === "nuevo"}
+        href={catalogHref({ ...state, estado: estado === "nuevo" ? undefined : "nuevo" })}
+      >
         🆕 Nuevas
       </Pill>
-      <Pill active={estado === "usado"} href={hrefFor(estado === "usado" ? undefined : "usado", !!oferta)}>
+      <Pill
+        active={estado === "usado"}
+        href={catalogHref({ ...state, estado: estado === "usado" ? undefined : "usado" })}
+      >
         ♻️ Usadas
       </Pill>
-      <Pill active={!!oferta} href={hrefFor(estado, !oferta)}>
+      <Pill active={!!oferta} href={catalogHref({ ...state, oferta: !oferta })}>
         🔥 En oferta
       </Pill>
     </div>

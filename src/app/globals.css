@@ -197,3 +197,12 @@ body {
     @apply font-sans;
   }
 }
+/* Carruseles horizontales (categorías, filtros, "Vendidas hace poco"): se
+   siguen pudiendo deslizar con el dedo o la rueda, pero sin la barra gris. */
+@utility no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}

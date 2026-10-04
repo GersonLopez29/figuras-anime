@@ -8,6 +8,7 @@ import { formatPrice, getFinalPrice, getActiveDiscountAmount, getDaysRemaining }
 import { getCurrentUser } from "@/lib/session";
 import { getConditionLabel, getConditionIcon, isNewCondition } from "@/lib/condition";
 import ListingGallery from "@/components/ListingGallery";
+import ListingCard from "@/components/ListingCard";
 import StarRating from "@/components/StarRating";
 import FavoriteButton from "@/components/FavoriteButton";
 import ShareButton from "@/components/ShareButton";
@@ -73,7 +74,7 @@ const getListingAndRegisterView = cache(async (id: string, viewerId: string | nu
     where: { id },
     include: {
       images: true,
-      user: { select: { id: true, name: true, whatsapp: true } },
+      user: { select: { id: true, name: true, whatsapp: true, createdAt: true } },
     },
   });
 
@@ -109,6 +110,34 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
   });
   const averageRating = ratingAgg._avg.rating ?? 0;
   const reviewCount = ratingAgg._count;
+  const memberSince = listing.user.createdAt.toLocaleDateString("es-PE", {
+    month: "long",
+    year: "numeric",
+  });
+
+  // "Más de este vendedor" y "Figuras similares" (misma categoría) para que el
+  // comprador siga explorando en vez de salir de la página.
+  const RELATED_LIMIT = 4;
+  const relatedInclude = {
+    images: { take: 1 },
+    user: { select: { name: true } },
+  } as const;
+  const sellerListings = await prisma.listing.findMany({
+    where: { userId: listing.user.id, sold: false, id: { not: listing.id } },
+    include: relatedInclude,
+    orderBy: { createdAt: "desc" },
+    take: RELATED_LIMIT,
+  });
+  const similarListings = await prisma.listing.findMany({
+    where: {
+      category: listing.category,
+      sold: false,
+      id: { notIn: [listing.id, ...sellerListings.map((l) => l.id)] },
+    },
+    include: relatedInclude,
+    orderBy: { createdAt: "desc" },
+    take: RELATED_LIMIT,
+  });
 
   const message = `Hola ${listing.user.name}, vi tu figura "${listing.title}" en FigurasAnime y me interesa. ¿Sigue disponible?`;
   const whatsappLink = currentUser?.emailVerified
@@ -247,8 +276,15 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
                 <span className="font-medium text-foreground">{listing.user.name}</span>
               </p>
               <div className="mt-0.5">
-                <StarRating rating={averageRating} reviewCount={reviewCount} />
+                {reviewCount > 0 ? (
+                  <StarRating rating={averageRating} reviewCount={reviewCount} />
+                ) : (
+                  <span className="text-xs text-muted-foreground">
+                    🆕 Vendedor nuevo · aún sin reseñas
+                  </span>
+                )}
               </div>
+              <p className="mt-0.5 text-xs text-muted-foreground">Miembro desde {memberSince}</p>
             </div>
           </Link>
 
@@ -269,11 +305,21 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
             <VerifyEmailToContact />
           ) : (
             <Alert className="mt-6 text-center">
-              <AlertDescription className="justify-center text-center">
-                Inicia sesión para contactar al vendedor por WhatsApp.
+              <AlertDescription className="block justify-center text-center">
+                <span className="font-medium text-foreground">
+                  Inicia sesión para ver el WhatsApp del vendedor.
+                </span>
+                <span className="mt-1 block text-xs">
+                  Lo pedimos para proteger los números de los vendedores de bots y estafadores.
+                  Crear tu cuenta es gratis y toma menos de un minuto.
+                </span>
               </AlertDescription>
               <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:justify-center">
-                <Button render={<Link href="/login" />} nativeButton={false} className="rounded-full">
+                <Button
+                  render={<Link href={`/login?volver=${encodeURIComponent(`/figura/${listing.id}`)}`} />}
+                  nativeButton={false}
+                  className="rounded-full"
+                >
                   Iniciar sesión
                 </Button>
                 <Button
@@ -287,8 +333,86 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
               </div>
             </Alert>
           )}
+
+          {!listing.sold && (
+            <div className="mt-6 rounded-lg bg-muted/50 p-4 text-sm">
+              <p className="font-semibold text-foreground">🛡️ Consejos para comprar seguro</p>
+              <ul className="mt-2 list-disc space-y-1 pl-5 text-muted-foreground">
+                <li>Pide fotos o un video reciente de la figura antes de pagar.</li>
+                <li>Si se encuentran en persona, que sea en un lugar público y concurrido.</li>
+                <li>Revisa la figura (y que sea original) antes de entregar el dinero.</li>
+                <li>Evita adelantar el pago completo a alguien que no conoces.</li>
+              </ul>
+            </div>
+          )}
         </Card>
       </div>
+
+      {sellerListings.length > 0 && (
+        <RelatedSection
+          title={`Más de ${listing.user.name}`}
+          href={`/vendedor/${listing.user.id}`}
+          listings={sellerListings}
+        />
+      )}
+
+      {similarListings.length > 0 && (
+        <RelatedSection
+          title="Figuras similares"
+          href={`/?categoria=${encodeURIComponent(listing.category)}#catalogo`}
+          listings={similarListings}
+        />
+      )}
     </div>
+  );
+}
+
+type RelatedListing = {
+  id: string;
+  title: string;
+  price: number;
+  discountAmount: number | null;
+  discountExpiresAt: Date | null;
+  category: string;
+  condition: string;
+  views: number;
+  images: { url: string }[];
+  user: { name: string };
+};
+
+function RelatedSection({
+  title,
+  href,
+  listings,
+}: {
+  title: string;
+  href: string;
+  listings: RelatedListing[];
+}) {
+  return (
+    <section className="mt-12">
+      <div className="flex items-baseline justify-between gap-3">
+        <h2 className="text-lg font-bold text-foreground">{title}</h2>
+        <Link href={href} className="shrink-0 text-sm font-medium text-primary hover:underline">
+          Ver todo
+        </Link>
+      </div>
+      <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
+        {listings.map((l) => (
+          <ListingCard
+            key={l.id}
+            id={l.id}
+            title={l.title}
+            price={l.price}
+            discountAmount={getActiveDiscountAmount(l.discountAmount, l.discountExpiresAt)}
+            category={l.category}
+            condition={l.condition}
+            imageUrl={l.images[0]?.url}
+            sellerName={l.user.name}
+            views={l.views}
+          />
+        ))}
+      </div>
+    </section>
   );
 }

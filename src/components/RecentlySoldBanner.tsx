@@ -22,7 +22,7 @@ export default function RecentlySoldBanner({ items }: { items: SoldItem[] }) {
           </span>
           Vendidas hace poco
         </span>
-        <div className="flex gap-2 overflow-x-auto">
+        <div className="no-scrollbar flex gap-2 overflow-x-auto py-0.5">
           {items.map((item) => (
             <Link
               key={item.id}

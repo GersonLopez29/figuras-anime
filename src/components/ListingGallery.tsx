@@ -48,7 +48,7 @@ export default function ListingGallery({ images, title, imageFit = "cover" }: Li
                   : "border-transparent opacity-80 hover:border-zinc-300 hover:opacity-100"
               }`}
             >
-              <Image src={img.url} alt="" fill className={fitClass} sizes="20vw" />
+              <Image src={img.url} alt="" fill className={fitClass} sizes="(min-width: 640px) 100px, 20vw" />
             </button>
           ))}
         </div>
