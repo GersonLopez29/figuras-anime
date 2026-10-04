@@ -115,3 +115,72 @@ export function catalogHref(state: CatalogState, page?: number): string {
   const qs = params.toString();
   return `${qs ? `/?${qs}` : "/"}#catalogo`;
 }
+
+// ---------------------------------------------------------------------------
+// Rangos de precio automáticos
+//
+// El comprador no escribe montos: a partir de los precios de las figuras
+// disponibles se detecta la más barata y la más cara, y se arman hasta 4 rangos
+// con cortes "redondos" (múltiplos de 10) en los cuartiles, para que cada rango
+// tenga figuras. Los cortes son exclusivos por arriba (max = corte - 0.01) para
+// que una figura de justo S/ 150 no aparezca en dos rangos a la vez.
+// ---------------------------------------------------------------------------
+
+export type PriceBucket = { min?: number; max?: number; label: string };
+
+export type PriceSummary = {
+  lowest: number;
+  highest: number;
+  buckets: PriceBucket[];
+};
+
+const EXCLUSIVE_STEP = 0.01;
+
+function roundToTen(value: number): number {
+  return Math.round(value / 10) * 10;
+}
+
+function formatSoles(value: number): string {
+  return `S/ ${Number.isInteger(value) ? value : value.toFixed(2)}`;
+}
+
+// Un tope exclusivo como 149.99 se muestra como "150".
+function displayMax(max: number): number {
+  const rounded = Math.round((max + EXCLUSIVE_STEP) * 100) / 100;
+  return Number.isInteger(rounded) ? rounded : max;
+}
+
+export function priceRangeLabel(min?: number, max?: number): string | null {
+  if (min !== undefined && max !== undefined) {
+    return `${formatSoles(min)} – ${formatSoles(displayMax(max))}`;
+  }
+  if (max !== undefined) return `Hasta ${formatSoles(displayMax(max))}`;
+  if (min !== undefined) return `${formatSoles(min)} o más`;
+  return null;
+}
+
+export function computePriceSummary(sortedPrices: number[]): PriceSummary | null {
+  if (sortedPrices.length === 0) return null;
+  const lowest = sortedPrices[0];
+  const highest = sortedPrices[sortedPrices.length - 1];
+
+  const quantile = (q: number) => sortedPrices[Math.floor(q * (sortedPrices.length - 1))];
+  const cuts = [...new Set([0.25, 0.5, 0.75].map((q) => roundToTen(quantile(q))))].filter(
+    (cut) => cut > lowest && cut <= highest
+  );
+
+  if (sortedPrices.length < 4 || cuts.length === 0) {
+    return { lowest, highest, buckets: [] };
+  }
+
+  const buckets: PriceBucket[] = [];
+  cuts.forEach((cut, i) => {
+    const min = i === 0 ? undefined : cuts[i - 1];
+    const max = cut - EXCLUSIVE_STEP;
+    buckets.push({ min, max, label: priceRangeLabel(min, max)! });
+  });
+  const lastMin = cuts[cuts.length - 1];
+  buckets.push({ min: lastMin, label: priceRangeLabel(lastMin)! });
+
+  return { lowest, highest, buckets };
+}
