@@ -62,11 +62,14 @@ export default function SuggestionButton() {
     <Dialog onOpenChange={handleOpenChange}>
       <DialogTrigger
         render={
-          <Button className="fixed bottom-5 right-5 z-40 h-11 gap-1.5 rounded-full px-4 shadow-lg shadow-orange-600/20" />
+          <Button
+            aria-label="Enviar una sugerencia"
+            className="fixed bottom-4 right-4 z-40 size-11 gap-1.5 rounded-full p-0 opacity-90 shadow-lg shadow-orange-600/20 transition-opacity hover:opacity-100 sm:bottom-5 sm:right-5 sm:h-11 sm:w-auto sm:px-4"
+          />
         }
       >
         <Lightbulb className="size-4" />
-        Sugerencias
+        <span className="hidden sm:inline">Sugerencias</span>
       </DialogTrigger>
 
       <DialogContent showCloseButton={!loading}>

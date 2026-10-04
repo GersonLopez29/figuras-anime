@@ -1,15 +1,18 @@
 import Link from "next/link";
 import Image from "next/image";
+import { catalogHref, type CatalogState } from "@/lib/catalog";
 
 type CategoryOption = { name: string; icon: string; imageUrl?: string | null };
 
 type CategoryFilterProps = {
-  activeCategory?: string;
-  q?: string;
+  state: CatalogState;
   categories: CategoryOption[];
 };
 
-export default function CategoryFilter({ activeCategory, q, categories }: CategoryFilterProps) {
+// Al cambiar de categoría se conservan los demás filtros (búsqueda, estado,
+// línea, precio y orden); la búsqueda nueva, en cambio, empieza desde cero.
+export default function CategoryFilter({ state, categories }: CategoryFilterProps) {
+  const { categoria: activeCategory, q } = state;
   return (
     <div className="space-y-5">
       <form action="/" method="get" className="flex gap-2">
@@ -33,9 +36,9 @@ export default function CategoryFilter({ activeCategory, q, categories }: Catego
         </button>
       </form>
 
-      <div className="flex gap-5 overflow-x-auto pb-1">
+      <div className="no-scrollbar flex gap-5 overflow-x-auto pb-1">
         <Link
-          href={q ? `/?q=${encodeURIComponent(q)}` : "/"}
+          href={catalogHref({ ...state, categoria: undefined })}
           className="flex shrink-0 flex-col items-center gap-1.5"
         >
           <span
@@ -50,14 +53,11 @@ export default function CategoryFilter({ activeCategory, q, categories }: Catego
           <span className="text-xs font-medium text-zinc-700">Todas</span>
         </Link>
         {categories.map((cat) => {
-          const params = new URLSearchParams();
-          params.set("categoria", cat.name);
-          if (q) params.set("q", q);
           const active = activeCategory === cat.name;
           return (
             <Link
               key={cat.name}
-              href={`/?${params.toString()}`}
+              href={catalogHref({ ...state, categoria: cat.name })}
               className="flex shrink-0 flex-col items-center gap-1.5"
             >
               <span

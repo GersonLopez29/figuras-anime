@@ -56,7 +56,7 @@ export default function BannerCarousel({ slides }: { slides: BannerSlide[] }) {
               loading={index === 0 ? "eager" : "lazy"}
               fetchPriority={index === 0 ? "high" : "auto"}
               className="object-cover"
-              sizes="(min-width: 1024px) 1152px, 100vw"
+              sizes="(min-width: 1024px) 560px, 100vw"
             />
             <div
               aria-hidden="true"

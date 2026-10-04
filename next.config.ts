@@ -22,6 +22,10 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   images: {
+    // Las imágenes subidas a Vercel Blob tienen nombre único (UUID) y nunca se
+    // sobrescriben, así que la versión optimizada puede cachearse un mes en vez
+    // de 4 horas: menos re-optimizaciones lentas y menos costo de Vercel.
+    minimumCacheTTL: 2678400,
     remotePatterns: [
       {
         protocol: "https",

@@ -9,6 +9,16 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
+// Solo se aceptan rutas internas ("/algo"), nunca "//dominio" ni URLs absolutas,
+// para que ?volver= no pueda usarse como redirección abierta.
+function getSafeReturnPath(): string {
+  const volver = new URLSearchParams(window.location.search).get("volver");
+  if (volver && volver.startsWith("/") && !volver.startsWith("//") && !volver.startsWith("/\\")) {
+    return volver;
+  }
+  return "/";
+}
+
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -35,7 +45,7 @@ export default function LoginPage() {
       return;
     }
 
-    router.push("/");
+    router.push(getSafeReturnPath());
     router.refresh();
   }
 

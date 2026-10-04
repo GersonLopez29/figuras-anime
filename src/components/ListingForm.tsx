@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useRef, useState, FormEvent, ChangeEvent, DragEvent } from "react";
 import Image from "next/image";
 import CategoryRequestForm from "@/components/CategoryRequestForm";
+import { suggestCategory } from "@/lib/categorySuggest";
 import {
   CONDITION_OPTIONS,
   USED_CONDITION_OPTIONS,
@@ -67,6 +68,12 @@ export default function ListingForm(props: ListingFormProps) {
   const [loading, setLoading] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const suggestedCategory = suggestCategory(
+    title,
+    props.categories.map((c) => c.name)
+  );
+  const showCategorySuggestion = !!suggestedCategory && suggestedCategory !== category;
 
   function addFiles(fileList: FileList | File[]) {
     const files = Array.from(fileList).filter((file) => file.type.startsWith("image/"));
@@ -144,8 +151,13 @@ export default function ListingForm(props: ListingFormProps) {
             required
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder="Ej: Figura de Goku Ultra Instinto 25cm"
+            placeholder="Ej: Goku Super Saiyan - S.H.Figuarts - Bandai - Sellado"
+            aria-describedby="listing-title-help"
           />
+          <p id="listing-title-help" className="text-xs text-muted-foreground">
+            Incluye el personaje, la línea o marca (S.H.Figuarts, Ichiban Kuji, Funko…) y si viene
+            sellada. Así te encuentran más rápido en el buscador.
+          </p>
         </div>
 
         <div className="space-y-1.5">
@@ -199,6 +211,15 @@ export default function ListingForm(props: ListingFormProps) {
                 ))}
               </SelectContent>
             </Select>
+            {showCategorySuggestion && (
+              <button
+                type="button"
+                onClick={() => setCategory(suggestedCategory)}
+                className="block text-left text-xs font-medium text-primary hover:underline"
+              >
+                ¿Es de {suggestedCategory}? Usar esa categoría
+              </button>
+            )}
             <CategoryRequestForm />
           </div>
         </div>
