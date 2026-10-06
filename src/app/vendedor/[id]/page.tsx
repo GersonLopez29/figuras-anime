@@ -8,6 +8,7 @@ import ReviewForm from "@/components/ReviewForm";
 import DeleteReviewButton from "@/components/DeleteReviewButton";
 import ListingCard from "@/components/ListingCard";
 import { OFFICIAL_STORE_NAME } from "@/lib/store";
+import { getActiveReservation } from "@/lib/reservation";
 import { getActiveDiscountAmount } from "@/lib/format";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -71,6 +72,8 @@ export default async function VendedorPage({ params }: VendedorPageProps) {
           deliveryZones: true,
           featuredUntil: true,
           isPreorder: true,
+          reservedAmount: true,
+          reservedUntil: true,
           images: { take: 1, select: { url: true } },
         },
       },
@@ -149,6 +152,7 @@ export default async function VendedorPage({ params }: VendedorPageProps) {
                 deliveryZones={listing.deliveryZones}
                 featuredUntil={listing.featuredUntil}
                 isPreorder={listing.isPreorder}
+                isReserved={!!getActiveReservation(listing.reservedAmount, listing.reservedUntil)}
                 officialStore={seller.isOfficialStore}
                 isFavorited={favoritedIds ? favoritedIds.has(listing.id) : undefined}
               />

@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/session";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
+import { formatPrice, getActiveDiscountAmount, getFinalPrice } from "@/lib/format";
+import { getActiveReservation } from "@/lib/reservation";
 
 // Cualquier visitante (con o sin cuenta) puede contactar al vendedor. El número
 // no se escribe en el HTML de la figura: se entrega aquí recién al tocar el
@@ -24,7 +26,17 @@ export async function POST(
 
   const listing = await prisma.listing.findUnique({
     where: { id },
-    select: { title: true, sold: true, userId: true, user: { select: { name: true, whatsapp: true } } },
+    select: {
+      title: true,
+      sold: true,
+      userId: true,
+      price: true,
+      discountAmount: true,
+      discountExpiresAt: true,
+      reservedAmount: true,
+      reservedUntil: true,
+      user: { select: { name: true, whatsapp: true } },
+    },
   });
   if (!listing) {
     return NextResponse.json({ error: "Publicación no encontrada" }, { status: 404 });
@@ -51,6 +63,14 @@ export async function POST(
     });
   }
 
-  const message = `Hola ${listing.user.name}, vi tu figura "${listing.title}" en FigurasAnime y me interesa. ¿Sigue disponible?`;
+  // Si está separada, el comprador ya avisa que pagaría el total.
+  const reserved = getActiveReservation(listing.reservedAmount, listing.reservedUntil);
+  const total = getFinalPrice(
+    listing.price,
+    getActiveDiscountAmount(listing.discountAmount, listing.discountExpiresAt)
+  );
+  const message = reserved
+    ? `Hola ${listing.user.name}, vi tu figura "${listing.title}" en FigurasAnime. Sé que está separada, pero me interesa comprarla pagando el total de ${formatPrice(total)}. ¿Es posible?`
+    : `Hola ${listing.user.name}, vi tu figura "${listing.title}" en FigurasAnime y me interesa. ¿Sigue disponible?`;
   return NextResponse.json({ link: buildWhatsAppLink(listing.user.whatsapp, message) });
 }

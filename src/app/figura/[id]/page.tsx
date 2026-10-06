@@ -10,6 +10,7 @@ import ListingGallery from "@/components/ListingGallery";
 import ListingCard from "@/components/ListingCard";
 import { cardInclude, toCardProps } from "@/lib/listingCard";
 import { formatArrival } from "@/lib/preorder";
+import { getActiveReservation, formatReservationDate } from "@/lib/reservation";
 import { isFeatured } from "@/lib/featured";
 import { OFFICIAL_STORE_NAME } from "@/lib/store";
 import { getDeliveryZoneLabel, sortDeliveryZones } from "@/lib/delivery";
@@ -137,6 +138,10 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
     : false;
 
   const activeDiscount = getActiveDiscountAmount(listing.discountAmount, listing.discountExpiresAt);
+  const reservation = listing.sold
+    ? null
+    : getActiveReservation(listing.reservedAmount, listing.reservedUntil);
+  const totalPrice = activeDiscount ? getFinalPrice(listing.price, activeDiscount) : listing.price;
   const discountDaysRemaining = getDaysRemaining(listing.discountExpiresAt);
   const discountExpiresLabel = listing.discountExpiresAt
     ? new Date(listing.discountExpiresAt).toLocaleDateString("es-PE", {
@@ -190,6 +195,11 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
             </Badge>
             {!listing.sold && !!activeDiscount && (
               <Badge className="bg-green-600 text-white">Oferta</Badge>
+            )}
+            {reservation && (
+              <Badge variant="outline" className="border-sky-200 bg-sky-50 text-sky-700">
+                🔖 Separada
+              </Badge>
             )}
             {!listing.sold && listing.isPreorder && (
               <Badge variant="outline" className="border-violet-200 bg-violet-50 text-violet-700">
@@ -252,6 +262,20 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
                 </span>
               </AlertDescription>
             </Alert>
+          )}
+
+          {reservation && (
+            <div className="mt-4 rounded-lg bg-sky-50 p-3 text-sm text-sky-900 ring-1 ring-sky-200">
+              <p className="font-semibold">🔖 Figura separada</p>
+              <p className="mt-1">
+                Alguien dejó un adelanto de <strong>{formatPrice(reservation.amount)}</strong>
+                {reservation.until
+                  ? ` y la tiene separada hasta el ${formatReservationDate(reservation.until)}`
+                  : ""}
+                . Todavía puedes comprarla si pagas el total de{" "}
+                <strong>{formatPrice(totalPrice)}</strong>.
+              </p>
+            </div>
           )}
 
           {!listing.sold && listing.isPreorder && listing.preorderArrival && (

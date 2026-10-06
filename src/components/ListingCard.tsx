@@ -23,6 +23,7 @@ type ListingCardProps = {
   deliveryZones?: string[];
   featuredUntil?: Date | null;
   isPreorder?: boolean;
+  isReserved?: boolean;
   officialStore?: boolean;
   isFavorited?: boolean;
 };
@@ -41,6 +42,7 @@ export default function ListingCard({
   deliveryZones,
   featuredUntil,
   isPreorder,
+  isReserved,
   officialStore,
   isFavorited,
 }: ListingCardProps) {
@@ -101,6 +103,11 @@ export default function ListingCard({
         <CardContent className="p-3">
           <h3 className="line-clamp-1 text-sm font-medium text-foreground">{title}</h3>
           <div className="mt-1.5 flex flex-wrap gap-1">
+            {isReserved && !sold && (
+              <Badge variant="outline" className="border-sky-200 bg-sky-50 text-sky-700">
+                🔖 Separada
+              </Badge>
+            )}
             {isPreorder && !sold && (
               <Badge variant="outline" className="border-violet-200 bg-violet-50 text-violet-700">
                 🕒 Preventa

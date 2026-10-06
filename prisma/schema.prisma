@@ -156,6 +156,10 @@ model Listing {
   isPreorder        Boolean        @default(false)
   preorderArrival   DateTime?
   preorderDeposit   Float?
+  // "Separada": alguien dejó un adelanto, pero quien pague el total puede
+  // comprarla igual. reservedUntil es opcional (sin fecha = hasta que se quite).
+  reservedAmount    Float?
+  reservedUntil     DateTime?
   sold              Boolean        @default(false)
   views             Int            @default(0)
   createdAt         DateTime       @default(now())

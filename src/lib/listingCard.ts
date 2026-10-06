@@ -1,4 +1,5 @@
 import { getActiveDiscountAmount } from "@/lib/format";
+import { getActiveReservation } from "@/lib/reservation";
 
 // Lo que cada consulta debe incluir para dibujar una tarjeta del catálogo.
 export const cardInclude = {
@@ -19,6 +20,8 @@ type CardListing = {
   deliveryZones: string[];
   featuredUntil: Date | null;
   isPreorder: boolean;
+  reservedAmount: number | null;
+  reservedUntil: Date | null;
   images: { url: string }[];
   user?: { name: string; isOfficialStore: boolean };
 };
@@ -40,5 +43,6 @@ export function toCardProps(l: CardListing) {
     deliveryZones: l.deliveryZones,
     featuredUntil: l.featuredUntil,
     isPreorder: l.isPreorder,
+    isReserved: !!getActiveReservation(l.reservedAmount, l.reservedUntil),
   };
 }
