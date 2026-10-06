@@ -8,8 +8,9 @@ import ReviewForm from "@/components/ReviewForm";
 import DeleteReviewButton from "@/components/DeleteReviewButton";
 import ListingCard from "@/components/ListingCard";
 import { OFFICIAL_STORE_NAME } from "@/lib/store";
-import { getActiveReservation } from "@/lib/reservation";
-import { getActiveDiscountAmount } from "@/lib/format";
+import { cardInclude, toCardProps } from "@/lib/listingCard";
+import { getTrustProgress } from "@/lib/trust";
+import TrustedSellerBadge, { TRUSTED_SELLER_EXPLANATION } from "@/components/TrustedSellerBadge";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -58,24 +59,9 @@ export default async function VendedorPage({ params }: VendedorPageProps) {
         },
       },
       listings: {
-        orderBy: { createdAt: "desc" },
-        select: {
-          id: true,
-          title: true,
-          price: true,
-          discountAmount: true,
-          discountExpiresAt: true,
-          category: true,
-          condition: true,
-          sold: true,
-          views: true,
-          deliveryZones: true,
-          featuredUntil: true,
-          isPreorder: true,
-          reservedAmount: true,
-          reservedUntil: true,
-          images: { take: 1, select: { url: true } },
-        },
+        // Primero las disponibles, después las vendidas.
+        orderBy: [{ sold: "asc" }, { createdAt: "desc" }],
+        include: cardInclude,
       },
     },
   });
@@ -91,6 +77,7 @@ export default async function VendedorPage({ params }: VendedorPageProps) {
       : 0;
 
   const isOwnProfile = currentUser?.id === seller.id;
+  const trust = await getTrustProgress(seller.id);
 
   const favoritedIds = currentUser
     ? new Set(
@@ -124,7 +111,16 @@ export default async function VendedorPage({ params }: VendedorPageProps) {
           {seller.isOfficialStore && (
             <p className="text-sm font-semibold text-orange-700">✔ {OFFICIAL_STORE_NAME}</p>
           )}
-          <p className="text-xs text-muted-foreground">Miembro desde {memberSince}</p>
+          {trust?.trusted && (
+            <div className="mt-1">
+              <TrustedSellerBadge size="md" />
+              <p className="mt-1 text-xs text-muted-foreground">{TRUSTED_SELLER_EXPLANATION}</p>
+            </div>
+          )}
+          <p className="text-xs text-muted-foreground">
+            Miembro desde {memberSince}
+            {trust && trust.sales > 0 && ` · ${trust.sales} ${trust.sales === 1 ? "figura vendida" : "figuras vendidas"}`}
+          </p>
           <div className="mt-1.5">
             <StarRating rating={averageRating} reviewCount={reviewCount} size="md" />
           </div>
@@ -140,20 +136,8 @@ export default async function VendedorPage({ params }: VendedorPageProps) {
             {seller.listings.map((listing) => (
               <ListingCard
                 key={listing.id}
-                id={listing.id}
-                title={listing.title}
-                price={listing.price}
-                discountAmount={getActiveDiscountAmount(listing.discountAmount, listing.discountExpiresAt)}
-                category={listing.category}
-                condition={listing.condition}
-                imageUrl={listing.images[0]?.url}
-                sold={listing.sold}
-                views={listing.views}
-                deliveryZones={listing.deliveryZones}
-                featuredUntil={listing.featuredUntil}
-                isPreorder={listing.isPreorder}
-                isReserved={!!getActiveReservation(listing.reservedAmount, listing.reservedUntil)}
-                officialStore={seller.isOfficialStore}
+                {...toCardProps(listing, trust?.trusted ? new Set([seller.id]) : undefined)}
+                sellerName={undefined}
                 isFavorited={favoritedIds ? favoritedIds.has(listing.id) : undefined}
               />
             ))}

@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/session";
 import ListingCard from "@/components/ListingCard";
 import { cardInclude, toCardProps } from "@/lib/listingCard";
+import { getTrustedSellerIds } from "@/lib/trust";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
@@ -20,6 +21,7 @@ export default async function FavoritosPage() {
     },
     orderBy: { createdAt: "desc" },
   });
+  const trustedSellerIds = await getTrustedSellerIds();
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10">
@@ -42,7 +44,7 @@ export default async function FavoritosPage() {
       ) : (
         <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
           {favorites.map(({ listing }) => (
-            <ListingCard key={listing.id} {...toCardProps(listing)} isFavorited={true} />
+            <ListingCard key={listing.id} {...toCardProps(listing, trustedSellerIds)} isFavorited={true} />
           ))}
         </div>
       )}

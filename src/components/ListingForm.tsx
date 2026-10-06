@@ -13,6 +13,7 @@ import {
   isNewCondition,
   isOpenBoxCondition,
 } from "@/lib/condition";
+import { PHOTO_TYPE_HELP, type PhotoType } from "@/lib/photoType";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -54,6 +55,7 @@ type ListingFormProps =
       // "2026-12" (mes estimado de llegada) o "".
       initialPreorderArrival: string;
       initialPreorderDeposit: number | null;
+      initialPhotoType: string | null;
       categories: CategoryOption[];
     };
 
@@ -75,6 +77,11 @@ export default function ListingForm(props: ListingFormProps) {
   );
   const [deliveryNotes, setDeliveryNotes] = useState(
     (isEdit ? props.initialDeliveryNotes : props.defaultDeliveryNotes) ?? ""
+  );
+  const [photoType, setPhotoType] = useState<PhotoType | "">(
+    isEdit && (props.initialPhotoType === "real" || props.initialPhotoType === "referencial")
+      ? props.initialPhotoType
+      : ""
   );
   const [isPreorder, setIsPreorder] = useState(isEdit ? props.initialIsPreorder : false);
   const [preorderArrival, setPreorderArrival] = useState(
@@ -148,6 +155,10 @@ export default function ListingForm(props: ListingFormProps) {
       setError("Sube al menos una imagen de la figura");
       return;
     }
+    if (!photoType) {
+      setError("Indica si las fotos son reales o referenciales");
+      return;
+    }
 
     setLoading(true);
 
@@ -157,6 +168,7 @@ export default function ListingForm(props: ListingFormProps) {
     formData.set("price", price);
     formData.set("category", category);
     formData.set("condition", condition);
+    formData.set("photoType", photoType);
     deliveryZones.forEach((zone) => formData.append("deliveryZones", zone));
     formData.set("deliveryNotes", deliveryNotes);
     formData.set("isPreorder", String(isPreorder));
@@ -504,6 +516,37 @@ export default function ListingForm(props: ListingFormProps) {
               ))}
             </div>
           )}
+
+          <p className="mt-4 text-sm font-medium text-foreground">¿Las fotos son de tu figura?</p>
+          <div className="mt-1.5 flex gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setPhotoType("real")}
+              aria-pressed={photoType === "real"}
+              className={`h-auto flex-1 whitespace-normal py-2 ${
+                photoType === "real" ? "border-primary bg-primary/5 text-primary" : "text-muted-foreground"
+              }`}
+            >
+              📷 Sí, son fotos reales
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setPhotoType("referencial")}
+              aria-pressed={photoType === "referencial"}
+              className={`h-auto flex-1 whitespace-normal py-2 ${
+                photoType === "referencial" ? "border-primary bg-primary/5 text-primary" : "text-muted-foreground"
+              }`}
+            >
+              🌐 No, son referenciales
+            </Button>
+          </div>
+          <p className="mt-1.5 text-xs text-muted-foreground">
+            {photoType
+              ? PHOTO_TYPE_HELP[photoType]
+              : "Las publicaciones con fotos reales generan más confianza y se venden más rápido."}
+          </p>
         </div>
 
         {error && (

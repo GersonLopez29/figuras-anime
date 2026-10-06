@@ -7,7 +7,7 @@ export const metadata: Metadata = {
     "Cómo FigurasAnime recopila, usa y protege tus datos personales al comprar, vender y publicar figuras de anime.",
 };
 
-const LAST_UPDATED = "6 de octubre de 2026";
+const LAST_UPDATED = "7 de octubre de 2026";
 const CONTACT_EMAIL = "gersonownd@gmail.com";
 
 export default function PoliticaPrivacidadPage() {
@@ -43,6 +43,18 @@ export default function PoliticaPrivacidadPage() {
               <li>Mensajes que envías a otros usuarios dentro del chat de la plataforma</li>
               <li>Reseñas y calificaciones que dejas a otros vendedores</li>
               <li>Tus favoritos y publicaciones que visitas</li>
+              <li>
+                Los pedidos que publicas en &quot;Se busca&quot; (lo que buscas, presupuesto y detalles)
+              </li>
+            </ul>
+
+            <h3 className="mt-4 text-sm font-semibold text-foreground">Avísame cuando llegue (sin cuenta)</h3>
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-muted-foreground">
+              <li>
+                Tu correo y lo que buscas. Solo se usa para avisarte cuando publiquen una figura que
+                coincida; el aviso se activa al confirmar el correo, dura 6 meses y puedes darlo de baja
+                desde cualquiera de esos correos.
+              </li>
             </ul>
 
             <h3 className="mt-4 text-sm font-semibold text-foreground">Automáticamente</h3>
@@ -71,7 +83,10 @@ export default function PoliticaPrivacidadPage() {
                 Permitir que los interesados te contacten por WhatsApp (tengan cuenta o no) o por el chat
                 interno (usuarios registrados) sobre una figura que publicaste
               </li>
-              <li>Enviarte correos necesarios para el servicio: verificación de cuenta y avisos de seguridad</li>
+              <li>
+                Enviarte correos necesarios para el servicio: verificación de cuenta, avisos de seguridad y
+                los avisos que pediste (figuras que buscas, destacados ganados por invitar amigos)
+              </li>
               <li>
                 Prevenir fraude, spam y accesos no autorizados (por ejemplo, bloqueo temporal tras varios
                 intentos fallidos de inicio de sesión)
@@ -87,6 +102,10 @@ export default function PoliticaPrivacidadPage() {
               página: se entrega a la persona que toca &quot;Contactar por WhatsApp&quot; en una figura tuya,
               tenga cuenta o no, para que pueda escribirte. Limitamos cuántas consultas puede hacer cada
               conexión por hora para evitar que se recolecten números de forma automática.
+            </p>
+            <p className="mt-2 text-muted-foreground">
+              Si publicas un pedido en &quot;Se busca&quot;, tu WhatsApp se entrega a los usuarios registrados
+              que tocan &quot;Tengo esta figura&quot; en ese pedido, también con un límite por hora.
             </p>
             <p className="mt-2 text-muted-foreground">
               Usamos proveedores externos que procesan datos en nuestro nombre, bajo sus propias políticas

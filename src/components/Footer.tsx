@@ -80,6 +80,21 @@ export default function Footer({ totalVisits, categories }: FooterProps) {
                 </Link>
               </li>
               <li>
+                <Link href="/se-busca" className="inline-block text-sm text-zinc-600 transition hover:translate-x-0.5 hover:text-orange-600">
+                  Se busca
+                </Link>
+              </li>
+              <li>
+                <Link href="/avisame" className="inline-block text-sm text-zinc-600 transition hover:translate-x-0.5 hover:text-orange-600">
+                  Avísame cuando llegue
+                </Link>
+              </li>
+              <li>
+                <Link href="/guias" className="inline-block text-sm text-zinc-600 transition hover:translate-x-0.5 hover:text-orange-600">
+                  Guías para coleccionistas
+                </Link>
+              </li>
+              <li>
                 <Link href="/registro" className="inline-block text-sm text-zinc-600 transition hover:translate-x-0.5 hover:text-orange-600">
                   Crear cuenta
                 </Link>

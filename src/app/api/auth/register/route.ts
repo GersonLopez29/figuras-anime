@@ -1,10 +1,12 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import bcrypt from "bcryptjs";
 import { randomBytes } from "crypto";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { createSession } from "@/lib/session";
 import { sendVerificationEmail, sendAccountExistsEmail } from "@/lib/email";
+import { REFERRAL_COOKIE, isReferralCodeShape } from "@/lib/referrals";
 
 const registerSchema = z.object({
   name: z.string().trim().min(2, "El nombre debe tener al menos 2 caracteres"),
@@ -60,6 +62,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ name, email });
   }
 
+  // Si llegó con un enlace de invitación (/r/<código>), se guarda quién lo invitó.
+  const cookieStore = await cookies();
+  const refCode = cookieStore.get(REFERRAL_COOKIE)?.value?.toLowerCase();
+  const referrer =
+    refCode && isReferralCodeShape(refCode)
+      ? await prisma.user.findUnique({ where: { referralCode: refCode }, select: { id: true } })
+      : null;
+
   const passwordHash = await bcrypt.hash(password, 10);
   const verificationToken = randomBytes(32).toString("hex");
   const verificationTokenExpiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24); // 24h
@@ -72,8 +82,10 @@ export async function POST(request: Request) {
       whatsapp,
       verificationToken,
       verificationTokenExpiresAt,
+      referredById: referrer?.id ?? null,
     },
   });
+  if (refCode) cookieStore.delete(REFERRAL_COOKIE);
 
   await createSession(user.id);
   await sendVerificationEmail(user.email, user.name, verificationToken);

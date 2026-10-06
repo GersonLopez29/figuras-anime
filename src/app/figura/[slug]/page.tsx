@@ -11,6 +11,9 @@ import ListingCard from "@/components/ListingCard";
 import { categoryPath, listingPath } from "@/lib/slug";
 import { resolveListingParam } from "@/lib/listingSlug";
 import { cardInclude, toCardProps } from "@/lib/listingCard";
+import { getTrustedSellerIds } from "@/lib/trust";
+import { PHOTO_TYPE_HELP, PHOTO_TYPE_LABEL, isValidPhotoType } from "@/lib/photoType";
+import TrustedSellerBadge from "@/components/TrustedSellerBadge";
 import { formatArrival } from "@/lib/preorder";
 import { getActiveReservation, formatReservationDate } from "@/lib/reservation";
 import { isFeatured } from "@/lib/featured";
@@ -22,6 +25,8 @@ import ShareButton from "@/components/ShareButton";
 import MessageButton from "@/components/MessageButton";
 import WhatsAppContactButton from "@/components/WhatsAppContactButton";
 import StoryShareButton from "@/components/StoryShareButton";
+import StockAlertForm from "@/components/StockAlertForm";
+import { normalizeAlertQuery } from "@/lib/alertMatch";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -156,6 +161,9 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
   });
 
 
+  const trustedSellerIds = await getTrustedSellerIds();
+  const sellerIsTrusted = trustedSellerIds.has(listing.user.id);
+
   const isFavorited = currentUser
     ? !!(await prisma.favorite.findUnique({
         where: { userId_listingId: { userId: currentUser.id, listingId: listing.id } },
@@ -235,7 +243,26 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
               <Badge className="bg-amber-400 text-amber-950">⭐ Destacada</Badge>
             )}
             {listing.sold && <Badge variant="secondary">Vendido</Badge>}
+            {isValidPhotoType(listing.photoType) && (
+              <Badge
+                variant="outline"
+                title={PHOTO_TYPE_HELP[listing.photoType]}
+                className={
+                  listing.photoType === "real"
+                    ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+                    : "border-zinc-200 bg-zinc-50 text-zinc-600"
+                }
+              >
+                {PHOTO_TYPE_LABEL[listing.photoType]}
+              </Badge>
+            )}
           </div>
+
+          {listing.photoType === "referencial" && !listing.sold && (
+            <p className="mt-2 text-xs text-muted-foreground">
+              🌐 {PHOTO_TYPE_HELP.referencial}
+            </p>
+          )}
 
           <div className="mt-2 flex items-center gap-1 text-xs text-muted-foreground">
             <span aria-hidden="true">👁️</span>
@@ -366,6 +393,11 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
               {listing.user.isOfficialStore && (
                 <p className="text-xs font-semibold text-orange-700">✔ {OFFICIAL_STORE_NAME}</p>
               )}
+              {sellerIsTrusted && (
+                <div className="mt-0.5">
+                  <TrustedSellerBadge />
+                </div>
+              )}
               <div className="mt-0.5">
                 {reviewCount > 0 ? (
                   <StarRating rating={averageRating} reviewCount={reviewCount} />
@@ -380,11 +412,25 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
           </Link>
 
           {listing.sold ? (
-            <Alert className="mt-6 text-center">
-              <AlertDescription className="justify-center text-center font-medium">
-                Este producto ya fue vendido.
-              </AlertDescription>
-            </Alert>
+            <>
+              <Alert className="mt-6 text-center">
+                <AlertDescription className="justify-center text-center font-medium">
+                  Este producto ya fue vendido.
+                </AlertDescription>
+              </Alert>
+              <div className="mt-4 rounded-lg bg-orange-50/70 p-4 ring-1 ring-orange-200">
+                <p className="text-sm font-semibold text-foreground">🔔 ¿Llegaste tarde?</p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Te avisamos por correo cuando alguien publique otra igual.
+                </p>
+                <div className="mt-3">
+                  <StockAlertForm
+                    defaultQuery={normalizeAlertQuery(listing.title).split(" ").slice(0, 5).join(" ")}
+                    defaultEmail={currentUser?.email ?? ""}
+                  />
+                </div>
+              </div>
+            </>
           ) : (
             // Cualquiera puede contactar al vendedor, tenga cuenta o no.
             <div className="mt-6">
@@ -412,6 +458,12 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
                 <li>Revisa la figura (y que sea original) antes de entregar el dinero.</li>
                 <li>Evita adelantar el pago completo a alguien que no conoces.</li>
               </ul>
+              <Link
+                href="/guias/figura-original-o-bamba"
+                className="mt-2 inline-block font-medium text-primary hover:underline"
+              >
+                Cómo reconocer una figura original →
+              </Link>
             </div>
           )}
         </Card>
@@ -422,6 +474,7 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
           title={`Más de ${listing.user.name}`}
           href={`/vendedor/${listing.user.id}`}
           listings={sellerListings}
+          trustedSellerIds={trustedSellerIds}
         />
       )}
 
@@ -430,6 +483,7 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
           title="Figuras similares"
           href={categoryPath(listing.category)}
           listings={similarListings}
+          trustedSellerIds={trustedSellerIds}
         />
       )}
     </div>
@@ -442,10 +496,12 @@ function RelatedSection({
   title,
   href,
   listings,
+  trustedSellerIds,
 }: {
   title: string;
   href: string;
   listings: RelatedListing[];
+  trustedSellerIds: Set<string>;
 }) {
   return (
     <section className="mt-12">
@@ -457,7 +513,7 @@ function RelatedSection({
       </div>
       <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
         {listings.map((l) => (
-          <ListingCard key={l.id} {...toCardProps(l)} />
+          <ListingCard key={l.id} {...toCardProps(l, trustedSellerIds)} />
         ))}
       </div>
     </section>

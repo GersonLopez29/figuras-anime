@@ -44,6 +44,19 @@ model User {
   whatsappClicks             WhatsAppClick[]
   featureRequests            FeatureRequest[]
   consignmentRequests        ConsignmentRequest[]
+  wantedPosts                WantedPost[]
+  wantedContacts             WantedContact[]
+  // Referidos: código propio para invitar (/r/<código>), quién lo invitó y
+  // cuándo se premió a quien lo invitó (al publicar su primera figura).
+  referralCode               String?           @unique
+  referredById               String?
+  referredBy                 User?             @relation("Referrals", fields: [referredById], references: [id], onDelete: SetNull)
+  referrals                  User[]            @relation("Referrals")
+  referralRewardedAt         DateTime?
+  // Destacados gratis ganados por invitar amigos.
+  freeFeatureCredits         Int               @default(0)
+
+  @@index([referredById])
 }
 
 model Favorite {
@@ -164,6 +177,9 @@ model Listing {
   // cambiados) para que los enlaces ya compartidos sigan redirigiendo.
   slug              String?        @unique
   oldSlugs          String[]       @default([])
+  // "real" (fotos de la figura que se vende) o "referencial" (de internet).
+  // null en publicaciones anteriores a esta opción.
+  photoType         String?
   sold              Boolean        @default(false)
   views             Int            @default(0)
   createdAt         DateTime       @default(now())
@@ -298,4 +314,62 @@ model PasswordResetAttempt {
   createdAt DateTime @default(now())
 
   @@index([ip, createdAt])
+}
+
+// "Avísame cuando llegue": alguien deja su correo y lo que busca; al publicarse
+// una figura que coincide le llega un correo. Se activa al confirmar el correo.
+model StockAlert {
+  id             String    @id @default(cuid())
+  email          String
+  query          String
+  // Sirve para confirmar y para dar de baja desde el correo.
+  token          String    @unique
+  confirmedAt    DateTime?
+  // Último correo de confirmación enviado (para no reenviarlo seguido).
+  confirmSentAt  DateTime?
+  lastNotifiedAt DateTime?
+  createdAt      DateTime  @default(now())
+
+  @@unique([email, query])
+  @@index([confirmedAt])
+}
+
+model AlertAttempt {
+  id        String   @id @default(cuid())
+  ip        String
+  createdAt DateTime @default(now())
+
+  @@index([ip, createdAt])
+}
+
+// "Se busca": un comprador publica la figura que quiere y los vendedores le
+// escriben. status: "open" o "found".
+model WantedPost {
+  id             String          @id @default(cuid())
+  title          String
+  details        String          @default("")
+  maxPrice       Float?
+  category       String?
+  status         String          @default("open")
+  lastNotifiedAt DateTime?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  userId         String
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  contacts       WantedContact[]
+
+  @@index([status, createdAt])
+}
+
+// Cada vez que un vendedor toca "Tengo esta figura" (limita cuántos números
+// de WhatsApp se pueden pedir por hora).
+model WantedContact {
+  id           String     @id @default(cuid())
+  createdAt    DateTime   @default(now())
+  wantedPostId String
+  wantedPost   WantedPost @relation(fields: [wantedPostId], references: [id], onDelete: Cascade)
+  userId       String
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
 }

@@ -49,6 +49,7 @@ export default async function EditarFiguraPage({ params }: EditarPageProps) {
           initialIsPreorder={listing.isPreorder}
           initialPreorderArrival={dateToMonth(listing.preorderArrival)}
           initialPreorderDeposit={listing.preorderDeposit}
+          initialPhotoType={listing.photoType}
           categories={categories}
         />
       </div>

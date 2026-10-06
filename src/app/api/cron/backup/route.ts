@@ -33,6 +33,8 @@ export async function GET(request: NextRequest) {
     messages,
     siteStats,
     visitStats,
+    stockAlerts,
+    wantedPosts,
   ] = await Promise.all([
     prisma.user.findMany({ omit: { passwordHash: true } }),
     prisma.listing.findMany(),
@@ -50,6 +52,9 @@ export async function GET(request: NextRequest) {
     prisma.message.findMany(),
     prisma.siteStats.findMany(),
     prisma.visitStat.findMany(),
+    // El token sirve para dar de baja avisos: no hace falta en el respaldo.
+    prisma.stockAlert.findMany({ omit: { token: true } }),
+    prisma.wantedPost.findMany(),
   ]);
 
   const database = {
@@ -71,6 +76,8 @@ export async function GET(request: NextRequest) {
       Message: messages,
       SiteStats: siteStats,
       VisitStat: visitStats,
+      StockAlert: stockAlerts,
+      WantedPost: wantedPosts,
     },
   };
 

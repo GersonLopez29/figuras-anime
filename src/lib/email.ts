@@ -265,3 +265,117 @@ export async function sendConsignmentRequestAdminEmail(
     )
   );
 }
+
+// --- Avísame cuando llegue ---------------------------------------------------
+
+function smallPrint(html: string) {
+  return `<p style="margin-top: 20px; font-size: 12px; color: #71717a; line-height: 1.5;">${html}</p>`;
+}
+
+export async function sendAlertConfirmEmail(to: string, query: string, token: string) {
+  const confirmUrl = `${SITE_URL}/avisame/confirmar?token=${token}`;
+  await sendEmail(
+    to,
+    `Confirma tu aviso: "${query}"`,
+    wrapper(
+      "🔔 Confirma tu aviso",
+      `
+        <p style="font-size: 14px; color: #3f3f46; line-height: 1.6;">
+          Pediste que te avisemos cuando publiquen una figura de
+          <strong>${escapeHtml(query)}</strong> en FigurasAnime. Confirma tu correo para activarlo:
+        </p>
+        ${button(confirmUrl, "Activar aviso")}
+        ${smallPrint("Si no fuiste tú, ignora este correo: sin confirmar no te enviaremos nada.")}
+      `
+    )
+  );
+}
+
+export async function sendAlertMatchEmail(
+  to: string,
+  query: string,
+  token: string,
+  listing: { title: string; path: string; priceLabel: string; imageUrl: string | null }
+) {
+  const searchUrl = `${SITE_URL}/?q=${encodeURIComponent(query)}#catalogo`;
+  const unsubscribeUrl = `${SITE_URL}/avisame/cancelar?token=${token}`;
+  await sendEmail(
+    to,
+    `🔔 Llegó: ${listing.title}`,
+    wrapper(
+      "🔔 ¡Llegó lo que buscabas!",
+      `
+        <p style="font-size: 14px; color: #3f3f46; line-height: 1.6;">
+          Acaban de publicar una figura que coincide con tu aviso <strong>${escapeHtml(query)}</strong>:
+        </p>
+        ${
+          listing.imageUrl
+            ? `<img src="${escapeHtml(listing.imageUrl)}" alt="" width="240" style="display: block; margin: 12px 0; border-radius: 12px; max-width: 100%;" />`
+            : ""
+        }
+        <p style="font-size: 16px; font-weight: 600; color: #18181b; margin: 8px 0 0;">${escapeHtml(listing.title)}</p>
+        <p style="font-size: 16px; font-weight: 700; color: #c2410c; margin: 4px 0 0;">${escapeHtml(listing.priceLabel)}</p>
+        ${button(`${SITE_URL}${listing.path}`, "Ver la figura")}
+        <p style="margin-top: 12px; font-size: 13px;">
+          <a href="${searchUrl}" style="color: #c2410c;">Ver todas las figuras de "${escapeHtml(query)}"</a>
+        </p>
+        ${smallPrint(`¿Ya no te interesa? <a href="${unsubscribeUrl}" style="color: #71717a;">Dejar de recibir este aviso</a>.`)}
+      `
+    )
+  );
+}
+
+// --- Se busca -----------------------------------------------------------------
+
+export async function sendWantedMatchEmail(
+  to: string,
+  name: string,
+  wantedTitle: string,
+  listing: { title: string; path: string; priceLabel: string; imageUrl: string | null }
+) {
+  await sendEmail(
+    to,
+    `🔎 Publicaron algo de lo que buscas: ${listing.title}`,
+    wrapper(
+      `¡Hola ${escapeHtml(name)}!`,
+      `
+        <p style="font-size: 14px; color: #3f3f46; line-height: 1.6;">
+          Publicaron una figura que coincide con tu pedido <strong>${escapeHtml(wantedTitle)}</strong> en "Se busca":
+        </p>
+        ${
+          listing.imageUrl
+            ? `<img src="${escapeHtml(listing.imageUrl)}" alt="" width="240" style="display: block; margin: 12px 0; border-radius: 12px; max-width: 100%;" />`
+            : ""
+        }
+        <p style="font-size: 16px; font-weight: 600; color: #18181b; margin: 8px 0 0;">${escapeHtml(listing.title)}</p>
+        <p style="font-size: 16px; font-weight: 700; color: #c2410c; margin: 4px 0 0;">${escapeHtml(listing.priceLabel)}</p>
+        ${button(`${SITE_URL}${listing.path}`, "Ver la figura")}
+        ${smallPrint(`Si ya la conseguiste, márcala como conseguida en <a href="${SITE_URL}/se-busca" style="color: #71717a;">Se busca</a> para dejar de recibir avisos.`)}
+      `
+    )
+  );
+}
+
+// --- Referidos ------------------------------------------------------------------
+
+export async function sendReferralRewardEmail(
+  to: string,
+  name: string,
+  friendName: string,
+  days: number
+) {
+  await sendEmail(
+    to,
+    "🎁 Ganaste un destacado gratis en FigurasAnime",
+    wrapper(
+      `¡Gracias, ${escapeHtml(name)}!`,
+      `
+        <p style="font-size: 14px; color: #3f3f46; line-height: 1.6;">
+          <strong>${escapeHtml(friendName)}</strong> se unió con tu invitación y publicó su primera figura.
+          Ganaste <strong>un destacado gratis de ${days} días</strong> para la figura que quieras.
+        </p>
+        ${button(`${SITE_URL}/mis-figuras`, "Usar mi destacado")}
+      `
+    )
+  );
+}
