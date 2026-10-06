@@ -14,6 +14,8 @@ import {
 } from "@/lib/featured";
 import ToggleSoldButton from "@/components/ToggleSoldButton";
 import DiscountControl from "@/components/DiscountControl";
+import ReservationControl from "@/components/ReservationControl";
+import { getActiveReservation } from "@/lib/reservation";
 import { formatPrice, getFinalPrice, getActiveDiscountAmount } from "@/lib/format";
 import { getConditionLabel } from "@/lib/condition";
 import { Card } from "@/components/ui/card";
@@ -73,6 +75,7 @@ export default async function MisFigurasPage() {
               listing.discountAmount,
               listing.discountExpiresAt
             );
+            const reservation = getActiveReservation(listing.reservedAmount, listing.reservedUntil);
             return (
             <div
               key={listing.id}
@@ -138,6 +141,15 @@ export default async function MisFigurasPage() {
                       discountExpiresAt={listing.discountExpiresAt}
                     />
                   </div>
+                  {!listing.sold && (
+                    <div className="mt-1.5">
+                      <ReservationControl
+                        listingId={listing.id}
+                        reservedAmount={reservation?.amount ?? null}
+                        reservedUntil={reservation?.until ?? null}
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
 

@@ -6,6 +6,7 @@ import { formatPrice, getActiveDiscountAmount, getFinalPrice } from "@/lib/forma
 import { isNewCondition, isOpenBoxCondition } from "@/lib/condition";
 import { getDeliveryZoneLabel, sortDeliveryZones } from "@/lib/delivery";
 import { OFFICIAL_STORE_NAME } from "@/lib/store";
+import { getActiveReservation } from "@/lib/reservation";
 
 // Imagen de vista previa (1200×630) que muestran WhatsApp, Facebook, X, etc.
 // al compartir una figura: foto, título, precio, estado, zona y la marca.
@@ -149,6 +150,8 @@ export async function renderListingShareImage(id: string): Promise<ImageResponse
         condition: true,
         sold: true,
         isPreorder: true,
+        reservedAmount: true,
+        reservedUntil: true,
         deliveryZones: true,
         images: { take: 1, select: { url: true } },
         user: { select: { name: true, isOfficialStore: true } },
@@ -261,6 +264,11 @@ export async function renderListingShareImage(id: string): Promise<ImageResponse
               <Pill background="#eff6ff" color="#1d4ed8">
                 {conditionLabel(listing.condition)}
               </Pill>
+              {!listing.sold && getActiveReservation(listing.reservedAmount, listing.reservedUntil) && (
+                <Pill background="#e0f2fe" color="#0369a1">
+                  Separada
+                </Pill>
+              )}
               {listing.isPreorder && !listing.sold && (
                 <Pill background="#f5f3ff" color="#6d28d9">
                   Preventa
