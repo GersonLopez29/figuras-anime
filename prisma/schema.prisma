@@ -147,6 +147,8 @@ model Listing {
   discountExpiresAt DateTime?
   category          String
   condition         String         @default("nuevo")
+  deliveryZones     String[]       @default([])
+  deliveryNotes     String?
   sold              Boolean        @default(false)
   views             Int            @default(0)
   createdAt         DateTime       @default(now())

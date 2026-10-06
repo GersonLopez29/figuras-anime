@@ -66,6 +66,7 @@ export default async function VendedorPage({ params }: VendedorPageProps) {
           condition: true,
           sold: true,
           views: true,
+          deliveryZones: true,
           images: { take: 1, select: { url: true } },
         },
       },
@@ -138,6 +139,7 @@ export default async function VendedorPage({ params }: VendedorPageProps) {
                 imageUrl={listing.images[0]?.url}
                 sold={listing.sold}
                 views={listing.views}
+                deliveryZones={listing.deliveryZones}
                 isFavorited={favoritedIds ? favoritedIds.has(listing.id) : undefined}
               />
             ))}

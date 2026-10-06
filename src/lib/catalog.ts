@@ -1,3 +1,5 @@
+import { isDeliveryZone, type DeliveryZone } from "@/lib/delivery";
+
 // Estado del catálogo (filtros, orden y página) leído desde la URL, y helpers
 // para construir enlaces que conservan los filtros activos.
 
@@ -56,6 +58,7 @@ export type CatalogState = {
   min?: number;
   max?: number;
   linea?: ProductLineSlug;
+  zona?: DeliveryZone;
 };
 
 const MAX_PRICE_FILTER = 1_000_000;
@@ -74,6 +77,7 @@ export function parseCatalogFilters(raw: {
   min?: string;
   max?: string;
   linea?: string;
+  zona?: string;
 }): Omit<CatalogState, "categoria" | "q"> {
   const estado = raw.estado === "nuevo" || raw.estado === "usado" ? raw.estado : undefined;
   const orden = ORDER_OPTIONS.some((o) => o.value === raw.orden)
@@ -94,6 +98,7 @@ export function parseCatalogFilters(raw: {
     min,
     max,
     linea,
+    zona: isDeliveryZone(raw.zona) ? raw.zona : undefined,
   };
 }
 
@@ -108,6 +113,7 @@ export function catalogHref(state: CatalogState, page?: number): string {
   if (state.estado) params.set("estado", state.estado);
   if (state.oferta) params.set("oferta", "1");
   if (state.linea) params.set("linea", state.linea);
+  if (state.zona) params.set("zona", state.zona);
   if (state.min !== undefined) params.set("min", String(state.min));
   if (state.max !== undefined) params.set("max", String(state.max));
   if (state.orden && state.orden !== "recientes") params.set("orden", state.orden);

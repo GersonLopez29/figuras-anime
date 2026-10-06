@@ -43,6 +43,8 @@ export default async function EditarFiguraPage({ params }: EditarPageProps) {
           initialCategory={listing.category}
           initialCondition={listing.condition}
           initialImages={listing.images.map((img) => ({ id: img.id, url: img.url }))}
+          initialDeliveryZones={listing.deliveryZones}
+          initialDeliveryNotes={listing.deliveryNotes}
           categories={categories}
         />
       </div>
