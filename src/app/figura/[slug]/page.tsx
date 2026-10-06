@@ -8,7 +8,8 @@ import { getCurrentUser } from "@/lib/session";
 import { getConditionLabel, getConditionIcon, isNewCondition } from "@/lib/condition";
 import ListingGallery from "@/components/ListingGallery";
 import ListingCard from "@/components/ListingCard";
-import { categoryPath, listingIdFromParam, listingPath, listingSlug } from "@/lib/slug";
+import { categoryPath, listingPath } from "@/lib/slug";
+import { resolveListingParam } from "@/lib/listingSlug";
 import { cardInclude, toCardProps } from "@/lib/listingCard";
 import { formatArrival } from "@/lib/preorder";
 import { getActiveReservation, formatReservationDate } from "@/lib/reservation";
@@ -29,16 +30,21 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://gerstore.club";
 
 type FiguraPageProps = {
-  params: Promise<{ id: string }>;
+  params: Promise<{ slug: string }>;
 };
 
 export async function generateMetadata({ params }: FiguraPageProps): Promise<Metadata> {
-  const { id: param } = await params;
-  const id = listingIdFromParam(param);
+  const { slug: param } = await params;
+  const resolved = await resolveListingParam(param);
+  if (!resolved) {
+    return { title: "Figura no encontrada — FigurasAnime" };
+  }
+  const id = resolved.id;
   const listing = await prisma.listing.findUnique({
     where: { id },
     select: {
       id: true,
+      slug: true,
       title: true,
       description: true,
       price: true,
@@ -96,18 +102,18 @@ const getListingAndRegisterView = cache(async (id: string, viewerId: string | nu
 });
 
 export default async function FiguraPage({ params }: FiguraPageProps) {
-  const { id: param } = await params;
-  const id = listingIdFromParam(param);
+  const { slug: param } = await params;
 
-  // Los enlaces viejos (/figura/<id>) o con un título anterior redirigen al
-  // enlace actual, antes de contar la visita.
-  const basic = await prisma.listing.findUnique({ where: { id }, select: { id: true, title: true } });
-  if (!basic) {
+  // Los enlaces anteriores (/figura/<id>, /figura/<nombre>-<id> o con un título
+  // anterior) redirigen al enlace actual, antes de contar la visita.
+  const resolved = await resolveListingParam(param);
+  if (!resolved) {
     notFound();
   }
-  if (decodeURIComponent(param) !== listingSlug(basic)) {
-    permanentRedirect(listingPath(basic));
+  if (!resolved.isCanonical) {
+    permanentRedirect(listingPath(resolved));
   }
+  const id = resolved.id;
 
   const currentUser = await getCurrentUser();
 

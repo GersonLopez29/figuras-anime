@@ -17,14 +17,14 @@ export default async function AdminDestacadosPage() {
       where: { status: "pending" },
       orderBy: { createdAt: "asc" },
       include: {
-        listing: { select: { id: true, title: true, price: true } },
+        listing: { select: { id: true, slug: true, title: true, price: true } },
         user: { select: { name: true, whatsapp: true } },
       },
     }),
     prisma.listing.findMany({
       where: { ...activeFeaturedWhere(now), sold: false },
       orderBy: { featuredUntil: "asc" },
-      select: { id: true, title: true, featuredUntil: true, user: { select: { name: true } } },
+      select: { id: true, slug: true, title: true, featuredUntil: true, user: { select: { name: true } } },
     }),
     prisma.featureRequest.aggregate({
       where: { status: "approved", resolvedAt: { gte: monthStart } },

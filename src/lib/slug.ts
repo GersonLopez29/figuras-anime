@@ -1,45 +1,33 @@
 // Enlaces legibles:
-//   figura:    /figura/kenshin-himura-rurouni-kenshin-sh-figuarts-cmu8cel3h000t04l2m8gop4gh
+//   figura:    /figura/kenshin-himura-rurouni-kenshin-samurai-x-sh-figuarts
 //   categoría: /categoria/samurai-x-rurouni-kenshin
 //
-// La figura lleva su código al final (el id): así el enlace nunca choca con
-// otra figura del mismo nombre y sigue funcionando aunque el vendedor cambie
-// el título (el texto se corrige solo con una redirección). Los enlaces viejos
-// (/figura/<id> y /?categoria=Nombre) redirigen a los nuevos.
+// Cada figura guarda su nombre de enlace (Listing.slug, único). Si dos figuras
+// se llaman igual, la segunda lleva "-2". Cuando el vendedor cambia el título,
+// el enlace se actualiza y el anterior queda en Listing.oldSlugs para seguir
+// redirigiendo. También redirigen los formatos anteriores: /figura/<id> y
+// /figura/<nombre>-<id>.
 
-const MAX_SLUG_WORDS = 8;
+import { slugify } from "./slugify.mjs";
 
-export function slugify(text: string, maxWords = MAX_SLUG_WORDS): string {
-  return text
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
-    .toLowerCase()
-    .replace(/s\.h\./g, "sh ")
-    .replace(/&/g, " y ")
-    .replace(/[^a-z0-9]+/g, " ")
-    .trim()
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, maxWords)
-    .join("-");
-}
+export { slugify };
 
 // --- Figuras ---------------------------------------------------------------
 
-export function listingSlug(listing: { id: string; title: string }): string {
-  const words = slugify(listing.title);
-  return words ? `${words}-${listing.id}` : listing.id;
+// Si una figura todavía no tiene slug (no debería pasar: el build lo completa),
+// se usa su id, que redirige al enlace bueno.
+export function listingPath(listing: { id: string; slug: string | null }): string {
+  return `/figura/${listing.slug ?? listing.id}`;
 }
 
-export function listingPath(listing: { id: string; title: string }): string {
-  return `/figura/${listingSlug(listing)}`;
-}
+// Los ids (cuid) son 25 caracteres en minúscula que empiezan con "c".
+const CUID = /^c[a-z0-9]{24}$/;
 
-// "kenshin-himura-...-cmu8cel3h000t04l2m8gop4gh" o "cmu8cel3h000t04l2m8gop4gh"
-// → "cmu8cel3h000t04l2m8gop4gh". Los ids (cuid) no tienen guiones.
-export function listingIdFromParam(param: string): string {
-  const decoded = decodeURIComponent(param);
-  return decoded.slice(decoded.lastIndexOf("-") + 1);
+// Devuelve el id si el parámetro es un formato antiguo con id:
+// "cmu8cel3h000t04l2m8gop4gh" o "kenshin-himura-...-cmu8cel3h000t04l2m8gop4gh".
+export function legacyIdFromParam(param: string): string | null {
+  const last = param.slice(param.lastIndexOf("-") + 1);
+  return CUID.test(last) ? last : null;
 }
 
 // --- Categorías ------------------------------------------------------------

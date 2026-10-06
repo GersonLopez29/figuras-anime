@@ -340,6 +340,7 @@ export default async function CatalogPage({ searchParams, fixedCategory }: Catal
   const bannerSlides = [
     ...(showHero ? featuredListings : []).map((l) => ({
       id: l.id,
+      slug: l.slug,
       title: l.title,
       price: l.price,
       discountAmount: getActiveDiscountAmount(l.discountAmount, l.discountExpiresAt),
@@ -351,6 +352,7 @@ export default async function CatalogPage({ searchParams, fixedCategory }: Catal
       .filter((l) => !featuredIds.has(l.id))
       .map((l) => ({
         id: l.id,
+        slug: l.slug,
         title: l.title,
         price: l.price,
         discountAmount: getActiveDiscountAmount(l.discountAmount, l.discountExpiresAt),
@@ -361,6 +363,7 @@ export default async function CatalogPage({ searchParams, fixedCategory }: Catal
       .filter((l) => !offerIds.has(l.id) && !featuredIds.has(l.id))
       .map((l) => ({
         id: l.id,
+        slug: l.slug,
         title: l.title,
         price: l.price,
         discountAmount: null as number | null,
@@ -371,6 +374,7 @@ export default async function CatalogPage({ searchParams, fixedCategory }: Catal
     .filter((s) => !!s.imageUrl)
     .slice(0, BANNER_SLIDES_LIMIT) as {
     id: string;
+    slug: string | null;
     title: string;
     price: number;
     discountAmount: number | null;
@@ -402,6 +406,7 @@ export default async function CatalogPage({ searchParams, fixedCategory }: Catal
       <RecentlySoldBanner
         items={recentlySold.map((l) => ({
           id: l.id,
+          slug: l.slug,
           title: l.title,
           price: l.price,
           imageUrl: l.images[0]?.url,

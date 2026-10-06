@@ -7,7 +7,7 @@ export default async function AdminContactosPage() {
   const clicks = await prisma.whatsAppClick.findMany({
     include: {
       user: { select: { name: true, email: true } },
-      listing: { select: { id: true, title: true, user: { select: { name: true } } } },
+      listing: { select: { id: true, slug: true, title: true, user: { select: { name: true } } } },
     },
     orderBy: { createdAt: "desc" },
     take: 200,

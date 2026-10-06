@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { getCurrentUser, isAdmin } from "@/lib/session";
 import { extendFeaturedUntil, formatShortDate } from "@/lib/featured";
 import { sendFeatureRequestResolvedEmail } from "@/lib/email";
+import { listingPath } from "@/lib/slug";
 
 const schema = z.object({ action: z.enum(["approve", "reject"]) });
 
@@ -25,7 +26,7 @@ export async function PATCH(
   const featureRequest = await prisma.featureRequest.findUnique({
     where: { id },
     include: {
-      listing: { select: { id: true, title: true, featuredUntil: true } },
+      listing: { select: { id: true, slug: true, title: true, featuredUntil: true } },
       user: { select: { name: true, email: true } },
     },
   });
@@ -43,7 +44,7 @@ export async function PATCH(
       where: { id },
       data: { status: "rejected", resolvedAt: new Date() },
     });
-    await sendFeatureRequestResolvedEmail(user.email, user.name, listing.title, listing.id, false);
+    await sendFeatureRequestResolvedEmail(user.email, user.name, listing.title, listingPath(listing), false);
     return NextResponse.json({ status: "rejected" });
   }
 
@@ -59,7 +60,7 @@ export async function PATCH(
     user.email,
     user.name,
     listing.title,
-    listing.id,
+    listingPath(listing),
     true,
     formatShortDate(featuredUntil)
   );

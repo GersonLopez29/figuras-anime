@@ -8,6 +8,7 @@ import { listingPath } from "@/lib/slug";
 
 type BannerSlide = {
   id: string;
+  slug: string | null;
   title: string;
   price: number;
   discountAmount: number | null;
