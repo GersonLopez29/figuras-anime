@@ -54,6 +54,7 @@ export type CatalogState = {
   q?: string;
   estado?: "nuevo" | "usado";
   oferta?: boolean;
+  preventa?: boolean;
   orden?: CatalogOrder;
   min?: number;
   max?: number;
@@ -73,6 +74,7 @@ function parsePrice(raw: string | undefined): number | undefined {
 export function parseCatalogFilters(raw: {
   estado?: string;
   oferta?: string;
+  preventa?: string;
   orden?: string;
   min?: string;
   max?: string;
@@ -94,6 +96,7 @@ export function parseCatalogFilters(raw: {
   return {
     estado,
     oferta: raw.oferta === "1",
+    preventa: raw.preventa === "1",
     orden: orden === "recientes" ? undefined : orden,
     min,
     max,
@@ -112,6 +115,7 @@ export function catalogHref(state: CatalogState, page?: number): string {
   if (state.q) params.set("q", state.q);
   if (state.estado) params.set("estado", state.estado);
   if (state.oferta) params.set("oferta", "1");
+  if (state.preventa) params.set("preventa", "1");
   if (state.linea) params.set("linea", state.linea);
   if (state.zona) params.set("zona", state.zona);
   if (state.min !== undefined) params.set("min", String(state.min));

@@ -3,6 +3,8 @@ import Image from "next/image";
 import { formatPrice, getFinalPrice } from "@/lib/format";
 import { isNewCondition, isOpenBoxCondition } from "@/lib/condition";
 import { getDeliveryZoneLabel, sortDeliveryZones } from "@/lib/delivery";
+import { isFeatured } from "@/lib/featured";
+import { OFFICIAL_STORE_NAME } from "@/lib/store";
 import FavoriteButton from "@/components/FavoriteButton";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -19,6 +21,9 @@ type ListingCardProps = {
   sold?: boolean;
   views?: number;
   deliveryZones?: string[];
+  featuredUntil?: Date | null;
+  isPreorder?: boolean;
+  officialStore?: boolean;
   isFavorited?: boolean;
 };
 
@@ -34,8 +39,12 @@ export default function ListingCard({
   sold,
   views,
   deliveryZones,
+  featuredUntil,
+  isPreorder,
+  officialStore,
   isFavorited,
 }: ListingCardProps) {
+  const featured = !sold && isFeatured(featuredUntil);
   const finalPrice = getFinalPrice(price, discountAmount);
   const zones = sortDeliveryZones(deliveryZones ?? []).map(getDeliveryZoneLabel);
   const zoneSummary =
@@ -44,7 +53,13 @@ export default function ListingCard({
   const hasDiscount = !!discountAmount && !sold;
   return (
     <Link href={`/figura/${id}`} className="group block transition hover:-translate-y-1">
-      <Card className="gap-0 overflow-hidden py-0 ring-1 ring-border transition group-hover:shadow-xl group-hover:ring-primary/30">
+      <Card
+        className={`gap-0 overflow-hidden py-0 ring-1 transition group-hover:shadow-xl ${
+          featured
+            ? "ring-2 ring-amber-400 group-hover:ring-amber-500"
+            : "ring-border group-hover:ring-primary/30"
+        }`}
+      >
         <div className="relative aspect-square w-full overflow-hidden bg-muted">
           {imageUrl ? (
             <Image
@@ -67,6 +82,11 @@ export default function ListingCard({
               🏷️ Oferta
             </Badge>
           )}
+          {featured && (
+            <Badge className="absolute right-2 bottom-2 bg-amber-400 text-amber-950 shadow-sm">
+              ⭐ Destacada
+            </Badge>
+          )}
           {typeof isFavorited === "boolean" && (
             <FavoriteButton listingId={id} initialFavorited={isFavorited} />
           )}
@@ -80,15 +100,22 @@ export default function ListingCard({
         </div>
         <CardContent className="p-3">
           <h3 className="line-clamp-1 text-sm font-medium text-foreground">{title}</h3>
-          {condition && (
-            <Badge variant="outline" className="mt-1.5 border-blue-200 bg-blue-50 text-blue-700">
-              {isNewCondition(condition)
-                ? "🆕 Nueva"
-                : isOpenBoxCondition(condition)
-                  ? "📦 Open box"
-                  : "♻️ Usada"}
-            </Badge>
-          )}
+          <div className="mt-1.5 flex flex-wrap gap-1">
+            {isPreorder && !sold && (
+              <Badge variant="outline" className="border-violet-200 bg-violet-50 text-violet-700">
+                🕒 Preventa
+              </Badge>
+            )}
+            {condition && (
+              <Badge variant="outline" className="border-blue-200 bg-blue-50 text-blue-700">
+                {isNewCondition(condition)
+                  ? "🆕 Nueva"
+                  : isOpenBoxCondition(condition)
+                    ? "📦 Open box"
+                    : "♻️ Usada"}
+              </Badge>
+            )}
+          </div>
           {hasDiscount ? (
             <p className="mt-1.5 flex flex-wrap items-baseline gap-1.5">
               <span className="text-xs text-muted-foreground line-through">{formatPrice(price)}</span>
@@ -103,8 +130,12 @@ export default function ListingCard({
             </p>
           )}
           <div className="mt-1 flex items-center justify-between gap-2 border-t border-border pt-1.5">
-            {sellerName && (
-              <p className="truncate text-xs text-muted-foreground">Vende: {sellerName}</p>
+            {officialStore ? (
+              <p className="truncate text-xs font-semibold text-orange-700">✔ {OFFICIAL_STORE_NAME}</p>
+            ) : (
+              sellerName && (
+                <p className="truncate text-xs text-muted-foreground">Vende: {sellerName}</p>
+              )
             )}
             {typeof views === "number" && (
               <span className="flex shrink-0 items-center gap-0.5 text-xs text-muted-foreground">

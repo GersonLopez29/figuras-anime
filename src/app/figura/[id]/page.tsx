@@ -9,6 +9,10 @@ import { getCurrentUser } from "@/lib/session";
 import { getConditionLabel, getConditionIcon, isNewCondition } from "@/lib/condition";
 import ListingGallery from "@/components/ListingGallery";
 import ListingCard from "@/components/ListingCard";
+import { cardInclude, toCardProps } from "@/lib/listingCard";
+import { formatArrival } from "@/lib/preorder";
+import { isFeatured } from "@/lib/featured";
+import { OFFICIAL_STORE_NAME } from "@/lib/store";
 import { getDeliveryZoneLabel, sortDeliveryZones } from "@/lib/delivery";
 import StarRating from "@/components/StarRating";
 import FavoriteButton from "@/components/FavoriteButton";
@@ -75,7 +79,9 @@ const getListingAndRegisterView = cache(async (id: string, viewerId: string | nu
     where: { id },
     include: {
       images: true,
-      user: { select: { id: true, name: true, whatsapp: true, createdAt: true } },
+      user: {
+        select: { id: true, name: true, whatsapp: true, createdAt: true, isOfficialStore: true },
+      },
     },
   });
 
@@ -119,13 +125,9 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
   // "Más de este vendedor" y "Figuras similares" (misma categoría) para que el
   // comprador siga explorando en vez de salir de la página.
   const RELATED_LIMIT = 4;
-  const relatedInclude = {
-    images: { take: 1 },
-    user: { select: { name: true } },
-  } as const;
   const sellerListings = await prisma.listing.findMany({
     where: { userId: listing.user.id, sold: false, id: { not: listing.id } },
-    include: relatedInclude,
+    include: cardInclude,
     orderBy: { createdAt: "desc" },
     take: RELATED_LIMIT,
   });
@@ -135,7 +137,7 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
       sold: false,
       id: { notIn: [listing.id, ...sellerListings.map((l) => l.id)] },
     },
-    include: relatedInclude,
+    include: cardInclude,
     orderBy: { createdAt: "desc" },
     take: RELATED_LIMIT,
   });
@@ -177,7 +179,11 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
       url: pageUrl,
       priceCurrency: "PEN",
       price: activeDiscount ? getFinalPrice(listing.price, activeDiscount) : listing.price,
-      availability: listing.sold ? "https://schema.org/SoldOut" : "https://schema.org/InStock",
+      availability: listing.sold
+        ? "https://schema.org/SoldOut"
+        : listing.isPreorder
+          ? "https://schema.org/PreOrder"
+          : "https://schema.org/InStock",
     },
   };
 
@@ -202,6 +208,14 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
             </Badge>
             {!listing.sold && !!activeDiscount && (
               <Badge className="bg-green-600 text-white">Oferta</Badge>
+            )}
+            {!listing.sold && listing.isPreorder && (
+              <Badge variant="outline" className="border-violet-200 bg-violet-50 text-violet-700">
+                🕒 Preventa
+              </Badge>
+            )}
+            {!listing.sold && isFeatured(listing.featuredUntil) && (
+              <Badge className="bg-amber-400 text-amber-950">⭐ Destacada</Badge>
             )}
             {listing.sold && <Badge variant="secondary">Vendido</Badge>}
           </div>
@@ -258,6 +272,25 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
             </Alert>
           )}
 
+          {!listing.sold && listing.isPreorder && listing.preorderArrival && (
+            <div className="mt-4 rounded-lg bg-violet-50 p-3 text-sm text-violet-900 ring-1 ring-violet-200">
+              <p className="font-semibold">🕒 Preventa</p>
+              <p className="mt-1">
+                Llega aprox. en <strong>{formatArrival(listing.preorderArrival)}</strong>.
+                {listing.preorderDeposit ? (
+                  <>
+                    {" "}
+                    Sepárala con un adelanto de{" "}
+                    <strong>{formatPrice(listing.preorderDeposit)}</strong> y paga el resto cuando
+                    llegue.
+                  </>
+                ) : (
+                  " Coordina con el vendedor cómo separarla."
+                )}
+              </p>
+            </div>
+          )}
+
           <p className="mt-4 whitespace-pre-line text-sm leading-relaxed text-foreground/80">
             {listing.description}
           </p>
@@ -299,6 +332,9 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
                 Vendido por{" "}
                 <span className="font-medium text-foreground">{listing.user.name}</span>
               </p>
+              {listing.user.isOfficialStore && (
+                <p className="text-xs font-semibold text-orange-700">✔ {OFFICIAL_STORE_NAME}</p>
+              )}
               <div className="mt-0.5">
                 {reviewCount > 0 ? (
                   <StarRating rating={averageRating} reviewCount={reviewCount} />
@@ -391,19 +427,7 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
   );
 }
 
-type RelatedListing = {
-  id: string;
-  title: string;
-  price: number;
-  discountAmount: number | null;
-  discountExpiresAt: Date | null;
-  category: string;
-  condition: string;
-  views: number;
-  deliveryZones: string[];
-  images: { url: string }[];
-  user: { name: string };
-};
+type RelatedListing = Parameters<typeof toCardProps>[0];
 
 function RelatedSection({
   title,
@@ -424,19 +448,7 @@ function RelatedSection({
       </div>
       <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
         {listings.map((l) => (
-          <ListingCard
-            key={l.id}
-            id={l.id}
-            title={l.title}
-            price={l.price}
-            discountAmount={getActiveDiscountAmount(l.discountAmount, l.discountExpiresAt)}
-            category={l.category}
-            condition={l.condition}
-            imageUrl={l.images[0]?.url}
-            sellerName={l.user.name}
-            views={l.views}
-            deliveryZones={l.deliveryZones}
-          />
+          <ListingCard key={l.id} {...toCardProps(l)} />
         ))}
       </div>
     </section>

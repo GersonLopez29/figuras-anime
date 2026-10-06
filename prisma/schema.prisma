@@ -19,6 +19,7 @@ model User {
   passwordHash               String
   whatsapp                   String
   role                       String            @default("user")
+  isOfficialStore            Boolean           @default(false)
   isBlocked                  Boolean           @default(false)
   failedLoginAttempts        Int               @default(0)
   lockedUntil                DateTime?
@@ -41,6 +42,8 @@ model User {
   conversationsAsSeller      Conversation[]    @relation("ConversationsAsSeller")
   messages                   Message[]
   whatsappClicks             WhatsAppClick[]
+  featureRequests            FeatureRequest[]
+  consignmentRequests        ConsignmentRequest[]
 }
 
 model Favorite {
@@ -149,6 +152,10 @@ model Listing {
   condition         String         @default("nuevo")
   deliveryZones     String[]       @default([])
   deliveryNotes     String?
+  featuredUntil     DateTime?
+  isPreorder        Boolean        @default(false)
+  preorderArrival   DateTime?
+  preorderDeposit   Float?
   sold              Boolean        @default(false)
   views             Int            @default(0)
   createdAt         DateTime       @default(now())
@@ -159,6 +166,42 @@ model Listing {
   favoritedBy       Favorite[]
   conversations     Conversation[]
   whatsappClicks    WhatsAppClick[]
+  featureRequests   FeatureRequest[]
+
+  @@index([featuredUntil])
+}
+
+// Pedido de un vendedor para destacar una figura. Paga por Yape/Plin y el
+// admin lo aprueba (featuredUntil se extiende N días) o lo rechaza.
+model FeatureRequest {
+  id         String    @id @default(cuid())
+  status     String    @default("pending")
+  amount     Float
+  days       Int
+  createdAt  DateTime  @default(now())
+  resolvedAt DateTime?
+  listingId  String
+  listing    Listing   @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+}
+
+// "Te la vendemos": un coleccionista pide que la tienda venda su figura a
+// cambio de una comisión.
+model ConsignmentRequest {
+  id             String   @id @default(cuid())
+  figure         String
+  details        String
+  expectedPrice  Float?
+  status         String   @default("nuevo")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([status])
 }
 
 model WhatsAppClick {

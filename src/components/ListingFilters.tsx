@@ -15,11 +15,14 @@ function Pill({ active, href, children }: { active: boolean; href: string; child
 }
 
 export default function ListingFilters({ state }: { state: CatalogState }) {
-  const { estado, oferta } = state;
+  const { estado, oferta, preventa } = state;
 
   return (
     <div className="no-scrollbar flex gap-2 overflow-x-auto pb-1">
-      <Pill active={!estado && !oferta} href={catalogHref({ ...state, estado: undefined, oferta: false })}>
+      <Pill
+        active={!estado && !oferta && !preventa}
+        href={catalogHref({ ...state, estado: undefined, oferta: false, preventa: false })}
+      >
         Todas
       </Pill>
       <Pill
@@ -36,6 +39,9 @@ export default function ListingFilters({ state }: { state: CatalogState }) {
       </Pill>
       <Pill active={!!oferta} href={catalogHref({ ...state, oferta: !oferta })}>
         🔥 En oferta
+      </Pill>
+      <Pill active={!!preventa} href={catalogHref({ ...state, preventa: !preventa })}>
+        🕒 Preventas
       </Pill>
     </div>
   );

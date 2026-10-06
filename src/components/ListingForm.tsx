@@ -49,6 +49,10 @@ type ListingFormProps =
       initialImages: ExistingImage[];
       initialDeliveryZones: string[];
       initialDeliveryNotes: string | null;
+      initialIsPreorder: boolean;
+      // "2026-12" (mes estimado de llegada) o "".
+      initialPreorderArrival: string;
+      initialPreorderDeposit: number | null;
       categories: CategoryOption[];
     };
 
@@ -70,6 +74,13 @@ export default function ListingForm(props: ListingFormProps) {
   );
   const [deliveryNotes, setDeliveryNotes] = useState(
     (isEdit ? props.initialDeliveryNotes : props.defaultDeliveryNotes) ?? ""
+  );
+  const [isPreorder, setIsPreorder] = useState(isEdit ? props.initialIsPreorder : false);
+  const [preorderArrival, setPreorderArrival] = useState(
+    isEdit ? props.initialPreorderArrival : ""
+  );
+  const [preorderDeposit, setPreorderDeposit] = useState(
+    isEdit && props.initialPreorderDeposit !== null ? String(props.initialPreorderDeposit) : ""
   );
   const [existingImages, setExistingImages] = useState<ExistingImage[]>(
     isEdit ? props.initialImages : []
@@ -126,6 +137,10 @@ export default function ListingForm(props: ListingFormProps) {
       setError("Marca al menos una zona de entrega");
       return;
     }
+    if (isPreorder && !preorderArrival) {
+      setError("Indica el mes estimado de llegada de la preventa");
+      return;
+    }
 
     const totalImages = existingImages.length + newFiles.length;
     if (totalImages === 0) {
@@ -143,6 +158,9 @@ export default function ListingForm(props: ListingFormProps) {
     formData.set("condition", condition);
     deliveryZones.forEach((zone) => formData.append("deliveryZones", zone));
     formData.set("deliveryNotes", deliveryNotes);
+    formData.set("isPreorder", String(isPreorder));
+    formData.set("preorderArrival", isPreorder ? preorderArrival : "");
+    formData.set("preorderDeposit", isPreorder ? preorderDeposit : "");
     newFiles.forEach((file) => formData.append("images", file));
     if (isEdit) {
       removedImageIds.forEach((id) => formData.append("removeImageIds", id));
@@ -307,6 +325,58 @@ export default function ListingForm(props: ListingFormProps) {
                 ))}
               </SelectContent>
             </Select>
+          )}
+        </div>
+
+        <div
+          className={`rounded-lg border p-3 transition ${
+            isPreorder ? "border-violet-300 bg-violet-50/60" : "border-input"
+          }`}
+        >
+          <label className="flex cursor-pointer items-start gap-2.5 text-sm">
+            <input
+              type="checkbox"
+              checked={isPreorder}
+              onChange={(e) => setIsPreorder(e.target.checked)}
+              className="mt-0.5 size-4 accent-violet-600"
+            />
+            <span>
+              <span className="block font-medium text-foreground">🕒 Es una preventa</span>
+              <span className="block text-xs text-muted-foreground">
+                La figura todavía no llega: el comprador la separa ahora y la recibe cuando llegue.
+              </span>
+            </span>
+          </label>
+          {isPreorder && (
+            <div className="mt-3 grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="listing-preorder-arrival">Llega aprox. en</Label>
+                <Input
+                  id="listing-preorder-arrival"
+                  type="month"
+                  required
+                  value={preorderArrival}
+                  onChange={(e) => setPreorderArrival(e.target.value)}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="listing-preorder-deposit">Adelanto (opcional)</Label>
+                <div className="relative">
+                  <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                    S/
+                  </span>
+                  <Input
+                    id="listing-preorder-deposit"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={preorderDeposit}
+                    onChange={(e) => setPreorderDeposit(e.target.value)}
+                    className="pl-9"
+                  />
+                </div>
+              </div>
+            </div>
           )}
         </div>
 

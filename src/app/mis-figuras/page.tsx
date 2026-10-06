@@ -1,9 +1,17 @@
 import Link from "next/link";
 import Image from "next/image";
 import { redirect } from "next/navigation";
-import { getCurrentUser } from "@/lib/session";
+import { getCurrentUser, isAdmin } from "@/lib/session";
 import { prisma } from "@/lib/db";
 import DeleteListingButton from "@/components/DeleteListingButton";
+import FeatureListingButton from "@/components/FeatureListingButton";
+import {
+  FEATURE_DAYS,
+  FEATURE_PRICE,
+  formatShortDate,
+  getFeaturePaymentInfo,
+  isFeatured,
+} from "@/lib/featured";
 import ToggleSoldButton from "@/components/ToggleSoldButton";
 import DiscountControl from "@/components/DiscountControl";
 import { formatPrice, getFinalPrice, getActiveDiscountAmount } from "@/lib/format";
@@ -19,11 +27,18 @@ export default async function MisFigurasPage() {
     redirect("/login");
   }
 
-  const listings = await prisma.listing.findMany({
-    where: { userId: user.id },
-    include: { images: { take: 1 } },
-    orderBy: { createdAt: "desc" },
-  });
+  const [listings, payment] = await Promise.all([
+    prisma.listing.findMany({
+      where: { userId: user.id },
+      include: {
+        images: { take: 1 },
+        featureRequests: { where: { status: "pending" }, select: { id: true }, take: 1 },
+      },
+      orderBy: { createdAt: "desc" },
+    }),
+    getFeaturePaymentInfo(),
+  ]);
+  const userIsAdmin = isAdmin(user);
   const missingZoneCount = listings.filter(
     (l) => !l.sold && l.deliveryZones.length === 0
   ).length;
@@ -84,6 +99,11 @@ export default async function MisFigurasPage() {
                       {listing.title}
                     </Link>
                     {listing.sold && <Badge variant="secondary">Vendido</Badge>}
+                    {!listing.sold && isFeatured(listing.featuredUntil) && (
+                      <Badge className="shrink-0 bg-amber-400 text-amber-950">
+                        ⭐ Destacada hasta el {formatShortDate(listing.featuredUntil!)}
+                      </Badge>
+                    )}
                     {!listing.sold && listing.deliveryZones.length === 0 && (
                       <Badge
                         variant="outline"
@@ -122,6 +142,22 @@ export default async function MisFigurasPage() {
               </div>
 
               <div className="flex flex-wrap items-center gap-2 sm:shrink-0 sm:justify-end">
+                {!listing.sold && (
+                  <FeatureListingButton
+                    listingId={listing.id}
+                    listingTitle={listing.title}
+                    price={FEATURE_PRICE}
+                    days={FEATURE_DAYS}
+                    featuredUntilLabel={
+                      isFeatured(listing.featuredUntil)
+                        ? formatShortDate(listing.featuredUntil!)
+                        : null
+                    }
+                    pending={listing.featureRequests.length > 0}
+                    isAdmin={userIsAdmin}
+                    payment={payment}
+                  />
+                )}
                 <ToggleSoldButton listingId={listing.id} sold={listing.sold} />
                 <Button
                   render={<Link href={`/mis-figuras/${listing.id}/editar`} />}
