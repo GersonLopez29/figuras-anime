@@ -14,6 +14,7 @@ const TABS = [
   { href: "/admin/publicaciones", label: "Publicaciones" },
   { href: "/admin/destacados", label: "⭐ Destacados" },
   { href: "/admin/consignaciones", label: "📦 Consignaciones" },
+  { href: "/admin/redes", label: "📲 Redes" },
   { href: "/admin/contactos", label: "Contactos" },
   { href: "/admin/comunidad", label: "Comunidad" },
   { href: "/admin/categorias", label: "Categorías" },
