@@ -2,6 +2,7 @@ import Link from "next/link";
 import { categoryPath } from "@/lib/slug";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import SocialLinks from "@/components/SocialLinks";
 
 type CategoryOption = { name: string; icon: string };
 
@@ -27,6 +28,12 @@ export default function Footer({ totalVisits, categories }: FooterProps) {
               El marketplace para comprar y vender figuras de anime entre coleccionistas,
               coordinando todo directo por WhatsApp.
             </p>
+            <h3 className="mt-5 text-xs font-semibold uppercase tracking-wide text-zinc-400">
+              Síguenos
+            </h3>
+            <div className="mt-3">
+              <SocialLinks />
+            </div>
           </div>
 
           <div>

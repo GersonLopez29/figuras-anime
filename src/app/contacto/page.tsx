@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Card } from "@/components/ui/card";
+import SocialLinks from "@/components/SocialLinks";
 
 export const metadata: Metadata = {
   title: "Contacto — FigurasAnime",
@@ -35,6 +36,15 @@ export default function ContactoPage() {
           </a>{" "}
           para el correo correspondiente.
         </p>
+      </Card>
+
+      <Card className="mt-6 p-6 shadow-sm sm:p-8">
+        <p className="text-sm leading-relaxed text-foreground/90">
+          Síguenos para ver las novedades y figuras recién llegadas:
+        </p>
+        <div className="mt-3">
+          <SocialLinks showHandle />
+        </div>
       </Card>
     </div>
   );
