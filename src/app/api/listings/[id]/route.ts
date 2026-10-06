@@ -6,6 +6,7 @@ import { saveUploadedImage, deleteUploadedImage } from "@/lib/uploads";
 import { isValidCategory } from "@/lib/categories";
 import { isValidCondition } from "@/lib/condition";
 import { deliveryFieldsSchema, readDeliveryFields } from "@/lib/delivery";
+import { preorderFieldsSchema, readPreorderFields } from "@/lib/preorder";
 
 export async function GET(
   _request: NextRequest,
@@ -82,6 +83,19 @@ export async function PATCH(
       { status: 400 }
     );
   }
+  const preorder = preorderFieldsSchema.safeParse(readPreorderFields(formData));
+  if (!preorder.success) {
+    return NextResponse.json({ error: preorder.error.issues[0].message }, { status: 400 });
+  }
+  if (
+    preorder.data.preorderDeposit !== null &&
+    preorder.data.preorderDeposit > parsed.data.price
+  ) {
+    return NextResponse.json(
+      { error: "El adelanto no puede ser mayor al precio" },
+      { status: 400 }
+    );
+  }
   if (!isValidCondition(parsed.data.condition)) {
     return NextResponse.json({ error: "Selecciona un estado válido" }, { status: 400 });
   }
@@ -123,6 +137,7 @@ export async function PATCH(
       where: { id },
       data: {
         ...parsed.data,
+        ...preorder.data,
         images: {
           deleteMany: { id: { in: removeImageIds } },
           create: newImageUrls.map((url) => ({ url })),

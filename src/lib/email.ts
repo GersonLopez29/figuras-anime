@@ -177,3 +177,90 @@ export async function sendSuggestionEmail(message: string, fromName?: string, fr
     )
   );
 }
+
+// Los avisos para el administrador (destacados, consignaciones) llegan a la
+// misma bandeja que las sugerencias.
+const ADMIN_INBOX = SUGGESTIONS_INBOX;
+
+function button(href: string, label: string) {
+  return `<a href="${href}" style="display: inline-block; margin-top: 12px; background: #ea580c; color: white; padding: 10px 20px; border-radius: 999px; text-decoration: none; font-weight: 600; font-size: 14px;">${label}</a>`;
+}
+
+export async function sendFeatureRequestAdminEmail(
+  sellerName: string,
+  listingTitle: string,
+  amount: number
+) {
+  await sendEmail(
+    ADMIN_INBOX,
+    `⭐ ${sellerName} pidió destacar una figura (S/ ${amount})`,
+    wrapper(
+      "⭐ Nueva solicitud para destacar",
+      `
+        <p style="font-size: 14px; color: #3f3f46; line-height: 1.6;">
+          <strong>${escapeHtml(sellerName)}</strong> dice que pagó <strong>S/ ${amount}</strong>
+          para destacar <strong>${escapeHtml(listingTitle)}</strong>.
+          Revisa tu Yape o Plin y apruébala en el panel.
+        </p>
+        ${button(`${SITE_URL}/admin/destacados`, "Ir a destacados")}
+      `
+    )
+  );
+}
+
+export async function sendFeatureRequestResolvedEmail(
+  to: string,
+  name: string,
+  listingTitle: string,
+  listingId: string,
+  approved: boolean,
+  untilLabel?: string
+) {
+  await sendEmail(
+    to,
+    approved
+      ? `⭐ Tu figura "${listingTitle}" ya está destacada`
+      : `Sobre tu solicitud para destacar "${listingTitle}"`,
+    wrapper(
+      approved ? "¡Tu figura ya está destacada!" : "Sobre tu solicitud",
+      `
+        <p style="font-size: 14px; color: #3f3f46; line-height: 1.6;">
+          Hola ${escapeHtml(name)},
+          ${
+            approved
+              ? `<strong>${escapeHtml(listingTitle)}</strong> ya aparece entre las destacadas del catálogo${
+                  untilLabel ? ` hasta el ${escapeHtml(untilLabel)}` : ""
+                }.`
+              : `no pudimos confirmar el pago para destacar <strong>${escapeHtml(listingTitle)}</strong>. Si ya pagaste, escríbenos por WhatsApp con la captura.`
+          }
+        </p>
+        ${button(`${SITE_URL}/figura/${listingId}`, "Ver mi figura")}
+      `
+    )
+  );
+}
+
+export async function sendConsignmentRequestAdminEmail(
+  userName: string,
+  userWhatsapp: string,
+  figure: string,
+  details: string,
+  expectedPrice: number | null
+) {
+  await sendEmail(
+    ADMIN_INBOX,
+    `📦 ${userName} quiere que vendas su figura: ${figure}`,
+    wrapper(
+      "📦 Nueva solicitud de consignación",
+      `
+        <p style="font-size: 14px; color: #3f3f46; line-height: 1.6;">
+          <strong>${escapeHtml(userName)}</strong> (WhatsApp ${escapeHtml(userWhatsapp)}) quiere que vendas:
+        </p>
+        <p style="font-size: 15px; font-weight: 600; color: #18181b;">${escapeHtml(figure)}</p>
+        <p style="font-size: 14px; color: #3f3f46; line-height: 1.6; white-space: pre-wrap;">${escapeHtml(details)}</p>
+        ${expectedPrice !== null ? `<p style="font-size: 14px; color: #3f3f46;">Precio esperado: <strong>S/ ${expectedPrice}</strong></p>` : ""}
+        ${button(`${SITE_URL}/admin/consignaciones`, "Ver solicitudes")}
+      `
+    )
+  );
+}

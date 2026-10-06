@@ -7,6 +7,7 @@ import StarRating from "@/components/StarRating";
 import ReviewForm from "@/components/ReviewForm";
 import DeleteReviewButton from "@/components/DeleteReviewButton";
 import ListingCard from "@/components/ListingCard";
+import { OFFICIAL_STORE_NAME } from "@/lib/store";
 import { getActiveDiscountAmount } from "@/lib/format";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -44,6 +45,7 @@ export default async function VendedorPage({ params }: VendedorPageProps) {
       id: true,
       name: true,
       createdAt: true,
+      isOfficialStore: true,
       reviewsReceived: {
         orderBy: { createdAt: "desc" },
         select: {
@@ -67,6 +69,8 @@ export default async function VendedorPage({ params }: VendedorPageProps) {
           sold: true,
           views: true,
           deliveryZones: true,
+          featuredUntil: true,
+          isPreorder: true,
           images: { take: 1, select: { url: true } },
         },
       },
@@ -114,6 +118,9 @@ export default async function VendedorPage({ params }: VendedorPageProps) {
         </Avatar>
         <div>
           <h1 className="text-2xl font-bold text-foreground">{seller.name}</h1>
+          {seller.isOfficialStore && (
+            <p className="text-sm font-semibold text-orange-700">✔ {OFFICIAL_STORE_NAME}</p>
+          )}
           <p className="text-xs text-muted-foreground">Miembro desde {memberSince}</p>
           <div className="mt-1.5">
             <StarRating rating={averageRating} reviewCount={reviewCount} size="md" />
@@ -140,6 +147,9 @@ export default async function VendedorPage({ params }: VendedorPageProps) {
                 sold={listing.sold}
                 views={listing.views}
                 deliveryZones={listing.deliveryZones}
+                featuredUntil={listing.featuredUntil}
+                isPreorder={listing.isPreorder}
+                officialStore={seller.isOfficialStore}
                 isFavorited={favoritedIds ? favoritedIds.has(listing.id) : undefined}
               />
             ))}

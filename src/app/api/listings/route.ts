@@ -6,6 +6,7 @@ import { saveUploadedImage } from "@/lib/uploads";
 import { getCategoryNames, isValidCategory } from "@/lib/categories";
 import { isValidCondition } from "@/lib/condition";
 import { deliveryFieldsSchema, readDeliveryFields } from "@/lib/delivery";
+import { preorderFieldsSchema, readPreorderFields } from "@/lib/preorder";
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
@@ -73,6 +74,19 @@ export async function POST(request: NextRequest) {
       { status: 400 }
     );
   }
+  const preorder = preorderFieldsSchema.safeParse(readPreorderFields(formData));
+  if (!preorder.success) {
+    return NextResponse.json({ error: preorder.error.issues[0].message }, { status: 400 });
+  }
+  if (
+    preorder.data.preorderDeposit !== null &&
+    preorder.data.preorderDeposit > parsed.data.price
+  ) {
+    return NextResponse.json(
+      { error: "El adelanto no puede ser mayor al precio" },
+      { status: 400 }
+    );
+  }
   if (!isValidCondition(parsed.data.condition)) {
     return NextResponse.json({ error: "Selecciona un estado válido" }, { status: 400 });
   }
@@ -108,6 +122,7 @@ export async function POST(request: NextRequest) {
   const listing = await prisma.listing.create({
     data: {
       ...parsed.data,
+      ...preorder.data,
       userId: user.id,
       images: { create: imageUrls.map((url) => ({ url })) },
     },

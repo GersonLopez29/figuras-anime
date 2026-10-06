@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/session";
 import ListingCard from "@/components/ListingCard";
-import { getActiveDiscountAmount } from "@/lib/format";
+import { cardInclude, toCardProps } from "@/lib/listingCard";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
@@ -16,12 +16,7 @@ export default async function FavoritosPage() {
   const favorites = await prisma.favorite.findMany({
     where: { userId: user.id },
     include: {
-      listing: {
-        include: {
-          images: { take: 1 },
-          user: { select: { name: true } },
-        },
-      },
+      listing: { include: cardInclude },
     },
     orderBy: { createdAt: "desc" },
   });
@@ -47,21 +42,7 @@ export default async function FavoritosPage() {
       ) : (
         <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
           {favorites.map(({ listing }) => (
-            <ListingCard
-              key={listing.id}
-              id={listing.id}
-              title={listing.title}
-              price={listing.price}
-              discountAmount={getActiveDiscountAmount(listing.discountAmount, listing.discountExpiresAt)}
-              category={listing.category}
-              condition={listing.condition}
-              imageUrl={listing.images[0]?.url}
-              sellerName={listing.user.name}
-              sold={listing.sold}
-              views={listing.views}
-              deliveryZones={listing.deliveryZones}
-              isFavorited={true}
-            />
+            <ListingCard key={listing.id} {...toCardProps(listing)} isFavorited={true} />
           ))}
         </div>
       )}

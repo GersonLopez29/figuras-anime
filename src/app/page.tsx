@@ -11,6 +11,9 @@ import BannerCarousel from "@/components/BannerCarousel";
 import RecentlySoldBanner from "@/components/RecentlySoldBanner";
 import Pagination from "@/components/Pagination";
 import CatalogControls from "@/components/CatalogControls";
+import { cardInclude, toCardProps } from "@/lib/listingCard";
+import { FEATURED_SECTION_LIMIT, activeFeaturedWhere, pickRandom } from "@/lib/featured";
+import { OFFICIAL_STORE_NAME } from "@/lib/store";
 import { getDeliveryZoneLabel } from "@/lib/delivery";
 import { getActiveDiscountAmount } from "@/lib/format";
 import {
@@ -38,6 +41,7 @@ const BANNER_OFFERS_LIMIT = 3;
 const BANNER_LATEST_LIMIT = 4;
 const BANNER_SLIDES_LIMIT = 5;
 const RECENTLY_SOLD_LIMIT = 8;
+const STORE_ROW_LIMIT = 4;
 
 const PAGE_SIZE = 24;
 
@@ -49,6 +53,7 @@ type HomeProps = {
     pagina?: string;
     estado?: string;
     oferta?: string;
+    preventa?: string;
     orden?: string;
     min?: string;
     max?: string;
@@ -137,13 +142,15 @@ export default async function Home({ searchParams }: HomeProps) {
     }),
   ]);
   const category = categories.some((c) => c.name === categoria) ? categoria : undefined;
-  const { estado, oferta, orden, min, max, linea, zona } = parseCatalogFilters(rawFilters);
+  const { estado, oferta, preventa, orden, min, max, linea, zona } =
+    parseCatalogFilters(rawFilters);
   const productLine = getProductLine(linea);
   const catalogState: CatalogState = {
     categoria: category,
     q,
     estado,
     oferta,
+    preventa,
     orden,
     min,
     max,
@@ -176,6 +183,7 @@ export default async function Home({ searchParams }: HomeProps) {
     ...(estado === "nuevo" ? { condition: "nuevo" } : {}),
     ...(estado === "usado" ? { condition: { notIn: ["nuevo", "open_box"] } } : {}),
     ...(oferta ? { discountAmount: { not: null }, discountExpiresAt: { gt: new Date() } } : {}),
+    ...(preventa ? { isPreorder: true } : {}),
     ...(textFilters.length > 0 ? { AND: textFilters } : {}),
   };
 
@@ -222,10 +230,7 @@ export default async function Home({ searchParams }: HomeProps) {
 
   const listings = await prisma.listing.findMany({
     where,
-    include: {
-      images: { take: 1 },
-      user: { select: { name: true } },
-    },
+    include: cardInclude,
     orderBy,
     skip: (page - 1) * PAGE_SIZE,
     take: PAGE_SIZE,
@@ -247,11 +252,37 @@ export default async function Home({ searchParams }: HomeProps) {
     !!q ||
     !!estado ||
     oferta ||
+    preventa ||
     !!linea ||
     !!zona ||
     min !== undefined ||
     max !== undefined;
   const showHero = !hasFilters && !orden && page === 1;
+
+  // Destacadas pagadas que coinciden con los filtros actuales: se muestran
+  // arriba del catálogo (solo en la página 1), rotando el orden en cada visita.
+  const now = new Date();
+  const featuredListings =
+    page === 1
+      ? pickRandom(
+          await prisma.listing.findMany({
+            where: { ...where, sold: false, ...activeFeaturedWhere(now) },
+            include: cardInclude,
+          }),
+          FEATURED_SECTION_LIMIT
+        )
+      : [];
+
+  // Fila "Tienda FigurasAnime" en la portada, con las figuras de la tienda oficial.
+  const storeListings = showHero
+    ? await prisma.listing.findMany({
+        where: { sold: false, user: { isOfficialStore: true } },
+        include: cardInclude,
+        orderBy: { createdAt: "desc" },
+        take: STORE_ROW_LIMIT,
+      })
+    : [];
+  const storeSellerId = storeListings[0]?.userId;
 
   const [offerListings, latestListings] = showHero
     ? await Promise.all([
@@ -274,18 +305,31 @@ export default async function Home({ searchParams }: HomeProps) {
       ])
     : [[], []];
 
+  // El banner muestra primero las destacadas, luego ofertas y novedades.
+  const featuredIds = new Set(featuredListings.map((l) => l.id));
   const offerIds = new Set(offerListings.map((l) => l.id));
   const bannerSlides = [
-    ...offerListings.map((l) => ({
+    ...(showHero ? featuredListings : []).map((l) => ({
       id: l.id,
       title: l.title,
       price: l.price,
       discountAmount: getActiveDiscountAmount(l.discountAmount, l.discountExpiresAt),
       imageUrl: l.images[0]?.url,
-      isOffer: true,
+      isOffer: false,
+      isFeatured: true,
     })),
+    ...offerListings
+      .filter((l) => !featuredIds.has(l.id))
+      .map((l) => ({
+        id: l.id,
+        title: l.title,
+        price: l.price,
+        discountAmount: getActiveDiscountAmount(l.discountAmount, l.discountExpiresAt),
+        imageUrl: l.images[0]?.url,
+        isOffer: true,
+      })),
     ...latestListings
-      .filter((l) => !offerIds.has(l.id))
+      .filter((l) => !offerIds.has(l.id) && !featuredIds.has(l.id))
       .map((l) => ({
         id: l.id,
         title: l.title,
@@ -303,6 +347,7 @@ export default async function Home({ searchParams }: HomeProps) {
     discountAmount: number | null;
     imageUrl: string;
     isOffer: boolean;
+    isFeatured?: boolean;
   }[];
 
   const filterLabels: string[] = [];
@@ -310,6 +355,7 @@ export default async function Home({ searchParams }: HomeProps) {
   if (estado === "nuevo") filterLabels.push("Nuevas");
   if (estado === "usado") filterLabels.push("Usadas");
   if (oferta) filterLabels.push("En oferta");
+  if (preventa) filterLabels.push("Preventas");
   if (productLine) filterLabels.push(productLine.label);
   if (zona) filterLabels.push(`📍 ${getDeliveryZoneLabel(zona)}`);
   const activePriceLabel = priceRangeLabel(min, max);
@@ -417,6 +463,52 @@ export default async function Home({ searchParams }: HomeProps) {
         </section>
       )}
 
+      {showHero && storeListings.length > 0 && (
+        <section className="border-b border-zinc-200 bg-gradient-to-br from-orange-50/60 to-white">
+          <div className="mx-auto max-w-6xl px-4 py-8">
+            <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <div>
+                <h2 className="text-lg font-bold text-zinc-900">✔ {OFFICIAL_STORE_NAME}</h2>
+                <p className="text-sm text-muted-foreground">
+                  Figuras vendidas directamente por nosotros.
+                </p>
+              </div>
+              {storeSellerId && (
+                <Link
+                  href={`/vendedor/${storeSellerId}`}
+                  className="text-sm font-medium text-primary hover:underline"
+                >
+                  Ver toda la tienda
+                </Link>
+              )}
+            </div>
+            <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
+              {storeListings.map((listing) => (
+                <ListingCard key={listing.id} {...toCardProps(listing)} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {showHero && (
+        <section className="border-b border-zinc-200 bg-white">
+          <div className="mx-auto flex max-w-6xl flex-col items-start gap-3 px-4 py-5 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-sm text-zinc-700">
+              <span aria-hidden="true">📦</span>{" "}
+              <strong>¿Tienes figuras que ya no usas y no tienes tiempo de venderlas?</strong>{" "}
+              Nosotros las vendemos por ti.
+            </p>
+            <Link
+              href="/te-la-vendemos"
+              className="shrink-0 rounded-full border border-orange-300 px-4 py-2 text-sm font-semibold text-orange-700 transition hover:bg-orange-50"
+            >
+              Te la vendemos →
+            </Link>
+          </div>
+        </section>
+      )}
+
       <div id="catalogo" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-8">
         {showLandingHeader && (
           <div className="mb-6">
@@ -443,6 +535,26 @@ export default async function Home({ searchParams }: HomeProps) {
           <CatalogControls state={catalogState} priceSummary={priceSummary} />
         </div>
 
+        {featuredListings.length > 0 && (
+          <section className="mt-6 rounded-2xl bg-amber-50/70 p-4 ring-1 ring-amber-200">
+            <div className="flex items-baseline justify-between gap-2">
+              <h2 className="flex items-center gap-2 text-lg font-bold text-zinc-900">
+                <span aria-hidden="true">⭐</span> Destacadas
+              </h2>
+              {user && (
+                <Link href="/mis-figuras" className="text-xs font-medium text-amber-800 hover:underline">
+                  Destaca la tuya
+                </Link>
+              )}
+            </div>
+            <div className="mt-3 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+              {featuredListings.map((listing) => (
+                <ListingCard key={listing.id} {...toCardProps(listing)} />
+              ))}
+            </div>
+          </section>
+        )}
+
         <div className="mt-6 flex flex-wrap items-baseline justify-between gap-2">
           <h2 className="flex items-center gap-2 text-lg font-bold text-zinc-900">
             <span aria-hidden="true">🔥</span>
@@ -467,17 +579,7 @@ export default async function Home({ searchParams }: HomeProps) {
             {listings.map((listing) => (
               <ListingCard
                 key={listing.id}
-                id={listing.id}
-                title={listing.title}
-                price={listing.price}
-                discountAmount={getActiveDiscountAmount(listing.discountAmount, listing.discountExpiresAt)}
-                category={listing.category}
-                condition={listing.condition}
-                imageUrl={listing.images[0]?.url}
-                sellerName={listing.user.name}
-                deliveryZones={listing.deliveryZones}
-                sold={listing.sold}
-                views={listing.views}
+                {...toCardProps(listing)}
                 isFavorited={favoritedIds ? favoritedIds.has(listing.id) : undefined}
               />
             ))}

@@ -3,6 +3,7 @@ import { getCurrentUser } from "@/lib/session";
 import { prisma } from "@/lib/db";
 import { getCategories } from "@/lib/categories";
 import ListingForm from "@/components/ListingForm";
+import { dateToMonth } from "@/lib/preorder";
 
 type EditarPageProps = {
   params: Promise<{ id: string }>;
@@ -45,6 +46,9 @@ export default async function EditarFiguraPage({ params }: EditarPageProps) {
           initialImages={listing.images.map((img) => ({ id: img.id, url: img.url }))}
           initialDeliveryZones={listing.deliveryZones}
           initialDeliveryNotes={listing.deliveryNotes}
+          initialIsPreorder={listing.isPreorder}
+          initialPreorderArrival={dateToMonth(listing.preorderArrival)}
+          initialPreorderDeposit={listing.preorderDeposit}
           categories={categories}
         />
       </div>

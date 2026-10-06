@@ -12,6 +12,7 @@ type BannerSlide = {
   discountAmount: number | null;
   imageUrl: string;
   isOffer: boolean;
+  isFeatured?: boolean;
 };
 
 const INTERVAL_MS = 5000;
@@ -64,13 +65,19 @@ export default function BannerCarousel({ slides }: { slides: BannerSlide[] }) {
             />
             <div className="absolute inset-y-0 left-0 flex w-[80%] flex-col justify-center gap-2 px-5 sm:w-2/3 sm:px-8">
               <span
-                className={`inline-flex w-fit items-center gap-1 rounded-full px-3 py-1 text-xs font-bold text-white shadow-sm ${
-                  slide.isOffer
-                    ? "bg-green-600"
-                    : "bg-gradient-to-r from-red-600 to-orange-600"
+                className={`inline-flex w-fit items-center gap-1 rounded-full px-3 py-1 text-xs font-bold shadow-sm ${
+                  slide.isFeatured
+                    ? "bg-amber-400 text-amber-950"
+                    : slide.isOffer
+                      ? "bg-green-600 text-white"
+                      : "bg-gradient-to-r from-red-600 to-orange-600 text-white"
                 }`}
               >
-                {slide.isOffer ? "🔥 En oferta" : "🆕 Recién publicada"}
+                {slide.isFeatured
+                  ? "⭐ Destacada"
+                  : slide.isOffer
+                    ? "🔥 En oferta"
+                    : "🆕 Recién publicada"}
               </span>
               <h3 className="line-clamp-2 text-lg font-extrabold text-white drop-shadow-md sm:text-2xl">
                 {slide.title}

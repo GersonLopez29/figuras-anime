@@ -4,6 +4,8 @@ import { prisma } from "@/lib/db";
 import BlockUserButton from "@/components/admin/BlockUserButton";
 import DeleteUserButton from "@/components/admin/DeleteUserButton";
 import VerifyEmailButton from "@/components/admin/VerifyEmailButton";
+import StoreToggleButton from "@/components/admin/StoreToggleButton";
+import { OFFICIAL_STORE_NAME } from "@/lib/store";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -62,6 +64,11 @@ export default async function AdminUsuariosPage() {
                       admin
                     </Badge>
                   )}
+                  {user.isOfficialStore && (
+                    <Badge className="ml-2 bg-orange-100 text-orange-800 hover:bg-orange-100">
+                      ✔ {OFFICIAL_STORE_NAME}
+                    </Badge>
+                  )}
                 </TableCell>
                 <TableCell className="text-muted-foreground">{user.email}</TableCell>
                 <TableCell className="text-muted-foreground">{user.whatsapp}</TableCell>
@@ -107,9 +114,13 @@ export default async function AdminUsuariosPage() {
                 </TableCell>
                 <TableCell>
                   {user.id === currentUser?.id ? (
-                    <span className="text-xs text-muted-foreground">Esta es tu cuenta</span>
+                    <div className="flex items-center gap-3">
+                      <StoreToggleButton userId={user.id} isOfficialStore={user.isOfficialStore} />
+                      <span className="text-xs text-muted-foreground">Esta es tu cuenta</span>
+                    </div>
                   ) : (
                     <div className="flex items-center gap-3">
+                      <StoreToggleButton userId={user.id} isOfficialStore={user.isOfficialStore} />
                       <VerifyEmailButton userId={user.id} emailVerified={user.emailVerified} />
                       <BlockUserButton userId={user.id} isBlocked={user.isBlocked} />
                       <DeleteUserButton
