@@ -24,7 +24,7 @@ const nextConfig: NextConfig = {
   // Las imágenes de vista previa (opengraph-image / twitter-image de cada
   // figura) leen las fuentes Geist desde assets/fonts en tiempo de ejecución.
   outputFileTracingIncludes: {
-    "/figura/\\[id\\]/*": ["./assets/fonts/**/*"],
+    "/figura/\\[slug\\]/*": ["./assets/fonts/**/*"],
     "/api/admin/redes": ["./assets/fonts/**/*"],
   },
   images: {

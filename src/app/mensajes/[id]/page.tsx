@@ -22,7 +22,7 @@ export default async function ConversacionPage({ params }: MensajePageProps) {
   const conversation = await prisma.conversation.findUnique({
     where: { id },
     include: {
-      listing: { select: { id: true, title: true, price: true, sold: true, images: { take: 1 } } },
+      listing: { select: { id: true, slug: true, title: true, price: true, sold: true, images: { take: 1 } } },
       buyer: { select: { id: true, name: true } },
       seller: { select: { id: true, name: true } },
       messages: {

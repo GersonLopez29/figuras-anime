@@ -5,6 +5,7 @@ import { listingPath } from "@/lib/slug";
 
 type SoldItem = {
   id: string;
+  slug: string | null;
   title: string;
   price: number;
   imageUrl?: string;

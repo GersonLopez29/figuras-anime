@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 
 type ListingCardProps = {
   id: string;
+  slug?: string | null;
   title: string;
   price: number;
   discountAmount?: number | null;
@@ -31,6 +32,7 @@ type ListingCardProps = {
 
 export default function ListingCard({
   id,
+  slug,
   title,
   price,
   discountAmount,
@@ -55,7 +57,7 @@ export default function ListingCard({
   const zoneTitle = zones.length > 0 ? `Entrega en: ${zones.join(", ")}` : undefined;
   const hasDiscount = !!discountAmount && !sold;
   return (
-    <Link href={listingPath({ id, title })} className="group block transition hover:-translate-y-1">
+    <Link href={listingPath({ id, slug: slug ?? null })} className="group block transition hover:-translate-y-1">
       <Card
         className={`gap-0 overflow-hidden py-0 ring-1 transition group-hover:shadow-xl ${
           featured

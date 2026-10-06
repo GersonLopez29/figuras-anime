@@ -7,6 +7,7 @@ import { getCategoryNames, isValidCategory } from "@/lib/categories";
 import { isValidCondition } from "@/lib/condition";
 import { deliveryFieldsSchema, readDeliveryFields } from "@/lib/delivery";
 import { preorderFieldsSchema, readPreorderFields } from "@/lib/preorder";
+import { uniqueListingSlug } from "@/lib/listingSlug";
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
@@ -121,6 +122,7 @@ export async function POST(request: NextRequest) {
 
   const listing = await prisma.listing.create({
     data: {
+      slug: await uniqueListingSlug(parsed.data.title),
       ...parsed.data,
       ...preorder.data,
       userId: user.id,

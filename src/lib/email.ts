@@ -1,5 +1,4 @@
 import { Resend } from "resend";
-import { listingPath } from "@/lib/slug";
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
@@ -213,7 +212,8 @@ export async function sendFeatureRequestResolvedEmail(
   to: string,
   name: string,
   listingTitle: string,
-  listingId: string,
+  // Ruta de la figura, ej. /figura/goku-sh-figuarts
+  listingUrlPath: string,
   approved: boolean,
   untilLabel?: string
 ) {
@@ -235,7 +235,7 @@ export async function sendFeatureRequestResolvedEmail(
               : `no pudimos confirmar el pago para destacar <strong>${escapeHtml(listingTitle)}</strong>. Si ya pagaste, escríbenos por WhatsApp con la captura.`
           }
         </p>
-        ${button(`${SITE_URL}${listingPath({ id: listingId, title: listingTitle })}`, "Ver mi figura")}
+        ${button(`${SITE_URL}${listingUrlPath}`, "Ver mi figura")}
       `
     )
   );

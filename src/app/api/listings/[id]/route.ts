@@ -7,6 +7,7 @@ import { isValidCategory } from "@/lib/categories";
 import { isValidCondition } from "@/lib/condition";
 import { deliveryFieldsSchema, readDeliveryFields } from "@/lib/delivery";
 import { preorderFieldsSchema, readPreorderFields } from "@/lib/preorder";
+import { slugUpdateForTitle } from "@/lib/listingSlug";
 
 export async function GET(
   _request: NextRequest,
@@ -132,12 +133,17 @@ export async function PATCH(
 
   const imagesToDelete = existing.images.filter((img) => removeImageIds.includes(img.id));
 
+  // Si cambió el título, el enlace cambia y el anterior sigue redirigiendo.
+  const slugChange =
+    parsed.data.title !== existing.title ? await slugUpdateForTitle(existing, parsed.data.title) : null;
+
   await prisma.$transaction([
     prisma.listing.update({
       where: { id },
       data: {
         ...parsed.data,
         ...preorder.data,
+        ...(slugChange ?? {}),
         images: {
           deleteMany: { id: { in: removeImageIds } },
           create: newImageUrls.map((url) => ({ url })),

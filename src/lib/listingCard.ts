@@ -9,6 +9,7 @@ export const cardInclude = {
 
 type CardListing = {
   id: string;
+  slug: string | null;
   title: string;
   price: number;
   discountAmount: number | null;
@@ -30,6 +31,7 @@ type CardListing = {
 export function toCardProps(l: CardListing) {
   return {
     id: l.id,
+    slug: l.slug,
     title: l.title,
     price: l.price,
     discountAmount: getActiveDiscountAmount(l.discountAmount, l.discountExpiresAt),

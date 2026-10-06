@@ -160,6 +160,10 @@ model Listing {
   // comprarla igual. reservedUntil es opcional (sin fecha = hasta que se quite).
   reservedAmount    Float?
   reservedUntil     DateTime?
+  // Nombre del enlace: /figura/<slug>. oldSlugs guarda los anteriores (títulos
+  // cambiados) para que los enlaces ya compartidos sigan redirigiendo.
+  slug              String?        @unique
+  oldSlugs          String[]       @default([])
   sold              Boolean        @default(false)
   views             Int            @default(0)
   createdAt         DateTime       @default(now())
