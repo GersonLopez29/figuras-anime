@@ -40,7 +40,6 @@ export async function generateMetadata({ params }: FiguraPageProps): Promise<Met
       price: true,
       discountAmount: true,
       discountExpiresAt: true,
-      images: { take: 1, select: { url: true } },
     },
   });
 
@@ -52,23 +51,14 @@ export async function generateMetadata({ params }: FiguraPageProps): Promise<Met
   const displayPrice = activeDiscount ? getFinalPrice(listing.price, activeDiscount) : listing.price;
   const title = `${listing.title} — ${formatPrice(displayPrice)} | FigurasAnime`;
   const description = listing.description.slice(0, 155);
-  const image = listing.images[0]?.url;
 
+  // La imagen de vista previa la generan opengraph-image.tsx y twitter-image.tsx
+  // (foto + precio + estado + marca), que tienen prioridad sobre este objeto.
   return {
     title,
     description,
-    openGraph: {
-      title,
-      description,
-      type: "website",
-      images: image ? [{ url: image }] : undefined,
-    },
-    twitter: {
-      card: image ? "summary_large_image" : "summary",
-      title,
-      description,
-      images: image ? [image] : undefined,
-    },
+    openGraph: { title, description, type: "website" },
+    twitter: { card: "summary_large_image", title, description },
   };
 }
 
