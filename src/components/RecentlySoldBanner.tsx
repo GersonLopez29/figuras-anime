@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { formatPrice } from "@/lib/format";
+import { listingPath } from "@/lib/slug";
 
 type SoldItem = {
   id: string;
@@ -26,7 +27,7 @@ export default function RecentlySoldBanner({ items }: { items: SoldItem[] }) {
           {items.map((item) => (
             <Link
               key={item.id}
-              href={`/figura/${item.id}`}
+              href={listingPath(item)}
               className="flex shrink-0 items-center gap-2 rounded-full bg-white py-1 pr-3 pl-1 text-xs shadow-sm ring-1 ring-zinc-200 transition hover:-translate-y-0.5 hover:shadow-md"
             >
               {item.imageUrl && (

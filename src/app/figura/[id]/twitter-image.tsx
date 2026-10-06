@@ -1,3 +1,4 @@
+import { listingIdFromParam } from "@/lib/slug";
 import { renderListingShareImage, SHARE_IMAGE_ALT, SHARE_IMAGE_SIZE } from "@/lib/listingShareImage";
 
 // Vista previa al compartir la figura (WhatsApp, Facebook, X…). Se regenera
@@ -9,5 +10,5 @@ export const contentType = "image/png";
 
 export default async function Image({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  return renderListingShareImage(id);
+  return renderListingShareImage(listingIdFromParam(id));
 }

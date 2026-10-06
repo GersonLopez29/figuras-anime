@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { listingPath } from "@/lib/slug";
 import { prisma } from "@/lib/db";
 import { Card } from "@/components/ui/card";
 
@@ -40,7 +41,7 @@ export default async function AdminContactosPage() {
                   )}{" "}
                   contactó por{" "}
                   <Link
-                    href={`/figura/${click.listing.id}`}
+                    href={listingPath(click.listing)}
                     className="font-medium text-primary hover:underline"
                   >
                     {click.listing.title}

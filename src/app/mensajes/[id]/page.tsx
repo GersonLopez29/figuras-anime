@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { listingPath } from "@/lib/slug";
 import Image from "next/image";
 import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
@@ -48,7 +49,7 @@ export default async function ConversacionPage({ params }: MensajePageProps) {
         &larr; Mensajes
       </Link>
 
-      <Link href={`/figura/${conversation.listing.id}`} className="mt-3 block">
+      <Link href={listingPath(conversation.listing)} className="mt-3 block">
         <Card className="flex-row items-center gap-3 p-3 shadow-sm transition hover:ring-primary/30">
           <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-muted">
             {conversation.listing.images[0] && (

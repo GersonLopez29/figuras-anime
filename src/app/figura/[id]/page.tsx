@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { cache } from "react";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import type { Metadata } from "next";
 import { prisma } from "@/lib/db";
 import { formatPrice, getFinalPrice, getActiveDiscountAmount, getDaysRemaining } from "@/lib/format";
@@ -8,6 +8,7 @@ import { getCurrentUser } from "@/lib/session";
 import { getConditionLabel, getConditionIcon, isNewCondition } from "@/lib/condition";
 import ListingGallery from "@/components/ListingGallery";
 import ListingCard from "@/components/ListingCard";
+import { categoryPath, listingIdFromParam, listingPath, listingSlug } from "@/lib/slug";
 import { cardInclude, toCardProps } from "@/lib/listingCard";
 import { formatArrival } from "@/lib/preorder";
 import { getActiveReservation, formatReservationDate } from "@/lib/reservation";
@@ -32,10 +33,12 @@ type FiguraPageProps = {
 };
 
 export async function generateMetadata({ params }: FiguraPageProps): Promise<Metadata> {
-  const { id } = await params;
+  const { id: param } = await params;
+  const id = listingIdFromParam(param);
   const listing = await prisma.listing.findUnique({
     where: { id },
     select: {
+      id: true,
       title: true,
       description: true,
       price: true,
@@ -58,7 +61,8 @@ export async function generateMetadata({ params }: FiguraPageProps): Promise<Met
   return {
     title,
     description,
-    openGraph: { title, description, type: "website" },
+    alternates: { canonical: listingPath(listing) },
+    openGraph: { title, description, type: "website", url: listingPath(listing) },
     twitter: { card: "summary_large_image", title, description },
   };
 }
@@ -92,7 +96,19 @@ const getListingAndRegisterView = cache(async (id: string, viewerId: string | nu
 });
 
 export default async function FiguraPage({ params }: FiguraPageProps) {
-  const { id } = await params;
+  const { id: param } = await params;
+  const id = listingIdFromParam(param);
+
+  // Los enlaces viejos (/figura/<id>) o con un título anterior redirigen al
+  // enlace actual, antes de contar la visita.
+  const basic = await prisma.listing.findUnique({ where: { id }, select: { id: true, title: true } });
+  if (!basic) {
+    notFound();
+  }
+  if (decodeURIComponent(param) !== listingSlug(basic)) {
+    permanentRedirect(listingPath(basic));
+  }
+
   const currentUser = await getCurrentUser();
 
   const result = await getListingAndRegisterView(id, currentUser?.id ?? null);
@@ -153,7 +169,7 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
       })
     : null;
 
-  const pageUrl = `${process.env.NEXT_PUBLIC_SITE_URL ?? "https://gerstore.club"}/figura/${listing.id}`;
+  const pageUrl = `${SITE_URL}${listingPath(listing)}`;
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -228,7 +244,7 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
                 text={`${listing.title} — ${formatPrice(
                   activeDiscount ? getFinalPrice(listing.price, activeDiscount) : listing.price
                 )} en FigurasAnime`}
-                url={`${process.env.NEXT_PUBLIC_SITE_URL ?? "https://gerstore.club"}/figura/${listing.id}`}
+                url={pageUrl}
               />
               {currentUser && (
                 <FavoriteButton
@@ -371,9 +387,9 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
                 <MessageButton listingId={listing.id} />
               )}
               <StoryShareButton
-                imageUrl={`/figura/${listing.id}/historia`}
+                imageUrl={`${listingPath(listing)}/historia`}
                 fileName={`figurasanime-${listing.id}-historia.png`}
-                shareText={`${listing.title} — ${formatPrice(totalPrice)} en ${SITE_URL}/figura/${listing.id}`}
+                shareText={`${listing.title} — ${formatPrice(totalPrice)} en ${pageUrl}`}
                 label="📲 Compartir en tus historias"
                 className="mt-3 w-full"
               />
@@ -405,7 +421,7 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
       {similarListings.length > 0 && (
         <RelatedSection
           title="Figuras similares"
-          href={`/?categoria=${encodeURIComponent(listing.category)}#catalogo`}
+          href={categoryPath(listing.category)}
           listings={similarListings}
         />
       )}

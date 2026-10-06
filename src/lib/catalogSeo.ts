@@ -1,5 +1,6 @@
 import { getDeliveryZoneLabel, type DeliveryZone } from "@/lib/delivery";
 import { getProductLine, type ProductLineSlug } from "@/lib/catalog";
+import { categoryPath } from "@/lib/slug";
 
 // Páginas del catálogo que vale la pena que Google indexe por separado: una
 // categoría, una zona de entrega o una línea (y sus combinaciones). El resto de
@@ -64,12 +65,12 @@ export function landingIntro(input: LandingInput, stats: LandingStats): string {
 
 export function landingCanonical({ categoria, zona, linea }: LandingInput, page: number): string {
   const params = new URLSearchParams();
-  if (categoria) params.set("categoria", categoria);
   if (zona) params.set("zona", zona);
   if (linea) params.set("linea", linea);
   if (page > 1) params.set("pagina", String(page));
   const qs = params.toString();
-  return qs ? `/?${qs}` : "/";
+  const path = categoria ? categoryPath(categoria) : "/";
+  return qs ? `${path}?${qs}` : path;
 }
 
 // Meta descripción para Google: "Figuras de Naruto en Lima: 12 figuras

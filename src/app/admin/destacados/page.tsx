@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { listingPath } from "@/lib/slug";
 import { prisma } from "@/lib/db";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 import { formatPrice } from "@/lib/format";
@@ -68,7 +69,7 @@ export default async function AdminDestacadosPage() {
               >
                 <div className="min-w-0">
                   <Link
-                    href={`/figura/${req.listing.id}`}
+                    href={listingPath(req.listing)}
                     className="line-clamp-1 text-sm font-medium text-foreground hover:underline"
                   >
                     {req.listing.title}
@@ -106,7 +107,7 @@ export default async function AdminDestacadosPage() {
               <div key={l.id} className="flex items-center justify-between gap-3 p-4">
                 <div className="min-w-0">
                   <Link
-                    href={`/figura/${l.id}`}
+                    href={listingPath(l)}
                     className="line-clamp-1 text-sm font-medium text-foreground hover:underline"
                   >
                     {l.title}

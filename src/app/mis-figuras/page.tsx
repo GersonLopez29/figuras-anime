@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { listingPath } from "@/lib/slug";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 import { getCurrentUser, isAdmin } from "@/lib/session";
@@ -99,7 +100,7 @@ export default async function MisFigurasPage() {
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
                     <Link
-                      href={`/figura/${listing.id}`}
+                      href={listingPath(listing)}
                       className="line-clamp-1 text-sm font-medium text-foreground hover:underline"
                     >
                       {listing.title}
@@ -175,9 +176,9 @@ export default async function MisFigurasPage() {
                 )}
                 {!listing.sold && (
                   <StoryShareButton
-                    imageUrl={`/figura/${listing.id}/historia`}
+                    imageUrl={`${listingPath(listing)}/historia`}
                     fileName={`figurasanime-${listing.id}-historia.png`}
-                    shareText={`${listing.title} en ${SITE_URL}/figura/${listing.id}`}
+                    shareText={`${listing.title} en ${SITE_URL}${listingPath(listing)}`}
                     label="📲 Historia"
                     size="sm"
                   />

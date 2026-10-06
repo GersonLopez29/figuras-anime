@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { categoryPath } from "@/lib/slug";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 
@@ -36,7 +37,7 @@ export default function Footer({ totalVisits, categories }: FooterProps) {
               {categories.slice(0, 5).map((cat) => (
                 <li key={cat.name}>
                   <Link
-                    href={`/?categoria=${encodeURIComponent(cat.name)}`}
+                    href={categoryPath(cat.name)}
                     className="inline-block text-sm text-zinc-600 transition hover:translate-x-0.5 hover:text-orange-600"
                   >
                     {cat.icon} {cat.name}
