@@ -7,15 +7,22 @@ type StoryShareButtonProps = {
   // URL de la imagen (ej. /figura/abc/historia).
   imageUrl: string;
   fileName: string;
+  // Texto con el enlace: se copia al portapapeles para pegarlo en la descripción.
   shareText: string;
   label?: string;
   size?: "sm" | "default";
   className?: string;
+  // Muestra debajo del botón una línea explicando cómo publicar.
+  showHint?: boolean;
 };
 
-// En el celular abre el menú de compartir con la imagen (Instagram, Facebook,
-// WhatsApp, TikTok…). Si el navegador no puede compartir archivos (la mayoría
+// En el celular abre el menú de compartir con la imagen (Instagram, TikTok,
+// Facebook, WhatsApp…). Si el navegador no puede compartir archivos (la mayoría
 // de computadoras), la descarga.
+//
+// Solo se comparte la imagen, sin texto: TikTok no recibe enlaces ni texto, y
+// en iPhone desaparece del menú si se le pasa texto junto con la foto. Por eso
+// el texto con el enlace se copia al portapapeles para pegarlo al publicar.
 export default function StoryShareButton({
   imageUrl,
   fileName,
@@ -23,11 +30,26 @@ export default function StoryShareButton({
   label = "📲 Imagen para historia",
   size = "default",
   className = "",
+  showHint = false,
 }: StoryShareButtonProps) {
-  const [status, setStatus] = useState<"idle" | "loading" | "downloaded" | "error">("idle");
+  const [status, setStatus] = useState<"idle" | "loading" | "copied" | "downloaded" | "error">(
+    "idle"
+  );
+
+  function resetLater(ms: number) {
+    setTimeout(() => setStatus("idle"), ms);
+  }
 
   async function handleClick() {
     setStatus("loading");
+
+    // Se copia antes de cualquier espera: Safari solo permite copiar
+    // inmediatamente después del toque.
+    const copied = navigator.clipboard
+      ?.writeText(shareText)
+      .then(() => true)
+      .catch(() => false) ?? Promise.resolve(false);
+
     try {
       const res = await fetch(imageUrl);
       if (!res.ok) throw new Error(String(res.status));
@@ -36,11 +58,12 @@ export default function StoryShareButton({
 
       if (navigator.canShare?.({ files: [file] })) {
         try {
-          await navigator.share({ files: [file], text: shareText });
+          await navigator.share({ files: [file] });
         } catch {
           // El usuario cerró el menú de compartir.
         }
-        setStatus("idle");
+        setStatus((await copied) ? "copied" : "idle");
+        resetLater(4000);
         return;
       }
 
@@ -53,29 +76,39 @@ export default function StoryShareButton({
       a.remove();
       setTimeout(() => URL.revokeObjectURL(url), 10_000);
       setStatus("downloaded");
-      setTimeout(() => setStatus("idle"), 3000);
+      resetLater(4000);
     } catch {
       setStatus("error");
-      setTimeout(() => setStatus("idle"), 3000);
+      resetLater(3000);
     }
   }
 
   return (
-    <Button
-      type="button"
-      variant="outline"
-      size={size === "sm" ? "sm" : "default"}
-      onClick={handleClick}
-      disabled={status === "loading"}
-      className={`rounded-full ${className}`}
-    >
-      {status === "loading"
-        ? "Preparando imagen..."
-        : status === "downloaded"
-          ? "✓ Imagen descargada"
-          : status === "error"
-            ? "No se pudo, intenta de nuevo"
-            : label}
-    </Button>
+    <div className={className}>
+      <Button
+        type="button"
+        variant="outline"
+        size={size === "sm" ? "sm" : "default"}
+        onClick={handleClick}
+        disabled={status === "loading"}
+        className="w-full rounded-full"
+      >
+        {status === "loading"
+          ? "Preparando imagen..."
+          : status === "copied"
+            ? "✓ Enlace copiado, pégalo al publicar"
+            : status === "downloaded"
+              ? "✓ Imagen descargada y enlace copiado"
+              : status === "error"
+                ? "No se pudo, intenta de nuevo"
+                : label}
+      </Button>
+      {showHint && (
+        <p className="mt-1.5 text-center text-xs text-muted-foreground">
+          Sirve para Instagram, TikTok, Facebook y WhatsApp. El enlace se copia solo: pégalo en
+          la descripción.
+        </p>
+      )}
+    </div>
   );
 }

@@ -179,7 +179,7 @@ export default async function MisFigurasPage() {
                     imageUrl={`${listingPath(listing)}/historia`}
                     fileName={`figurasanime-${listing.id}-historia.png`}
                     shareText={`${listing.title} en ${SITE_URL}${listingPath(listing)}`}
-                    label="📲 Historia"
+                    label="📲 Historia o TikTok"
                     size="sm"
                   />
                 )}
