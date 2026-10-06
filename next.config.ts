@@ -21,6 +21,11 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  // Las imágenes de vista previa (opengraph-image / twitter-image de cada
+  // figura) leen las fuentes Geist desde assets/fonts en tiempo de ejecución.
+  outputFileTracingIncludes: {
+    "/figura/\\[id\\]/*": ["./assets/fonts/**/*"],
+  },
   images: {
     // Las imágenes subidas a Vercel Blob tienen nombre único (UUID) y nunca se
     // sobrescriben, así que la versión optimizada puede cachearse un mes en vez
