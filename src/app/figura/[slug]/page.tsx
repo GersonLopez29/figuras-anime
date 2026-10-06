@@ -396,8 +396,9 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
                 imageUrl={`${listingPath(listing)}/historia`}
                 fileName={`figurasanime-${listing.id}-historia.png`}
                 shareText={`${listing.title} — ${formatPrice(totalPrice)} en ${pageUrl}`}
-                label="📲 Compartir en tus historias"
+                label="📲 Compartir en historias o TikTok"
                 className="mt-3 w-full"
+                showHint
               />
             </div>
           )}
