@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { formatPrice, getFinalPrice } from "@/lib/format";
+import { listingPath } from "@/lib/slug";
 
 type BannerSlide = {
   id: string;
@@ -43,7 +44,7 @@ export default function BannerCarousel({ slides }: { slides: BannerSlide[] }) {
         return (
           <Link
             key={slide.id}
-            href={`/figura/${slide.id}`}
+            href={listingPath(slide)}
             aria-hidden={index !== active}
             tabIndex={index === active ? 0 : -1}
             className={`absolute inset-0 transition-opacity duration-700 ${

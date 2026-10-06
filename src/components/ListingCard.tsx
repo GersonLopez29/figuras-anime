@@ -5,6 +5,7 @@ import { isNewCondition, isOpenBoxCondition } from "@/lib/condition";
 import { getDeliveryZoneLabel, sortDeliveryZones } from "@/lib/delivery";
 import { isFeatured } from "@/lib/featured";
 import { OFFICIAL_STORE_NAME } from "@/lib/store";
+import { listingPath } from "@/lib/slug";
 import FavoriteButton from "@/components/FavoriteButton";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -54,7 +55,7 @@ export default function ListingCard({
   const zoneTitle = zones.length > 0 ? `Entrega en: ${zones.join(", ")}` : undefined;
   const hasDiscount = !!discountAmount && !sold;
   return (
-    <Link href={`/figura/${id}`} className="group block transition hover:-translate-y-1">
+    <Link href={listingPath({ id, title })} className="group block transition hover:-translate-y-1">
       <Card
         className={`gap-0 overflow-hidden py-0 ring-1 transition group-hover:shadow-xl ${
           featured

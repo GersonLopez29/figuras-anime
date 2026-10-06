@@ -5,6 +5,7 @@ import { useRef, useState, FormEvent, ChangeEvent, DragEvent } from "react";
 import Image from "next/image";
 import CategoryRequestForm from "@/components/CategoryRequestForm";
 import { suggestCategory } from "@/lib/categorySuggest";
+import { listingPath } from "@/lib/slug";
 import { DELIVERY_ZONES, MAX_DELIVERY_NOTES } from "@/lib/delivery";
 import {
   CONDITION_OPTIONS,
@@ -179,7 +180,7 @@ export default function ListingForm(props: ListingFormProps) {
     }
 
     const listing = await res.json();
-    router.push(`/figura/${listing.id}`);
+    router.push(listingPath(listing));
     router.refresh();
   }
 

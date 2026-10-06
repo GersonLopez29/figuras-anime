@@ -1,4 +1,5 @@
 import { isDeliveryZone, type DeliveryZone } from "@/lib/delivery";
+import { categoryPath } from "@/lib/slug";
 
 // Estado del catálogo (filtros, orden y página) leído desde la URL, y helpers
 // para construir enlaces que conservan los filtros activos.
@@ -109,9 +110,9 @@ export function getProductLine(slug: ProductLineSlug | undefined) {
   return PRODUCT_LINES.find((l) => l.slug === slug);
 }
 
+// La categoría va en la ruta (/categoria/naruto); el resto, como parámetros.
 export function catalogHref(state: CatalogState, page?: number): string {
   const params = new URLSearchParams();
-  if (state.categoria) params.set("categoria", state.categoria);
   if (state.q) params.set("q", state.q);
   if (state.estado) params.set("estado", state.estado);
   if (state.oferta) params.set("oferta", "1");
@@ -123,7 +124,8 @@ export function catalogHref(state: CatalogState, page?: number): string {
   if (state.orden && state.orden !== "recientes") params.set("orden", state.orden);
   if (page && page > 1) params.set("pagina", String(page));
   const qs = params.toString();
-  return `${qs ? `/?${qs}` : "/"}#catalogo`;
+  const path = state.categoria ? categoryPath(state.categoria) : "/";
+  return `${path}${qs ? `?${qs}` : ""}#catalogo`;
 }
 
 // ---------------------------------------------------------------------------

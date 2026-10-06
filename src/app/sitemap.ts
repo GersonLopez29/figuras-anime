@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { prisma } from "@/lib/db";
 import { DELIVERY_ZONES } from "@/lib/delivery";
+import { categoryPath, listingPath } from "@/lib/slug";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://gerstore.club";
 
@@ -8,7 +9,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [listings, sellers, posts, categories, zoneCounts] = await Promise.all([
     prisma.listing.findMany({
       where: { sold: false },
-      select: { id: true, updatedAt: true },
+      select: { id: true, title: true, updatedAt: true },
       orderBy: { updatedAt: "desc" },
       take: 1000,
     }),
@@ -51,7 +52,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   const categoryRoutes: MetadataRoute.Sitemap = categories.map((c) => ({
-    url: `${SITE_URL}/?categoria=${encodeURIComponent(c.category)}`,
+    url: `${SITE_URL}${categoryPath(c.category)}`,
     lastModified: c._max.updatedAt ?? undefined,
     changeFrequency: "daily",
     priority: 0.9,
@@ -66,7 +67,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }));
 
   const listingRoutes: MetadataRoute.Sitemap = listings.map((listing) => ({
-    url: `${SITE_URL}/figura/${listing.id}`,
+    url: `${SITE_URL}${listingPath(listing)}`,
     lastModified: listing.updatedAt,
     changeFrequency: "weekly",
     priority: 0.8,
