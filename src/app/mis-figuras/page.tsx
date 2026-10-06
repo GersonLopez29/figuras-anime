@@ -11,6 +11,7 @@ import { getConditionLabel } from "@/lib/condition";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default async function MisFigurasPage() {
   const user = await getCurrentUser();
@@ -23,6 +24,9 @@ export default async function MisFigurasPage() {
     include: { images: { take: 1 } },
     orderBy: { createdAt: "desc" },
   });
+  const missingZoneCount = listings.filter(
+    (l) => !l.sold && l.deliveryZones.length === 0
+  ).length;
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-10">
@@ -32,6 +36,16 @@ export default async function MisFigurasPage() {
           Publicar nueva
         </Button>
       </div>
+
+      {missingZoneCount > 0 && (
+        <Alert className="mt-6 border-amber-200 bg-amber-50">
+          <AlertDescription className="text-amber-900">
+            📍 {missingZoneCount === 1 ? "1 figura no tiene" : `${missingZoneCount} figuras no tienen`}{" "}
+            zona de entrega. Los compradores ahora filtran por zona, así que esas figuras no
+            aparecen en esos resultados. Toca <strong>Agregar zona</strong> para completarla.
+          </AlertDescription>
+        </Alert>
+      )}
 
       {listings.length === 0 ? (
         <p className="mt-10 text-sm text-muted-foreground">
@@ -70,6 +84,15 @@ export default async function MisFigurasPage() {
                       {listing.title}
                     </Link>
                     {listing.sold && <Badge variant="secondary">Vendido</Badge>}
+                    {!listing.sold && listing.deliveryZones.length === 0 && (
+                      <Badge
+                        variant="outline"
+                        className="shrink-0 border-amber-300 bg-amber-50 text-amber-800"
+                        render={<Link href={`/mis-figuras/${listing.id}/editar`} />}
+                      >
+                        📍 Agregar zona
+                      </Badge>
+                    )}
                   </div>
                   <p className="text-sm text-muted-foreground">
                     {activeDiscount ? (

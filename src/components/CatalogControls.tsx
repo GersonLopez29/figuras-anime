@@ -18,8 +18,10 @@ import {
   type CatalogState,
   type ProductLineSlug,
 } from "@/lib/catalog";
+import { DELIVERY_ZONES, type DeliveryZone } from "@/lib/delivery";
 
 const ALL_LINES = "todas";
+const ALL_ZONES = "todas-zonas";
 const ALL_PRICES = "todos";
 
 function priceKey(min?: number, max?: number): string {
@@ -104,6 +106,34 @@ export default function CatalogControls({
           {PRODUCT_LINES.map((l) => (
             <SelectItem key={l.slug} value={l.slug}>
               {l.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
+      <Select
+        value={state.zona ?? ALL_ZONES}
+        onValueChange={(v) =>
+          v && go({ ...state, zona: v === ALL_ZONES ? undefined : (v as DeliveryZone) })
+        }
+      >
+        <SelectTrigger aria-label="Zona de entrega" className="h-9 rounded-full bg-white px-3">
+          <SelectValue>
+            {(v: string) =>
+              v === ALL_ZONES
+                ? "📍 Todas las zonas"
+                : `📍 ${DELIVERY_ZONES.find((z) => z.value === v)?.label ?? v}`
+            }
+          </SelectValue>
+        </SelectTrigger>
+        <SelectContent alignItemWithTrigger={false} align="start" className="min-w-72">
+          <SelectItem value={ALL_ZONES}>Todas las zonas</SelectItem>
+          {DELIVERY_ZONES.map((z) => (
+            <SelectItem key={z.value} value={z.value}>
+              <span className="flex flex-col">
+                <span>{z.label}</span>
+                <span className="text-xs text-muted-foreground">{z.districts}</span>
+              </span>
             </SelectItem>
           ))}
         </SelectContent>

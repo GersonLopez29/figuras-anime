@@ -5,6 +5,7 @@ import { getCurrentUser } from "@/lib/session";
 import { saveUploadedImage } from "@/lib/uploads";
 import { getCategoryNames, isValidCategory } from "@/lib/categories";
 import { isValidCondition } from "@/lib/condition";
+import { deliveryFieldsSchema, readDeliveryFields } from "@/lib/delivery";
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
@@ -18,8 +19,8 @@ export async function GET(request: NextRequest) {
       ...(q
         ? {
             OR: [
-              { title: { contains: q } },
-              { description: { contains: q } },
+              { title: { contains: q, mode: "insensitive" } },
+              { description: { contains: q, mode: "insensitive" } },
             ],
           }
         : {}),
@@ -41,7 +42,7 @@ const createListingSchema = z.object({
   price: z.coerce.number().positive("El precio debe ser mayor a 0"),
   category: z.string().trim().min(1, "Selecciona una categoría"),
   condition: z.string().trim().min(1, "Indica el estado de la figura"),
-});
+}).merge(deliveryFieldsSchema);
 
 export async function POST(request: NextRequest) {
   const user = await getCurrentUser();
@@ -63,6 +64,7 @@ export async function POST(request: NextRequest) {
     price: formData.get("price"),
     category: formData.get("category"),
     condition: formData.get("condition"),
+    ...readDeliveryFields(formData),
   });
 
   if (!parsed.success) {

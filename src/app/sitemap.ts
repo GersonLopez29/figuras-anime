@@ -1,10 +1,11 @@
 import type { MetadataRoute } from "next";
 import { prisma } from "@/lib/db";
+import { DELIVERY_ZONES } from "@/lib/delivery";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://gerstore.club";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [listings, sellers, posts] = await Promise.all([
+  const [listings, sellers, posts, categories, zoneCounts] = await Promise.all([
     prisma.listing.findMany({
       where: { sold: false },
       select: { id: true, updatedAt: true },
@@ -20,6 +21,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       orderBy: { createdAt: "desc" },
       take: 1000,
     }),
+    // Solo categorías y zonas con figuras disponibles: una página vacía no
+    // aporta nada en Google.
+    prisma.listing.groupBy({
+      by: ["category"],
+      where: { sold: false },
+      _max: { updatedAt: true },
+    }),
+    Promise.all(
+      DELIVERY_ZONES.map(async (zone) => ({
+        zone: zone.value,
+        count: await prisma.listing.count({
+          where: { sold: false, deliveryZones: { has: zone.value } },
+        }),
+      }))
+    ),
   ]);
 
   const staticRoutes: MetadataRoute.Sitemap = [
@@ -32,6 +48,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/terminos-condiciones`, changeFrequency: "yearly", priority: 0.2 },
     { url: `${SITE_URL}/politica-privacidad`, changeFrequency: "yearly", priority: 0.2 },
   ];
+
+  const categoryRoutes: MetadataRoute.Sitemap = categories.map((c) => ({
+    url: `${SITE_URL}/?categoria=${encodeURIComponent(c.category)}`,
+    lastModified: c._max.updatedAt ?? undefined,
+    changeFrequency: "daily",
+    priority: 0.9,
+  }));
+
+  const zoneRoutes: MetadataRoute.Sitemap = zoneCounts
+    .filter((z) => z.count > 0)
+    .map((z) => ({
+      url: `${SITE_URL}/?zona=${z.zone}`,
+      changeFrequency: "daily",
+      priority: 0.7,
+    }));
 
   const listingRoutes: MetadataRoute.Sitemap = listings.map((listing) => ({
     url: `${SITE_URL}/figura/${listing.id}`,
@@ -53,5 +84,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.4,
   }));
 
-  return [...staticRoutes, ...listingRoutes, ...sellerRoutes, ...postRoutes];
+  return [
+    ...staticRoutes,
+    ...categoryRoutes,
+    ...zoneRoutes,
+    ...listingRoutes,
+    ...sellerRoutes,
+    ...postRoutes,
+  ];
 }

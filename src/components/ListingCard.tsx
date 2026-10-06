@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { formatPrice, getFinalPrice } from "@/lib/format";
 import { isNewCondition, isOpenBoxCondition } from "@/lib/condition";
+import { getDeliveryZoneLabel, sortDeliveryZones } from "@/lib/delivery";
 import FavoriteButton from "@/components/FavoriteButton";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -17,6 +18,7 @@ type ListingCardProps = {
   sellerName?: string;
   sold?: boolean;
   views?: number;
+  deliveryZones?: string[];
   isFavorited?: boolean;
 };
 
@@ -31,9 +33,14 @@ export default function ListingCard({
   sellerName,
   sold,
   views,
+  deliveryZones,
   isFavorited,
 }: ListingCardProps) {
   const finalPrice = getFinalPrice(price, discountAmount);
+  const zones = sortDeliveryZones(deliveryZones ?? []).map(getDeliveryZoneLabel);
+  const zoneSummary =
+    zones.length === 0 ? null : zones.length === 1 ? zones[0] : `${zones[0]} +${zones.length - 1}`;
+  const zoneTitle = zones.length > 0 ? `Entrega en: ${zones.join(", ")}` : undefined;
   const hasDiscount = !!discountAmount && !sold;
   return (
     <Link href={`/figura/${id}`} className="group block transition hover:-translate-y-1">
@@ -89,6 +96,11 @@ export default function ListingCard({
             </p>
           ) : (
             <p className="mt-1.5 text-base font-bold text-primary sm:text-lg">{formatPrice(price)}</p>
+          )}
+          {zoneSummary && (
+            <p className="mt-0.5 truncate text-xs text-muted-foreground" title={zoneTitle}>
+              <span aria-hidden="true">📍</span> {zoneSummary}
+            </p>
           )}
           <div className="mt-1 flex items-center justify-between gap-2 border-t border-border pt-1.5">
             {sellerName && (

@@ -5,6 +5,7 @@ import { useRef, useState, FormEvent, ChangeEvent, DragEvent } from "react";
 import Image from "next/image";
 import CategoryRequestForm from "@/components/CategoryRequestForm";
 import { suggestCategory } from "@/lib/categorySuggest";
+import { DELIVERY_ZONES, MAX_DELIVERY_NOTES } from "@/lib/delivery";
 import {
   CONDITION_OPTIONS,
   USED_CONDITION_OPTIONS,
@@ -33,6 +34,9 @@ type ListingFormProps =
   | {
       mode: "create";
       categories: CategoryOption[];
+      // Zonas de la última publicación del vendedor, para no marcarlas cada vez.
+      defaultDeliveryZones?: string[];
+      defaultDeliveryNotes?: string | null;
     }
   | {
       mode: "edit";
@@ -43,6 +47,8 @@ type ListingFormProps =
       initialCategory: string;
       initialCondition: string;
       initialImages: ExistingImage[];
+      initialDeliveryZones: string[];
+      initialDeliveryNotes: string | null;
       categories: CategoryOption[];
     };
 
@@ -58,6 +64,12 @@ export default function ListingForm(props: ListingFormProps) {
   );
   const [condition, setCondition] = useState(
     isEdit ? props.initialCondition : CONDITION_OPTIONS[0].value
+  );
+  const [deliveryZones, setDeliveryZones] = useState<string[]>(
+    isEdit ? props.initialDeliveryZones : (props.defaultDeliveryZones ?? [])
+  );
+  const [deliveryNotes, setDeliveryNotes] = useState(
+    (isEdit ? props.initialDeliveryNotes : props.defaultDeliveryNotes) ?? ""
   );
   const [existingImages, setExistingImages] = useState<ExistingImage[]>(
     isEdit ? props.initialImages : []
@@ -100,9 +112,20 @@ export default function ListingForm(props: ListingFormProps) {
     setRemovedImageIds((prev) => [...prev, id]);
   }
 
+  function toggleZone(zone: string) {
+    setDeliveryZones((prev) =>
+      prev.includes(zone) ? prev.filter((z) => z !== zone) : [...prev, zone]
+    );
+  }
+
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError(null);
+
+    if (deliveryZones.length === 0) {
+      setError("Marca al menos una zona de entrega");
+      return;
+    }
 
     const totalImages = existingImages.length + newFiles.length;
     if (totalImages === 0) {
@@ -118,6 +141,8 @@ export default function ListingForm(props: ListingFormProps) {
     formData.set("price", price);
     formData.set("category", category);
     formData.set("condition", condition);
+    deliveryZones.forEach((zone) => formData.append("deliveryZones", zone));
+    formData.set("deliveryNotes", deliveryNotes);
     newFiles.forEach((file) => formData.append("images", file));
     if (isEdit) {
       removedImageIds.forEach((id) => formData.append("removeImageIds", id));
@@ -284,6 +309,50 @@ export default function ListingForm(props: ListingFormProps) {
             </Select>
           )}
         </div>
+
+        <fieldset className="space-y-1.5">
+          <legend className="text-sm font-medium leading-none">📍 ¿Dónde entregas?</legend>
+          <p className="text-xs text-muted-foreground">
+            Marca todas las zonas donde puedes entregar. Los compradores filtran por zona.
+          </p>
+          <div className="grid grid-cols-1 gap-2 pt-1 sm:grid-cols-2">
+            {DELIVERY_ZONES.map((zone) => {
+              const checked = deliveryZones.includes(zone.value);
+              return (
+                <label
+                  key={zone.value}
+                  className={`flex cursor-pointer items-start gap-2.5 rounded-lg border p-2.5 text-sm transition ${
+                    checked
+                      ? "border-primary bg-primary/5"
+                      : "border-input hover:border-primary/40"
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={() => toggleZone(zone.value)}
+                    className="mt-0.5 size-4 accent-orange-600"
+                  />
+                  <span>
+                    <span className="block font-medium text-foreground">{zone.label}</span>
+                    <span className="block text-xs text-muted-foreground">{zone.districts}</span>
+                  </span>
+                </label>
+              );
+            })}
+          </div>
+          <div className="space-y-1.5 pt-2">
+            <Label htmlFor="listing-delivery-notes">Puntos de encuentro (opcional)</Label>
+            <Input
+              id="listing-delivery-notes"
+              type="text"
+              maxLength={MAX_DELIVERY_NOTES}
+              value={deliveryNotes}
+              onChange={(e) => setDeliveryNotes(e.target.value)}
+              placeholder="Ej: Mall del Sur, estación Angamos, Galería Lampa"
+            />
+          </div>
+        </fieldset>
 
         <div>
           <Label>Imágenes (hasta 6)</Label>

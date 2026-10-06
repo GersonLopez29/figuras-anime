@@ -9,6 +9,7 @@ import { getCurrentUser } from "@/lib/session";
 import { getConditionLabel, getConditionIcon, isNewCondition } from "@/lib/condition";
 import ListingGallery from "@/components/ListingGallery";
 import ListingCard from "@/components/ListingCard";
+import { getDeliveryZoneLabel, sortDeliveryZones } from "@/lib/delivery";
 import StarRating from "@/components/StarRating";
 import FavoriteButton from "@/components/FavoriteButton";
 import ShareButton from "@/components/ShareButton";
@@ -261,6 +262,29 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
             {listing.description}
           </p>
 
+          {listing.deliveryZones.length > 0 && (
+            <div className="mt-4 rounded-lg bg-muted/50 p-3 text-sm">
+              <p className="font-semibold text-foreground">📍 Entrega en</p>
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {sortDeliveryZones(listing.deliveryZones).map((zone) => (
+                  <Badge
+                    key={zone}
+                    variant="outline"
+                    className="bg-white"
+                    render={<Link href={`/?zona=${zone}#catalogo`} />}
+                  >
+                    {getDeliveryZoneLabel(zone)}
+                  </Badge>
+                ))}
+              </div>
+              {listing.deliveryNotes && (
+                <p className="mt-2 text-muted-foreground">
+                  Puntos de encuentro: {listing.deliveryNotes}
+                </p>
+              )}
+            </div>
+          )}
+
           <Link
             href={`/vendedor/${listing.user.id}`}
             className="mt-4 flex items-center gap-3 rounded-xl border border-border p-3 transition hover:border-primary/40 hover:bg-primary/5"
@@ -376,6 +400,7 @@ type RelatedListing = {
   category: string;
   condition: string;
   views: number;
+  deliveryZones: string[];
   images: { url: string }[];
   user: { name: string };
 };
@@ -410,6 +435,7 @@ function RelatedSection({
             imageUrl={l.images[0]?.url}
             sellerName={l.user.name}
             views={l.views}
+            deliveryZones={l.deliveryZones}
           />
         ))}
       </div>

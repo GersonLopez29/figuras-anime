@@ -5,6 +5,7 @@ import { getCurrentUser, isAdmin } from "@/lib/session";
 import { saveUploadedImage, deleteUploadedImage } from "@/lib/uploads";
 import { isValidCategory } from "@/lib/categories";
 import { isValidCondition } from "@/lib/condition";
+import { deliveryFieldsSchema, readDeliveryFields } from "@/lib/delivery";
 
 export async function GET(
   _request: NextRequest,
@@ -41,7 +42,7 @@ const updateListingSchema = z.object({
   price: z.coerce.number().positive("El precio debe ser mayor a 0"),
   category: z.string().trim().min(1, "Selecciona una categoría"),
   condition: z.string().trim().min(1, "Indica el estado de la figura"),
-});
+}).merge(deliveryFieldsSchema);
 
 export async function PATCH(
   request: NextRequest,
@@ -72,6 +73,7 @@ export async function PATCH(
     price: formData.get("price"),
     category: formData.get("category"),
     condition: formData.get("condition"),
+    ...readDeliveryFields(formData),
   });
 
   if (!parsed.success) {

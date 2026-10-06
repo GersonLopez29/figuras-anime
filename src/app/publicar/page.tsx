@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/session";
 import { getCategories } from "@/lib/categories";
+import { prisma } from "@/lib/db";
 import ListingForm from "@/components/ListingForm";
 import EmailVerificationBanner from "@/components/EmailVerificationBanner";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
@@ -28,7 +29,14 @@ export default async function PublicarPage() {
     );
   }
 
-  const categories = await getCategories();
+  const [categories, lastListing] = await Promise.all([
+    getCategories(),
+    prisma.listing.findFirst({
+      where: { userId: user.id, NOT: { deliveryZones: { isEmpty: true } } },
+      orderBy: { createdAt: "desc" },
+      select: { deliveryZones: true, deliveryNotes: true },
+    }),
+  ]);
 
   return (
     <div className="mx-auto max-w-xl px-4 py-10">
@@ -39,7 +47,12 @@ export default async function PublicarPage() {
       </p>
 
       <div className="mt-8">
-        <ListingForm mode="create" categories={categories} />
+        <ListingForm
+          mode="create"
+          categories={categories}
+          defaultDeliveryZones={lastListing?.deliveryZones}
+          defaultDeliveryNotes={lastListing?.deliveryNotes}
+        />
       </div>
     </div>
   );

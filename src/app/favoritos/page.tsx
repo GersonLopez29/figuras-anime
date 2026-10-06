@@ -59,6 +59,7 @@ export default async function FavoritosPage() {
               sellerName={listing.user.name}
               sold={listing.sold}
               views={listing.views}
+              deliveryZones={listing.deliveryZones}
               isFavorited={true}
             />
           ))}

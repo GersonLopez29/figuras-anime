@@ -1,6 +1,7 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { prisma } from "@/lib/db";
-import { getCategoriesWithCoverImage } from "@/lib/categories";
+import { getCategoriesWithCoverImage, getCategoryNames } from "@/lib/categories";
 import { getCurrentUser } from "@/lib/session";
 import ListingCard from "@/components/ListingCard";
 import CategoryFilter from "@/components/CategoryFilter";
@@ -10,6 +11,7 @@ import BannerCarousel from "@/components/BannerCarousel";
 import RecentlySoldBanner from "@/components/RecentlySoldBanner";
 import Pagination from "@/components/Pagination";
 import CatalogControls from "@/components/CatalogControls";
+import { getDeliveryZoneLabel } from "@/lib/delivery";
 import { getActiveDiscountAmount } from "@/lib/format";
 import {
   parseCatalogFilters,
@@ -18,7 +20,17 @@ import {
   priceRangeLabel,
   ORDER_OPTIONS,
   type CatalogState,
+  type ProductLineSlug,
 } from "@/lib/catalog";
+import {
+  isLandingPage,
+  landingCanonical,
+  landingDescription,
+  landingH1,
+  landingIntro,
+  landingTitle,
+  type LandingInput,
+} from "@/lib/catalogSeo";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
@@ -41,8 +53,75 @@ type HomeProps = {
     min?: string;
     max?: string;
     linea?: string;
+    zona?: string;
   }>;
 };
+
+// Filtro por línea (S.H.Figuarts, Ichiban Kuji…): se detecta por palabras del título.
+function productLineWhere(linea: ProductLineSlug | undefined) {
+  const productLine = getProductLine(linea);
+  if (!productLine) return null;
+  return {
+    OR: [
+      ...productLine.contains.map((word) => ({
+        title: { contains: word, mode: "insensitive" as const },
+      })),
+      ...productLine.startsWith.map((word) => ({
+        title: { startsWith: word, mode: "insensitive" as const },
+      })),
+    ],
+  };
+}
+
+// Títulos, descripción y URL canónica propios por categoría, zona y línea,
+// para que Google muestre "Figuras de Naruto en Lima" en vez del título genérico.
+export async function generateMetadata({ searchParams }: HomeProps): Promise<Metadata> {
+  const { categoria, q, pagina, ...rawFilters } = await searchParams;
+  const { linea, zona } = parseCatalogFilters(rawFilters);
+  const categoryNames = categoria ? await getCategoryNames() : [];
+  const landing: LandingInput = {
+    categoria: categoria && categoryNames.includes(categoria) ? categoria : undefined,
+    zona,
+    linea,
+  };
+  const page = Math.max(1, parseInt(pagina ?? "1", 10) || 1);
+  const canonical = landingCanonical(landing, page);
+  // Los resultados de búsqueda por texto no se indexan (contenido duplicado y
+  // casi infinito), pero Google sí sigue sus enlaces a las figuras.
+  if (q?.trim()) {
+    return { robots: { index: false, follow: true } };
+  }
+
+  if (!isLandingPage(landing)) {
+    return { alternates: { canonical } };
+  }
+
+  const lineWhere = productLineWhere(linea);
+  const stats = await prisma.listing.aggregate({
+    where: {
+      sold: false,
+      ...(landing.categoria ? { category: landing.categoria } : {}),
+      ...(zona ? { deliveryZones: { has: zona } } : {}),
+      ...(lineWhere ?? {}),
+    },
+    _count: true,
+    _min: { price: true },
+    _max: { price: true },
+  });
+  const title = landingTitle(landing);
+  const description = landingDescription(landing, {
+    count: stats._count,
+    lowest: stats._min.price,
+    highest: stats._max.price,
+  });
+
+  return {
+    title,
+    description,
+    alternates: { canonical },
+    openGraph: { title, description, url: canonical, type: "website" },
+  };
+}
 
 export default async function Home({ searchParams }: HomeProps) {
   const { categoria, q: rawQ, bienvenida, pagina, ...rawFilters } = await searchParams;
@@ -58,9 +137,19 @@ export default async function Home({ searchParams }: HomeProps) {
     }),
   ]);
   const category = categories.some((c) => c.name === categoria) ? categoria : undefined;
-  const { estado, oferta, orden, min, max, linea } = parseCatalogFilters(rawFilters);
+  const { estado, oferta, orden, min, max, linea, zona } = parseCatalogFilters(rawFilters);
   const productLine = getProductLine(linea);
-  const catalogState: CatalogState = { categoria: category, q, estado, oferta, orden, min, max, linea };
+  const catalogState: CatalogState = {
+    categoria: category,
+    q,
+    estado,
+    oferta,
+    orden,
+    min,
+    max,
+    linea,
+    zona,
+  };
   const sellCtaHref = user ? "/publicar" : "/registro";
 
   // Las búsquedas por texto no distinguen mayúsculas ("goku" encuentra "GOKU").
@@ -75,20 +164,7 @@ export default async function Home({ searchParams }: HomeProps) {
           },
         ]
       : []),
-    ...(productLine
-      ? [
-          {
-            OR: [
-              ...productLine.contains.map((word) => ({
-                title: { contains: word, mode: "insensitive" as const },
-              })),
-              ...productLine.startsWith.map((word) => ({
-                title: { startsWith: word, mode: "insensitive" as const },
-              })),
-            ],
-          },
-        ]
-      : []),
+    ...(productLine ? [productLineWhere(linea)!] : []),
   ];
 
   // El rango y el orden por precio usan el precio publicado (sin descuento).
@@ -96,6 +172,7 @@ export default async function Home({ searchParams }: HomeProps) {
   // precio con las figuras que el comprador está viendo.
   const whereWithoutPrice = {
     ...(category ? { category } : {}),
+    ...(zona ? { deliveryZones: { has: zona } } : {}),
     ...(estado === "nuevo" ? { condition: "nuevo" } : {}),
     ...(estado === "usado" ? { condition: { notIn: ["nuevo", "open_box"] } } : {}),
     ...(oferta ? { discountAmount: { not: null }, discountExpiresAt: { gt: new Date() } } : {}),
@@ -122,6 +199,9 @@ export default async function Home({ searchParams }: HomeProps) {
     orderBy: { price: "asc" },
   });
   const priceSummary = computePriceSummary(availablePrices.map((l) => l.price));
+
+  const landing: LandingInput = { categoria: category, zona, linea };
+  const showLandingHeader = isLandingPage(landing) && !q;
 
   const orderBy = [
     { sold: "asc" as const },
@@ -163,7 +243,14 @@ export default async function Home({ searchParams }: HomeProps) {
     : null;
 
   const hasFilters =
-    !!category || !!q || !!estado || oferta || !!linea || min !== undefined || max !== undefined;
+    !!category ||
+    !!q ||
+    !!estado ||
+    oferta ||
+    !!linea ||
+    !!zona ||
+    min !== undefined ||
+    max !== undefined;
   const showHero = !hasFilters && !orden && page === 1;
 
   const [offerListings, latestListings] = showHero
@@ -224,6 +311,7 @@ export default async function Home({ searchParams }: HomeProps) {
   if (estado === "usado") filterLabels.push("Usadas");
   if (oferta) filterLabels.push("En oferta");
   if (productLine) filterLabels.push(productLine.label);
+  if (zona) filterLabels.push(`📍 ${getDeliveryZoneLabel(zona)}`);
   const activePriceLabel = priceRangeLabel(min, max);
   if (activePriceLabel) filterLabels.push(activePriceLabel);
   if (q) filterLabels.push(`"${q}"`);
@@ -330,6 +418,21 @@ export default async function Home({ searchParams }: HomeProps) {
       )}
 
       <div id="catalogo" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-8">
+        {showLandingHeader && (
+          <div className="mb-6">
+            <h1 className="text-2xl font-extrabold tracking-tight text-zinc-900 sm:text-3xl">
+              {landingH1(landing)}
+            </h1>
+            <p className="mt-1.5 max-w-3xl text-sm text-zinc-600">
+              {landingIntro(landing, {
+                count: availablePrices.length,
+                lowest: priceSummary?.lowest ?? null,
+                highest: priceSummary?.highest ?? null,
+              })}
+            </p>
+          </div>
+        )}
+
         <CategoryFilter state={catalogState} categories={categories} />
 
         <div className="mt-4">
@@ -372,6 +475,7 @@ export default async function Home({ searchParams }: HomeProps) {
                 condition={listing.condition}
                 imageUrl={listing.images[0]?.url}
                 sellerName={listing.user.name}
+                deliveryZones={listing.deliveryZones}
                 sold={listing.sold}
                 views={listing.views}
                 isFavorited={favoritedIds ? favoritedIds.has(listing.id) : undefined}
