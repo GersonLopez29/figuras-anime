@@ -20,6 +20,15 @@ import ReservationControl from "@/components/ReservationControl";
 import { getActiveReservation } from "@/lib/reservation";
 import { formatPrice, getFinalPrice, getActiveDiscountAmount } from "@/lib/format";
 import { getConditionLabel } from "@/lib/condition";
+import {
+  TRUST_MIN_ACCOUNT_DAYS,
+  TRUST_MIN_RATING,
+  TRUST_MIN_REVIEWS,
+  TRUST_MIN_SALES,
+  getTrustProgress,
+} from "@/lib/trust";
+import TrustedSellerBadge from "@/components/TrustedSellerBadge";
+import { claimReferralRewards } from "@/lib/referrals";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -33,7 +42,9 @@ export default async function MisFigurasPage() {
     redirect("/login");
   }
 
-  const [listings, payment] = await Promise.all([
+  // Entrega los destacados gratis de invitados que ya cumplen las condiciones.
+  await claimReferralRewards(user.id);
+  const [listings, payment, trust, credits] = await Promise.all([
     prisma.listing.findMany({
       where: { userId: user.id },
       include: {
@@ -43,11 +54,30 @@ export default async function MisFigurasPage() {
       orderBy: { createdAt: "desc" },
     }),
     getFeaturePaymentInfo(),
+    getTrustProgress(user.id),
+    prisma.user
+      .findUnique({ where: { id: user.id }, select: { freeFeatureCredits: true } })
+      .then((u) => u?.freeFeatureCredits ?? 0),
   ]);
   const userIsAdmin = isAdmin(user);
   const missingZoneCount = listings.filter(
     (l) => !l.sold && l.deliveryZones.length === 0
   ).length;
+  const missingPhotoTypeCount = listings.filter((l) => !l.sold && !l.photoType).length;
+  // Qué le falta para la insignia "Vendedor confiable".
+  const trustMissing = trust && !trust.trusted
+    ? [
+        trust.sales < TRUST_MIN_SALES &&
+          `${TRUST_MIN_SALES - trust.sales} ${TRUST_MIN_SALES - trust.sales === 1 ? "venta" : "ventas"} (marca tus figuras como vendidas)`,
+        trust.reviews < TRUST_MIN_REVIEWS &&
+          `${TRUST_MIN_REVIEWS - trust.reviews} ${TRUST_MIN_REVIEWS - trust.reviews === 1 ? "reseña" : "reseñas"} de tus compradores`,
+        trust.reviews >= TRUST_MIN_REVIEWS &&
+          trust.rating < TRUST_MIN_RATING &&
+          `subir tu calificación a ${TRUST_MIN_RATING} estrellas o más`,
+        trust.accountDays < TRUST_MIN_ACCOUNT_DAYS &&
+          `${TRUST_MIN_ACCOUNT_DAYS - trust.accountDays} días más de antigüedad`,
+      ].filter((x): x is string => typeof x === "string")
+    : [];
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-10">
@@ -57,6 +87,54 @@ export default async function MisFigurasPage() {
           Publicar nueva
         </Button>
       </div>
+
+      {listings.length > 0 && trust && (
+        <div className="mt-6 grid gap-3 sm:grid-cols-2">
+          <div className="rounded-lg bg-muted/50 p-4 text-sm">
+            {trust.trusted ? (
+              <>
+                <TrustedSellerBadge />
+                <p className="mt-2 text-muted-foreground">
+                  Tus figuras muestran la insignia. ¡Sigue así!
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="font-semibold text-foreground">🏅 Insignia de Vendedor confiable</p>
+                <p className="mt-1 text-muted-foreground">
+                  Te falta: {trustMissing.join(", ")}. Se activa sola.
+                </p>
+              </>
+            )}
+          </div>
+          <Link
+            href="/invitar"
+            className="rounded-lg bg-green-50 p-4 text-sm ring-1 ring-green-200 transition hover:bg-green-100/70"
+          >
+            <p className="font-semibold text-green-900">
+              🎁 {credits > 0
+                ? `Tienes ${credits} ${credits === 1 ? "destacado gratis" : "destacados gratis"}`
+                : "Gana destacados gratis"}
+            </p>
+            <p className="mt-1 text-green-800">
+              {credits > 0
+                ? "Úsalo con el botón ⭐ Destacar de cualquier figura. Invita a más amigos para ganar otro →"
+                : "Invita a un amigo a vender: cuando publique su primera figura, ganas 7 días de destacado →"}
+            </p>
+          </Link>
+        </div>
+      )}
+
+      {missingPhotoTypeCount > 0 && (
+        <Alert className="mt-6 border-sky-200 bg-sky-50">
+          <AlertDescription className="text-sky-900">
+            📷 {missingPhotoTypeCount === 1 ? "1 figura no indica" : `${missingPhotoTypeCount} figuras no indican`}{" "}
+            si sus fotos son reales o referenciales. Las que tienen <strong>Foto real</strong> muestran
+            una etiqueta en el catálogo y generan más confianza. Toca <strong>Editar</strong> para
+            marcarlo.
+          </AlertDescription>
+        </Alert>
+      )}
 
       {missingZoneCount > 0 && (
         <Alert className="mt-6 border-amber-200 bg-amber-50">
@@ -172,6 +250,7 @@ export default async function MisFigurasPage() {
                     pending={listing.featureRequests.length > 0}
                     isAdmin={userIsAdmin}
                     payment={payment}
+                    freeCredits={credits}
                   />
                 )}
                 {!listing.sold && (

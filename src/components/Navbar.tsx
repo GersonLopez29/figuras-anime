@@ -38,6 +38,9 @@ export default async function Navbar() {
             <span aria-hidden="true">✨</span>
             Comunidad
           </Badge>
+          <Link href="/se-busca" className="text-sm font-medium text-zinc-600 hover:text-zinc-900">
+            Se busca
+          </Link>
           {user ? (
             <>
               <Link

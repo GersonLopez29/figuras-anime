@@ -49,6 +49,27 @@ export default function MobileMenu({ isLoggedIn, userName, isAdmin, unreadCount 
               <span aria-hidden="true">✨</span>
               Comunidad
             </Badge>
+            <Link
+              href="/se-busca"
+              onClick={() => setOpen(false)}
+              className="rounded-xl px-3 py-2.5 text-sm font-medium text-foreground/80 transition hover:bg-muted"
+            >
+              🔎 Se busca
+            </Link>
+            <Link
+              href="/avisame"
+              onClick={() => setOpen(false)}
+              className="rounded-xl px-3 py-2.5 text-sm font-medium text-foreground/80 transition hover:bg-muted"
+            >
+              🔔 Avísame cuando llegue
+            </Link>
+            <Link
+              href="/guias"
+              onClick={() => setOpen(false)}
+              className="rounded-xl px-3 py-2.5 text-sm font-medium text-foreground/80 transition hover:bg-muted"
+            >
+              📚 Guías
+            </Link>
 
             {isLoggedIn ? (
               <>
@@ -71,6 +92,13 @@ export default function MobileMenu({ isLoggedIn, userName, isAdmin, unreadCount 
                   onClick={() => setOpen(false)}
                   className="flex items-center rounded-xl px-3 py-2.5 text-sm font-medium text-foreground/80 transition hover:bg-muted"
                 />
+                <Link
+                  href="/invitar"
+                  onClick={() => setOpen(false)}
+                  className="rounded-xl px-3 py-2.5 text-sm font-medium text-foreground/80 transition hover:bg-muted"
+                >
+                  🎁 Invita y gana destacados
+                </Link>
                 <Link
                   href="/publicar"
                   onClick={() => setOpen(false)}

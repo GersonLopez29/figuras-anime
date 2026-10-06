@@ -1,14 +1,15 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, after } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/session";
 import { saveUploadedImage } from "@/lib/uploads";
 import { getCategoryNames, isValidCategory } from "@/lib/categories";
 import { isValidCondition } from "@/lib/condition";
+import { isValidPhotoType } from "@/lib/photoType";
 import { deliveryFieldsSchema, readDeliveryFields } from "@/lib/delivery";
 import { preorderFieldsSchema, readPreorderFields } from "@/lib/preorder";
 import { uniqueListingSlug } from "@/lib/listingSlug";
-
+import { notifyNewListing } from "@/lib/newListingNotifications";
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const category = searchParams.get("categoria");
@@ -91,6 +92,13 @@ export async function POST(request: NextRequest) {
   if (!isValidCondition(parsed.data.condition)) {
     return NextResponse.json({ error: "Selecciona un estado válido" }, { status: 400 });
   }
+  const photoType = formData.get("photoType");
+  if (!isValidPhotoType(photoType)) {
+    return NextResponse.json(
+      { error: "Indica si las fotos son reales o referenciales" },
+      { status: 400 }
+    );
+  }
   if (!(await isValidCategory(parsed.data.category))) {
     return NextResponse.json({ error: "Selecciona una categoría válida" }, { status: 400 });
   }
@@ -125,10 +133,21 @@ export async function POST(request: NextRequest) {
       slug: await uniqueListingSlug(parsed.data.title),
       ...parsed.data,
       ...preorder.data,
+      photoType,
       userId: user.id,
       images: { create: imageUrls.map((url) => ({ url })) },
     },
     include: { images: true },
+  });
+
+  // Correos a quienes esperaban esta figura ("Avísame" y "Se busca"), después
+  // de responder para que publicar no se demore.
+  after(async () => {
+    try {
+      await notifyNewListing(listing.id);
+    } catch (err) {
+      console.error("[avisos] No se pudieron enviar los avisos de la figura nueva:", err);
+    }
   });
 
   return NextResponse.json(listing, { status: 201 });

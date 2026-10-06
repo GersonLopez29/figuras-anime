@@ -8,7 +8,7 @@ import { sendFeatureRequestAdminEmail } from "@/lib/email";
 // pendiente hasta que el admin confirme el pago en /admin/destacados. Si quien
 // la pide es el propio admin (su tienda), se destaca al instante sin pago.
 export async function POST(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
@@ -40,6 +40,39 @@ export async function POST(
       { error: "Ya tienes una solicitud pendiente para esta figura" },
       { status: 409 }
     );
+  }
+
+  // Destacado gratis ganado invitando amigos: se aplica al instante.
+  const body = await request.json().catch(() => null);
+  if (body?.useCredit === true) {
+    // Todo en una transacción: si algo falla, el destacado gratis no se pierde.
+    const featuredUntil = await prisma.$transaction(async (tx) => {
+      const spent = await tx.user.updateMany({
+        where: { id: user.id, freeFeatureCredits: { gt: 0 } },
+        data: { freeFeatureCredits: { decrement: 1 } },
+      });
+      if (spent.count !== 1) return null;
+      // Bloquea la fila para que dos usos simultáneos sumen los días uno tras otro.
+      await tx.$queryRaw`SELECT id FROM "Listing" WHERE id = ${id} FOR UPDATE`;
+      const current = await tx.listing.findUnique({ where: { id }, select: { featuredUntil: true } });
+      const until = extendFeaturedUntil(current?.featuredUntil ?? null, FEATURE_DAYS);
+      await tx.featureRequest.create({
+        data: {
+          listingId: id,
+          userId: user.id,
+          amount: 0,
+          days: FEATURE_DAYS,
+          status: "approved",
+          resolvedAt: new Date(),
+        },
+      });
+      await tx.listing.update({ where: { id }, data: { featuredUntil: until } });
+      return until;
+    });
+    if (!featuredUntil) {
+      return NextResponse.json({ error: "No tienes destacados gratis disponibles" }, { status: 400 });
+    }
+    return NextResponse.json({ status: "approved", featuredUntil }, { status: 201 });
   }
 
   if (isAdmin(user)) {

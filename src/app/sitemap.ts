@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { prisma } from "@/lib/db";
 import { DELIVERY_ZONES } from "@/lib/delivery";
 import { categoryPath, listingPath } from "@/lib/slug";
+import { GUIDES } from "@/lib/guides";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://gerstore.club";
 
@@ -46,6 +47,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/registro`, changeFrequency: "monthly", priority: 0.3 },
     { url: `${SITE_URL}/contacto`, changeFrequency: "yearly", priority: 0.3 },
     { url: `${SITE_URL}/te-la-vendemos`, changeFrequency: "monthly", priority: 0.6 },
+    { url: `${SITE_URL}/se-busca`, changeFrequency: "daily", priority: 0.7 },
+    { url: `${SITE_URL}/avisame`, changeFrequency: "monthly", priority: 0.5 },
+    { url: `${SITE_URL}/guias`, changeFrequency: "monthly", priority: 0.6 },
+    ...GUIDES.map((g) => ({
+      url: `${SITE_URL}/guias/${g.slug}`,
+      lastModified: new Date(`${g.updated}T12:00:00Z`),
+      changeFrequency: "monthly" as const,
+      priority: 0.6,
+    })),
     { url: `${SITE_URL}/sobre-nosotros`, changeFrequency: "yearly", priority: 0.3 },
     { url: `${SITE_URL}/terminos-condiciones`, changeFrequency: "yearly", priority: 0.2 },
     { url: `${SITE_URL}/politica-privacidad`, changeFrequency: "yearly", priority: 0.2 },

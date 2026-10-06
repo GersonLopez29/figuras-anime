@@ -5,6 +5,7 @@ import { getCurrentUser, isAdmin } from "@/lib/session";
 import { saveUploadedImage, deleteUploadedImage } from "@/lib/uploads";
 import { isValidCategory } from "@/lib/categories";
 import { isValidCondition } from "@/lib/condition";
+import { isValidPhotoType } from "@/lib/photoType";
 import { deliveryFieldsSchema, readDeliveryFields } from "@/lib/delivery";
 import { preorderFieldsSchema, readPreorderFields } from "@/lib/preorder";
 import { slugUpdateForTitle } from "@/lib/listingSlug";
@@ -100,6 +101,13 @@ export async function PATCH(
   if (!isValidCondition(parsed.data.condition)) {
     return NextResponse.json({ error: "Selecciona un estado válido" }, { status: 400 });
   }
+  const photoType = formData.get("photoType");
+  if (!isValidPhotoType(photoType)) {
+    return NextResponse.json(
+      { error: "Indica si las fotos son reales o referenciales" },
+      { status: 400 }
+    );
+  }
   if (!(await isValidCategory(parsed.data.category))) {
     return NextResponse.json({ error: "Selecciona una categoría válida" }, { status: 400 });
   }
@@ -143,6 +151,7 @@ export async function PATCH(
       data: {
         ...parsed.data,
         ...preorder.data,
+        photoType,
         ...(slugChange ?? {}),
         images: {
           deleteMany: { id: { in: removeImageIds } },

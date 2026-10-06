@@ -23,12 +23,15 @@ type CardListing = {
   isPreorder: boolean;
   reservedAmount: number | null;
   reservedUntil: Date | null;
+  photoType?: string | null;
+  userId: string;
   images: { url: string }[];
   user?: { name: string; isOfficialStore: boolean };
 };
 
 // Convierte una publicación de la base de datos en las props de <ListingCard>.
-export function toCardProps(l: CardListing) {
+// trustedSellerIds: vendedores con la insignia "Vendedor confiable".
+export function toCardProps(l: CardListing, trustedSellerIds?: Set<string>) {
   return {
     id: l.id,
     slug: l.slug,
@@ -46,5 +49,7 @@ export function toCardProps(l: CardListing) {
     featuredUntil: l.featuredUntil,
     isPreorder: l.isPreorder,
     isReserved: !!getActiveReservation(l.reservedAmount, l.reservedUntil),
+    realPhotos: l.photoType === "real",
+    trustedSeller: trustedSellerIds?.has(l.userId) ?? false,
   };
 }

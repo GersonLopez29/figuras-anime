@@ -24,6 +24,8 @@ type FeatureListingButtonProps = {
   // El admin destaca sus propias figuras sin pagar.
   isAdmin: boolean;
   payment: { name: string; number: string } | null;
+  // Destacados gratis ganados invitando amigos.
+  freeCredits?: number;
 };
 
 export default function FeatureListingButton({
@@ -35,6 +37,7 @@ export default function FeatureListingButton({
   pending,
   isAdmin,
   payment,
+  freeCredits = 0,
 }: FeatureListingButtonProps) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -49,10 +52,14 @@ export default function FeatureListingButton({
     );
   }
 
-  async function handleConfirm() {
+  async function handleConfirm(useCredit = false) {
     setLoading(true);
     setError(null);
-    const res = await fetch(`/api/listings/${listingId}/feature-request`, { method: "POST" });
+    const res = await fetch(`/api/listings/${listingId}/feature-request`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ useCredit }),
+    });
     setLoading(false);
     if (!res.ok) {
       const data = await res.json().catch(() => ({}));
@@ -89,6 +96,23 @@ export default function FeatureListingButton({
             {featuredUntilLabel && ` Hoy está destacada hasta el ${featuredUntilLabel}; los días se suman.`}
           </DialogDescription>
         </DialogHeader>
+
+        {freeCredits > 0 && !isAdmin && (
+          <div className="rounded-lg bg-green-50 p-3 text-sm text-green-900 ring-1 ring-green-200">
+            <p>
+              🎁 Tienes <strong>{freeCredits}</strong>{" "}
+              {freeCredits === 1 ? "destacado gratis" : "destacados gratis"} por invitar amigos.
+            </p>
+            <Button
+              type="button"
+              onClick={() => handleConfirm(true)}
+              disabled={loading}
+              className="mt-2 w-full rounded-full bg-green-600 text-white hover:bg-green-700"
+            >
+              {loading ? "Destacando..." : `Usar uno gratis (${days} días)`}
+            </Button>
+          </div>
+        )}
 
         {isAdmin ? (
           <p className="text-sm text-muted-foreground">
@@ -129,7 +153,7 @@ export default function FeatureListingButton({
         {(isAdmin || payment) && (
           <Button
             type="button"
-            onClick={handleConfirm}
+            onClick={() => handleConfirm(false)}
             disabled={loading}
             className="w-full rounded-full"
           >

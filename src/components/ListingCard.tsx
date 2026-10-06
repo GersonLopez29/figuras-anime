@@ -28,6 +28,8 @@ type ListingCardProps = {
   isReserved?: boolean;
   officialStore?: boolean;
   isFavorited?: boolean;
+  realPhotos?: boolean;
+  trustedSeller?: boolean;
 };
 
 export default function ListingCard({
@@ -48,6 +50,8 @@ export default function ListingCard({
   isReserved,
   officialStore,
   isFavorited,
+  realPhotos,
+  trustedSeller,
 }: ListingCardProps) {
   const featured = !sold && isFeatured(featuredUntil);
   const finalPrice = getFinalPrice(price, discountAmount);
@@ -125,6 +129,11 @@ export default function ListingCard({
                     : "♻️ Usada"}
               </Badge>
             )}
+            {realPhotos && !sold && (
+              <Badge variant="outline" className="border-emerald-200 bg-emerald-50 text-emerald-700" title="Fotos de la figura que se vende">
+                📷 Foto real
+              </Badge>
+            )}
           </div>
           {hasDiscount ? (
             <p className="mt-1.5 flex flex-wrap items-baseline gap-1.5">
@@ -144,7 +153,14 @@ export default function ListingCard({
               <p className="truncate text-xs font-semibold text-orange-700">✔ {OFFICIAL_STORE_NAME}</p>
             ) : (
               sellerName && (
-                <p className="truncate text-xs text-muted-foreground">Vende: {sellerName}</p>
+                <p className="truncate text-xs text-muted-foreground">
+                  Vende: {sellerName}
+                  {trustedSeller && (
+                    <span className="ml-1" title="Vendedor confiable" aria-label="Vendedor confiable">
+                      🏅
+                    </span>
+                  )}
+                </p>
               )
             )}
             {typeof views === "number" && (

@@ -13,7 +13,9 @@ import BannerCarousel from "@/components/BannerCarousel";
 import RecentlySoldBanner from "@/components/RecentlySoldBanner";
 import Pagination from "@/components/Pagination";
 import CatalogControls from "@/components/CatalogControls";
+import StockAlertForm from "@/components/StockAlertForm";
 import { cardInclude, toCardProps } from "@/lib/listingCard";
+import { getTrustedSellerIds } from "@/lib/trust";
 import { FEATURED_SECTION_LIMIT, activeFeaturedWhere, pickRandom } from "@/lib/featured";
 import { OFFICIAL_STORE_NAME } from "@/lib/store";
 import { getDeliveryZoneLabel } from "@/lib/delivery";
@@ -264,6 +266,8 @@ export default async function CatalogPage({ searchParams, fixedCategory }: Catal
     skip: (page - 1) * PAGE_SIZE,
     take: PAGE_SIZE,
   });
+
+  const trustedSellerIds = await getTrustedSellerIds();
 
   const favoritedIds = user
     ? new Set(
@@ -518,7 +522,7 @@ export default async function CatalogPage({ searchParams, fixedCategory }: Catal
             </div>
             <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
               {storeListings.map((listing) => (
-                <ListingCard key={listing.id} {...toCardProps(listing)} />
+                <ListingCard key={listing.id} {...toCardProps(listing, trustedSellerIds)} />
               ))}
             </div>
           </div>
@@ -583,7 +587,7 @@ export default async function CatalogPage({ searchParams, fixedCategory }: Catal
             </div>
             <div className="mt-3 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
               {featuredListings.map((listing) => (
-                <ListingCard key={listing.id} {...toCardProps(listing)} />
+                <ListingCard key={listing.id} {...toCardProps(listing, trustedSellerIds)} />
               ))}
             </div>
           </section>
@@ -613,7 +617,7 @@ export default async function CatalogPage({ searchParams, fixedCategory }: Catal
             {listings.map((listing) => (
               <ListingCard
                 key={listing.id}
-                {...toCardProps(listing)}
+                {...toCardProps(listing, trustedSellerIds)}
                 isFavorited={favoritedIds ? favoritedIds.has(listing.id) : undefined}
               />
             ))}
@@ -621,6 +625,25 @@ export default async function CatalogPage({ searchParams, fixedCategory }: Catal
         )}
 
         <Pagination page={page} totalPages={totalPages} state={catalogState} />
+
+        {q && page === totalPages && (
+          <div className="mx-auto mt-10 max-w-xl rounded-2xl bg-orange-50/70 p-5 ring-1 ring-orange-200">
+            <p className="font-semibold text-zinc-900">
+              🔔 {listings.length === 0 ? "¿No está lo que buscas?" : "¿No encontraste la que querías?"}
+            </p>
+            <p className="mt-1 text-sm text-zinc-600">
+              Te avisamos por correo cuando alguien publique <strong>{q}</strong>.
+            </p>
+            <div className="mt-3">
+              <StockAlertForm
+                key={q}
+                defaultQuery={q}
+                defaultEmail={user?.email ?? ""}
+                hideQuery
+              />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
