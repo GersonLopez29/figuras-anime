@@ -25,6 +25,7 @@ const nextConfig: NextConfig = {
   // figura) leen las fuentes Geist desde assets/fonts en tiempo de ejecución.
   outputFileTracingIncludes: {
     "/figura/\\[id\\]/*": ["./assets/fonts/**/*"],
+    "/api/admin/redes": ["./assets/fonts/**/*"],
   },
   images: {
     // Las imágenes subidas a Vercel Blob tienen nombre único (UUID) y nunca se

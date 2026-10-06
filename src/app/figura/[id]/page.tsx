@@ -19,10 +19,13 @@ import FavoriteButton from "@/components/FavoriteButton";
 import ShareButton from "@/components/ShareButton";
 import MessageButton from "@/components/MessageButton";
 import WhatsAppContactButton from "@/components/WhatsAppContactButton";
+import StoryShareButton from "@/components/StoryShareButton";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://gerstore.club";
 
 type FiguraPageProps = {
   params: Promise<{ id: string }>;
@@ -367,6 +370,13 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
               {currentUser && currentUser.id !== listing.user.id && (
                 <MessageButton listingId={listing.id} />
               )}
+              <StoryShareButton
+                imageUrl={`/figura/${listing.id}/historia`}
+                fileName={`figurasanime-${listing.id}-historia.png`}
+                shareText={`${listing.title} — ${formatPrice(totalPrice)} en ${SITE_URL}/figura/${listing.id}`}
+                label="📲 Compartir en tus historias"
+                className="mt-3 w-full"
+              />
             </div>
           )}
 

@@ -5,6 +5,7 @@ import { getCurrentUser, isAdmin } from "@/lib/session";
 import { prisma } from "@/lib/db";
 import DeleteListingButton from "@/components/DeleteListingButton";
 import FeatureListingButton from "@/components/FeatureListingButton";
+import StoryShareButton from "@/components/StoryShareButton";
 import {
   FEATURE_DAYS,
   FEATURE_PRICE,
@@ -22,6 +23,8 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://gerstore.club";
 
 export default async function MisFigurasPage() {
   const user = await getCurrentUser();
@@ -168,6 +171,15 @@ export default async function MisFigurasPage() {
                     pending={listing.featureRequests.length > 0}
                     isAdmin={userIsAdmin}
                     payment={payment}
+                  />
+                )}
+                {!listing.sold && (
+                  <StoryShareButton
+                    imageUrl={`/figura/${listing.id}/historia`}
+                    fileName={`figurasanime-${listing.id}-historia.png`}
+                    shareText={`${listing.title} en ${SITE_URL}/figura/${listing.id}`}
+                    label="📲 Historia"
+                    size="sm"
                   />
                 )}
                 <ToggleSoldButton listingId={listing.id} sold={listing.sold} />

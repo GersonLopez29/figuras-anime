@@ -1,12 +1,22 @@
 import { ImageResponse } from "next/og";
-import { join } from "node:path";
-import { readFile } from "node:fs/promises";
 import { prisma } from "@/lib/db";
 import { formatPrice, getActiveDiscountAmount, getFinalPrice } from "@/lib/format";
-import { isNewCondition, isOpenBoxCondition } from "@/lib/condition";
 import { getDeliveryZoneLabel, sortDeliveryZones } from "@/lib/delivery";
 import { OFFICIAL_STORE_NAME } from "@/lib/store";
 import { getActiveReservation } from "@/lib/reservation";
+import {
+  GREEN,
+  INK,
+  MUTED,
+  ORANGE,
+  RED,
+  SITE_HOST,
+  conditionLabel,
+  fontsPromise,
+  loadPhoto,
+  type ImageFonts,
+  truncate,
+} from "@/lib/imageKit";
 
 // Imagen de vista previa (1200×630) que muestran WhatsApp, Facebook, X, etc.
 // al compartir una figura: foto, título, precio, estado, zona y la marca.
@@ -15,70 +25,6 @@ export const SHARE_IMAGE_SIZE = { width: 1200, height: 630 };
 export const SHARE_IMAGE_ALT = "Figura en venta en FigurasAnime";
 
 const PHOTO_SIZE = 630;
-const SITE_HOST = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://gerstore.club").replace(
-  /^https?:\/\//,
-  ""
-);
-
-const ORANGE = "#ea580c";
-const RED = "#dc2626";
-const GREEN = "#15803d";
-const INK = "#18181b";
-const MUTED = "#71717a";
-
-// Geist (licencia OFL, ver assets/fonts/OFL-Geist.txt). Se lee una sola vez.
-const fontsPromise = Promise.all(
-  [
-    { file: "Geist-Medium.ttf", weight: 500 as const },
-    { file: "Geist-Bold.ttf", weight: 700 as const },
-    { file: "Geist-Black.ttf", weight: 900 as const },
-  ].map(async ({ file, weight }) => ({
-    name: "Geist",
-    data: await readFile(join(process.cwd(), "assets/fonts", file)),
-    weight,
-    style: "normal" as const,
-  }))
-);
-
-// Baja la foto de la figura y la deja como JPEG cuadrado de 630 px. Se pasa por
-// sharp porque el generador de imágenes no lee WebP y las fotos del celular
-// pueden pesar varios MB. Si algo falla, la imagen se arma sin foto.
-async function loadPhoto(url: string | undefined): Promise<string | null> {
-  if (!url) return null;
-  try {
-    let buffer: Buffer;
-    if (url.startsWith("/")) {
-      // Desarrollo local sin Vercel Blob: las fotos viven en /public.
-      buffer = await readFile(join(process.cwd(), "public", url));
-    } else {
-      const res = await fetch(url, { signal: AbortSignal.timeout(6000) });
-      if (!res.ok) return null;
-      buffer = Buffer.from(await res.arrayBuffer());
-    }
-    const sharp = (await import("sharp")).default;
-    const jpeg = await sharp(buffer)
-      .rotate()
-      .resize(PHOTO_SIZE, PHOTO_SIZE, { fit: "cover" })
-      .jpeg({ quality: 80 })
-      .toBuffer();
-    return `data:image/jpeg;base64,${jpeg.toString("base64")}`;
-  } catch (err) {
-    console.error("[share-image] No se pudo cargar la foto:", err);
-    return null;
-  }
-}
-
-function truncate(text: string, max: number): string {
-  const clean = text.replace(/\s+/g, " ").trim();
-  return clean.length <= max ? clean : `${clean.slice(0, max - 1).trimEnd()}…`;
-}
-
-function conditionLabel(condition: string): string {
-  if (isNewCondition(condition)) return "Nueva";
-  if (isOpenBoxCondition(condition)) return "Open box";
-  return "Usada";
-}
-
 function Pill({ children, background, color }: { children: string; background: string; color: string }) {
   return (
     <div
@@ -108,7 +54,7 @@ function Brand() {
   );
 }
 
-function fallbackImage(fonts: Awaited<typeof fontsPromise>) {
+function fallbackImage(fonts: ImageFonts) {
   return new ImageResponse(
     (
       <div
@@ -161,7 +107,7 @@ export async function renderListingShareImage(id: string): Promise<ImageResponse
 
   if (!listing) return fallbackImage(fonts);
 
-  const photo = await loadPhoto(listing.images[0]?.url);
+  const photo = await loadPhoto(listing.images[0]?.url, PHOTO_SIZE, PHOTO_SIZE);
   const discount = listing.sold
     ? null
     : getActiveDiscountAmount(listing.discountAmount, listing.discountExpiresAt);
