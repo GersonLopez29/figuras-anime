@@ -79,7 +79,7 @@ export default async function Navbar() {
                 Iniciar sesión
               </Link>
               <Button render={<Link href="/registro" />} nativeButton={false} className="rounded-full">
-                Registrarme
+                Vende tus figuras
               </Button>
             </>
           )}

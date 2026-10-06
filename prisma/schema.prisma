@@ -204,16 +204,21 @@ model ConsignmentRequest {
   @@index([status])
 }
 
+// Cada vez que alguien toca "Contactar por WhatsApp". El comprador puede no
+// tener cuenta (userId null); la IP sirve para limitar cuántos números se
+// pueden pedir por hora y así frenar bots que recolectan WhatsApps.
 model WhatsAppClick {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ip        String?
   listingId String
   listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
 
   @@index([listingId])
   @@index([userId])
+  @@index([ip, createdAt])
 }
 
 model ListingImage {

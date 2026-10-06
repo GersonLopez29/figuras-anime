@@ -7,7 +7,7 @@ export const metadata: Metadata = {
     "Cómo FigurasAnime recopila, usa y protege tus datos personales al comprar, vender y publicar figuras de anime.",
 };
 
-const LAST_UPDATED = "10 de agosto de 2026";
+const LAST_UPDATED = "6 de octubre de 2026";
 const CONTACT_EMAIL = "gersonownd@gmail.com";
 
 export default function PoliticaPrivacidadPage() {
@@ -48,8 +48,8 @@ export default function PoliticaPrivacidadPage() {
             <h3 className="mt-4 text-sm font-semibold text-foreground">Automáticamente</h3>
             <ul className="mt-2 list-disc space-y-1 pl-5 text-muted-foreground">
               <li>
-                Dirección IP — se usa solo para limitar intentos de inicio de sesión y registro de cuentas,
-                y prevenir spam y accesos indebidos. No se usa para identificarte ni se comparte con
+                Dirección IP — se usa solo para limitar intentos de inicio de sesión, registro de cuentas y
+                consultas de contacto por WhatsApp, y prevenir spam y accesos indebidos. No se usa para identificarte ni se comparte con
                 terceros.
               </li>
               <li>
@@ -68,8 +68,8 @@ export default function PoliticaPrivacidadPage() {
             <ul className="mt-2 list-disc space-y-1 pl-5 text-muted-foreground">
               <li>Operar tu cuenta y mostrar tus publicaciones en el catálogo</li>
               <li>
-                Permitir que otros usuarios registrados te contacten por WhatsApp o por el chat interno
-                sobre una figura que publicaste
+                Permitir que los interesados te contacten por WhatsApp (tengan cuenta o no) o por el chat
+                interno (usuarios registrados) sobre una figura que publicaste
               </li>
               <li>Enviarte correos necesarios para el servicio: verificación de cuenta y avisos de seguridad</li>
               <li>
@@ -83,9 +83,10 @@ export default function PoliticaPrivacidadPage() {
           <section>
             <h2 className="text-lg font-semibold text-foreground">3. Con quién compartimos tus datos</h2>
             <p className="mt-2 text-muted-foreground">
-              Tu nombre y tu número de WhatsApp se muestran a otros usuarios que hayan iniciado sesión y
-              quieran contactarte por una publicación tuya — así funciona el marketplace, y es la única
-              forma en que otros usuarios ven tu contacto.
+              Tu nombre se muestra en tus publicaciones. Tu número de WhatsApp no aparece escrito en la
+              página: se entrega a la persona que toca &quot;Contactar por WhatsApp&quot; en una figura tuya,
+              tenga cuenta o no, para que pueda escribirte. Limitamos cuántas consultas puede hacer cada
+              conexión por hora para evitar que se recolecten números de forma automática.
             </p>
             <p className="mt-2 text-muted-foreground">
               Usamos proveedores externos que procesan datos en nuestro nombre, bajo sus propias políticas
