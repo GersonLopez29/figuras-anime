@@ -3,7 +3,6 @@ import { cache } from "react";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { prisma } from "@/lib/db";
-import { buildWhatsAppLink } from "@/lib/whatsapp";
 import { formatPrice, getFinalPrice, getActiveDiscountAmount, getDaysRemaining } from "@/lib/format";
 import { getCurrentUser } from "@/lib/session";
 import { getConditionLabel, getConditionIcon, isNewCondition } from "@/lib/condition";
@@ -19,10 +18,8 @@ import FavoriteButton from "@/components/FavoriteButton";
 import ShareButton from "@/components/ShareButton";
 import MessageButton from "@/components/MessageButton";
 import WhatsAppContactButton from "@/components/WhatsAppContactButton";
-import VerifyEmailToContact from "@/components/VerifyEmailToContact";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
@@ -70,7 +67,7 @@ const getListingAndRegisterView = cache(async (id: string, viewerId: string | nu
     include: {
       images: true,
       user: {
-        select: { id: true, name: true, whatsapp: true, createdAt: true, isOfficialStore: true },
+        select: { id: true, name: true, createdAt: true, isOfficialStore: true },
       },
     },
   });
@@ -132,11 +129,6 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
     take: RELATED_LIMIT,
   });
 
-  const message = `Hola ${listing.user.name}, vi tu figura "${listing.title}" en FigurasAnime y me interesa. ¿Sigue disponible?`;
-  const whatsappLink = currentUser?.emailVerified
-    ? buildWhatsAppLink(listing.user.whatsapp, message)
-    : null;
-  const needsEmailVerification = !!currentUser && !currentUser.emailVerified;
 
   const isFavorited = currentUser
     ? !!(await prisma.favorite.findUnique({
@@ -344,44 +336,14 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
                 Este producto ya fue vendido.
               </AlertDescription>
             </Alert>
-          ) : whatsappLink ? (
+          ) : (
+            // Cualquiera puede contactar al vendedor, tenga cuenta o no.
             <div className="mt-6">
-              <WhatsAppContactButton listingId={listing.id} whatsappLink={whatsappLink} />
+              <WhatsAppContactButton listingId={listing.id} />
               {currentUser && currentUser.id !== listing.user.id && (
                 <MessageButton listingId={listing.id} />
               )}
             </div>
-          ) : needsEmailVerification ? (
-            <VerifyEmailToContact />
-          ) : (
-            <Alert className="mt-6 text-center">
-              <AlertDescription className="block justify-center text-center">
-                <span className="font-medium text-foreground">
-                  Inicia sesión para ver el WhatsApp del vendedor.
-                </span>
-                <span className="mt-1 block text-xs">
-                  Lo pedimos para proteger los números de los vendedores de bots y estafadores.
-                  Crear tu cuenta es gratis y toma menos de un minuto.
-                </span>
-              </AlertDescription>
-              <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:justify-center">
-                <Button
-                  render={<Link href={`/login?volver=${encodeURIComponent(`/figura/${listing.id}`)}`} />}
-                  nativeButton={false}
-                  className="rounded-full"
-                >
-                  Iniciar sesión
-                </Button>
-                <Button
-                  render={<Link href="/registro" />}
-                  nativeButton={false}
-                  variant="outline"
-                  className="rounded-full"
-                >
-                  Crear cuenta
-                </Button>
-              </div>
-            </Alert>
           )}
 
           {!listing.sold && (

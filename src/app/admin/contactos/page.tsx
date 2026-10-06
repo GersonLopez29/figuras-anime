@@ -18,8 +18,8 @@ export default async function AdminContactosPage() {
         Contactos por WhatsApp ({clicks.length})
       </h2>
       <p className="mt-1 text-sm text-muted-foreground">
-        Cada vez que un usuario registrado hace clic en &quot;Contactar por WhatsApp&quot; en una
-        figura, aparece aquí. Se muestran los últimos 200.
+        Cada vez que alguien toca &quot;Contactar por WhatsApp&quot; en una figura aparece aquí,
+        tenga cuenta o no. Se muestran los últimos 200.
       </p>
 
       {clicks.length === 0 ? (
@@ -30,8 +30,15 @@ export default async function AdminContactosPage() {
             <div key={click.id} className="flex flex-wrap items-center justify-between gap-2 p-4">
               <div className="min-w-0">
                 <p className="text-sm text-foreground">
-                  <span className="font-medium">{click.user.name}</span>{" "}
-                  <span className="text-muted-foreground">({click.user.email})</span> contactó por{" "}
+                  {click.user ? (
+                    <>
+                      <span className="font-medium">{click.user.name}</span>{" "}
+                      <span className="text-muted-foreground">({click.user.email})</span>
+                    </>
+                  ) : (
+                    <span className="font-medium text-muted-foreground">Visitante sin cuenta</span>
+                  )}{" "}
+                  contactó por{" "}
                   <Link
                     href={`/figura/${click.listing.id}`}
                     className="font-medium text-primary hover:underline"

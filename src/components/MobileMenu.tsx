@@ -108,7 +108,7 @@ export default function MobileMenu({ isLoggedIn, userName, isAdmin, unreadCount 
                   onClick={() => setOpen(false)}
                   className="rounded-xl px-3 py-2.5 text-sm font-medium text-primary transition hover:bg-primary/5"
                 >
-                  Registrarme
+                  Vende tus figuras
                 </Link>
               </>
             )}
