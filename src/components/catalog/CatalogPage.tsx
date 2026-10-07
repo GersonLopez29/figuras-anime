@@ -4,7 +4,10 @@ import { categoryPath } from "@/lib/slug";
 import type { Metadata } from "next";
 import { prisma } from "@/lib/db";
 import { getCategoriesWithCoverImage, getCategoryNames } from "@/lib/categories";
-import { getCurrentUser } from "@/lib/session";
+import { after } from "next/server";
+import { headers } from "next/headers";
+import { getCurrentUser, isAdmin } from "@/lib/session";
+import { isBotUserAgent, recordSearch } from "@/lib/searchStats";
 import ListingCard from "@/components/ListingCard";
 import CategoryFilter from "@/components/CategoryFilter";
 import ListingFilters from "@/components/ListingFilters";
@@ -238,6 +241,17 @@ export default async function CatalogPage({ searchParams, fixedCategory }: Catal
     orderBy: { price: "asc" },
   });
   const priceSummary = computePriceSummary(availablePrices.map((l) => l.price));
+
+  // Búsqueda anónima para el reporte "Demanda" del admin (solo la primera
+  // página, sin contar al admin ni a los bots). El user-agent se lee antes:
+  // dentro de after() no se puede usar headers().
+  if (q && (!pagina || pagina === "1") && !isAdmin(user)) {
+    const userAgent = (await headers()).get("user-agent");
+    if (!isBotUserAgent(userAgent)) {
+      const hadResults = availablePrices.length > 0;
+      after(() => recordSearch(q, hadResults));
+    }
+  }
 
   const landing: LandingInput = { categoria: category, zona, linea };
   const showLandingHeader = isLandingPage(landing) && !q;
