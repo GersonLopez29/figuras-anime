@@ -69,6 +69,10 @@ export default function PoliticaPrivacidadPage() {
                 Insights — no se vinculan a tu identidad ni se usan con fines publicitarios.
               </li>
               <li>
+                Las palabras que buscas en el catálogo, sin ningún dato tuyo, para saber qué figuras
+                buscan los coleccionistas. Se borran a los 6 meses.
+              </li>
+              <li>
                 Una cookie de sesión técnica (httpOnly, no accesible desde JavaScript) que solo sirve para
                 mantenerte con la sesión iniciada.
               </li>

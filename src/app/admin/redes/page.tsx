@@ -84,6 +84,46 @@ export default async function AdminRedesPage() {
           {caption}
         </pre>
       </Card>
+
+      <Card className="gap-4 p-4">
+        <div>
+          <h3 className="font-semibold text-foreground">🛍️ Catálogo para Google Shopping y Facebook</h3>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Todas las figuras disponibles con foto, precio y enlace. Se actualiza solo cada hora:
+            regístralo una vez y las figuras nuevas, vendidas o con descuento se actualizan solas.
+          </p>
+        </div>
+        {[
+          {
+            name: "Google Merchant Center",
+            url: `${SITE_URL}/feeds/google.xml`,
+            steps:
+              "merchants.google.com → Productos → Agregar productos → Archivo → \"Agregar URL del archivo\" y pega este enlace. País: Perú, idioma: español, moneda: PEN. En Envíos configura el costo de envío.",
+          },
+          {
+            name: "Facebook / Instagram",
+            url: `${SITE_URL}/feeds/facebook.xml`,
+            steps:
+              "business.facebook.com → Commerce Manager → Catálogo → Fuentes de datos → Agregar artículos → Fuente de datos → \"Usar una URL\" y pega este enlace con actualización diaria.",
+          },
+        ].map((feed) => (
+          <div key={feed.name} className="rounded-lg bg-muted/50 p-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="text-sm font-semibold text-foreground">{feed.name}</p>
+              <CopyTextButton text={feed.url} />
+            </div>
+            <a
+              href={feed.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-1 block break-all font-mono text-xs text-primary hover:underline"
+            >
+              {feed.url}
+            </a>
+            <p className="mt-2 text-xs text-muted-foreground">{feed.steps}</p>
+          </div>
+        ))}
+      </Card>
     </div>
   );
 }

@@ -373,3 +373,17 @@ model WantedContact {
 
   @@index([userId, createdAt])
 }
+
+// Búsquedas del catálogo por día y por término (sin datos de quién buscó).
+// noResults: cuántas no encontraron ninguna figura disponible. Alimenta el
+// reporte "Demanda" del administrador.
+model SearchStat {
+  id        String   @id @default(cuid())
+  date      DateTime
+  query     String
+  searches  Int      @default(0)
+  noResults Int      @default(0)
+
+  @@unique([date, query])
+  @@index([date])
+}
