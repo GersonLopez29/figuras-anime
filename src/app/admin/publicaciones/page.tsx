@@ -9,10 +9,18 @@ import ToggleSoldButton from "@/components/ToggleSoldButton";
 import CategorySelect from "@/components/CategorySelect";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import SoldFilterTabs from "@/components/SoldFilterTabs";
+import { parseSoldFilter, soldCounts, soldWhere } from "@/lib/soldFilter";
 
-export default async function AdminPublicacionesPage() {
-  const [listings, categoryNames] = await Promise.all([
+type AdminPublicacionesPageProps = {
+  searchParams: Promise<{ estado?: string }>;
+};
+
+export default async function AdminPublicacionesPage({ searchParams }: AdminPublicacionesPageProps) {
+  const filter = parseSoldFilter((await searchParams).estado);
+  const [listings, categoryNames, soldGroups] = await Promise.all([
     prisma.listing.findMany({
+      where: soldWhere(filter),
       include: {
         images: { take: 1 },
         user: { select: { name: true, email: true } },
@@ -20,16 +28,26 @@ export default async function AdminPublicacionesPage() {
       orderBy: { createdAt: "desc" },
     }),
     getCategoryNames(),
+    prisma.listing.groupBy({ by: ["sold"], _count: { _all: true } }),
   ]);
+  const countFor = (sold: boolean) => soldGroups.find((g) => g.sold === sold)?._count._all ?? 0;
+  const counts = soldCounts(countFor(false), countFor(true));
 
   return (
     <div>
-      <h2 className="text-lg font-semibold text-foreground">
-        Publicaciones ({listings.length})
-      </h2>
+      <h2 className="text-lg font-semibold text-foreground">Publicaciones ({counts.todas})</h2>
+      <div className="mt-3">
+        <SoldFilterTabs basePath="/admin/publicaciones" active={filter} counts={counts} />
+      </div>
 
       {listings.length === 0 ? (
-        <p className="mt-4 text-sm text-muted-foreground">Todavía no hay publicaciones.</p>
+        <p className="mt-4 text-sm text-muted-foreground">
+          {filter === "vendidas"
+            ? "Todavía no hay figuras vendidas."
+            : filter === "disponibles"
+              ? "No hay figuras disponibles."
+              : "Todavía no hay publicaciones."}
+        </p>
       ) : (
         <Card className="mt-4 gap-0 divide-y divide-border py-0 shadow-sm">
           {listings.map((listing) => (
