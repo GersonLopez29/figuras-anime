@@ -33,10 +33,17 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import SoldFilterTabs from "@/components/SoldFilterTabs";
+import { matchesSoldFilter, parseSoldFilter, soldCounts } from "@/lib/soldFilter";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://gerstore.club";
 
-export default async function MisFigurasPage() {
+type MisFigurasPageProps = {
+  searchParams: Promise<{ estado?: string }>;
+};
+
+export default async function MisFigurasPage({ searchParams }: MisFigurasPageProps) {
+  const filter = parseSoldFilter((await searchParams).estado);
   const user = await getCurrentUser();
   if (!user) {
     redirect("/login");
@@ -60,6 +67,9 @@ export default async function MisFigurasPage() {
       .then((u) => u?.freeFeatureCredits ?? 0),
   ]);
   const userIsAdmin = isAdmin(user);
+  const soldCount = listings.filter((l) => l.sold).length;
+  const counts = soldCounts(listings.length - soldCount, soldCount);
+  const visibleListings = listings.filter((l) => matchesSoldFilter(filter, l.sold));
   const missingZoneCount = listings.filter(
     (l) => !l.sold && l.deliveryZones.length === 0
   ).length;
@@ -146,13 +156,25 @@ export default async function MisFigurasPage() {
         </Alert>
       )}
 
+      {listings.length > 0 && (
+        <div className="mt-6">
+          <SoldFilterTabs basePath="/mis-figuras" active={filter} counts={counts} />
+        </div>
+      )}
+
       {listings.length === 0 ? (
         <p className="mt-10 text-sm text-muted-foreground">
           Todavía no has publicado ninguna figura.
         </p>
+      ) : visibleListings.length === 0 ? (
+        <p className="mt-6 rounded-lg bg-muted/50 p-4 text-sm text-muted-foreground">
+          {filter === "vendidas"
+            ? "Todavía no tienes figuras vendidas. Cuando vendas una, márcala con \"Marcar como vendido\" para que aparezca aquí."
+            : "No tienes figuras disponibles en este momento."}
+        </p>
       ) : (
-        <Card className="mt-6 gap-0 divide-y divide-border py-0 shadow-sm">
-          {listings.map((listing) => {
+        <Card className="mt-4 gap-0 divide-y divide-border py-0 shadow-sm">
+          {visibleListings.map((listing) => {
             const activeDiscount = getActiveDiscountAmount(
               listing.discountAmount,
               listing.discountExpiresAt
