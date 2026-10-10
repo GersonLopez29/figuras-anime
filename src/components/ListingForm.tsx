@@ -14,7 +14,11 @@ import {
   isOpenBoxCondition,
 } from "@/lib/condition";
 import { PHOTO_TYPE_HELP, type PhotoType } from "@/lib/photoType";
-import { prepareImagesForUpload, uploadErrorMessage } from "@/lib/compressImage";
+import {
+  prepareImagesForUpload,
+  sendFormWithProgress,
+  uploadErrorMessage,
+} from "@/lib/compressImage";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -98,6 +102,10 @@ export default function ListingForm(props: ListingFormProps) {
   const [newFiles, setNewFiles] = useState<File[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  // Etapa del envío, para que el botón muestre qué está pasando.
+  const [stage, setStage] = useState<
+    { step: "preparing" } | { step: "uploading"; percent: number } | { step: "saving" } | { step: "opening" } | null
+  >(null);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -177,6 +185,7 @@ export default function ListingForm(props: ListingFormProps) {
     formData.set("preorderDeposit", isPreorder ? preorderDeposit : "");
     // Las fotos se achican antes de enviarlas (Vercel no acepta envíos de más
     // de 4.5 MB y las fotos de celular pesan varios MB cada una).
+    if (newFiles.length > 0) setStage({ step: "preparing" });
     const uploadFiles = await prepareImagesForUpload(newFiles);
     uploadFiles.forEach((file) => formData.append("images", file));
     if (isEdit) {
@@ -186,26 +195,46 @@ export default function ListingForm(props: ListingFormProps) {
     const url = isEdit ? `/api/listings/${props.listingId}` : "/api/listings";
     const method = isEdit ? "PATCH" : "POST";
 
-    let res: Response;
+    setStage({ step: "uploading", percent: 0 });
+    let res;
     try {
-      res = await fetch(url, { method, body: formData });
+      res = await sendFormWithProgress(url, method, formData, (fraction) => {
+        // Al terminar de subir, el servidor todavía guarda las fotos y la figura.
+        setStage(fraction >= 1 ? { step: "saving" } : { step: "uploading", percent: Math.round(fraction * 100) });
+      });
     } catch {
       setLoading(false);
+      setStage(null);
       setError("No se pudo conectar. Revisa tu conexión e intenta de nuevo.");
       return;
     }
-    setLoading(false);
 
     if (!res.ok) {
-      const data = await res.json().catch(() => ({}));
-      setError(uploadErrorMessage(res.status, data.error));
+      setLoading(false);
+      setStage(null);
+      setError(uploadErrorMessage(res.status, res.data.error as string | undefined));
       return;
     }
 
-    const listing = await res.json();
-    router.push(listingPath(listing));
-    router.refresh();
+    // El botón sigue desactivado hasta que se abra la ficha: así no queda la
+    // sensación de que no pasó nada (ni se publica dos veces por error).
+    setStage({ step: "opening" });
+    router.push(listingPath(res.data as { id: string; slug: string | null }));
   }
+
+  const buttonLabel = !loading
+    ? isEdit
+      ? "Guardar cambios"
+      : "Publicar figura"
+    : stage?.step === "preparing"
+      ? "Preparando fotos..."
+      : stage?.step === "uploading"
+        ? `Subiendo fotos... ${stage.percent} %`
+        : stage?.step === "opening"
+          ? isEdit
+            ? "Abriendo..."
+            : "¡Listo! Abriendo tu figura..."
+          : "Guardando...";
 
   return (
     <Card className="p-6 shadow-sm sm:p-8">
@@ -567,7 +596,7 @@ export default function ListingForm(props: ListingFormProps) {
         )}
 
         <Button type="submit" disabled={loading} size="lg" className="w-full rounded-full">
-          {loading ? "Guardando..." : isEdit ? "Guardar cambios" : "Publicar figura"}
+          {buttonLabel}
         </Button>
       </form>
     </Card>

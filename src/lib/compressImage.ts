@@ -2,13 +2,14 @@
 //
 // Vercel rechaza cualquier envío de más de 4.5 MB en total, y una foto de
 // celular pesa entre 2 y 5 MB: con 3 o 4 fotos la publicación fallaba antes de
-// llegar al servidor. Una foto de 1600 px de lado en JPEG pesa ~200-400 KB y se
-// ve igual de bien en la página (las tarjetas y la ficha muestran mucho menos).
+// llegar al servidor. Una foto de 1280 px de lado en JPEG pesa ~150-300 KB y se
+// ve igual de bien en la página (la ficha la muestra a ~1000 px como máximo).
+// Menos peso = se sube más rápido con datos móviles.
 //
 // Solo para componentes del navegador ("use client").
 
-const MAX_SIDE = 1600;
-const QUALITY = 0.82;
+const MAX_SIDE = 1280;
+const QUALITY = 0.8;
 // Fotos chicas y livianas se suben tal cual.
 const SKIP_BELOW_BYTES = 400 * 1024;
 // Límite de Vercel (4.5 MB) con margen para el resto del formulario.
@@ -71,12 +72,50 @@ function totalBytes(files: File[]) {
   return files.reduce((sum, f) => sum + f.size, 0);
 }
 
+// De a una foto por vez: abrir varias fotos de 12 MP a la vez satura la
+// memoria de los celulares más sencillos y todo se vuelve lento.
+async function compressAll(files: File[], maxSide?: number, quality?: number) {
+  const out: File[] = [];
+  for (const f of files) out.push(await compressImage(f, maxSide, quality));
+  return out;
+}
+
 // Achica todas las fotos; si juntas todavía pasan el límite, hace una segunda
 // pasada más fuerte.
 export async function prepareImagesForUpload(files: File[]): Promise<File[]> {
-  const first = await Promise.all(files.map((f) => compressImage(f)));
+  const first = await compressAll(files);
   if (totalBytes(first) <= MAX_UPLOAD_BYTES) return first;
-  return Promise.all(files.map((f) => compressImage(f, 1200, 0.7)));
+  return compressAll(files, 1024, 0.7);
+}
+
+export type UploadResult = { ok: boolean; status: number; data: Record<string, unknown> };
+
+// Envía el formulario mostrando el avance de la subida (fetch no lo permite).
+// onProgress recibe de 0 a 1.
+export function sendFormWithProgress(
+  url: string,
+  method: string,
+  body: FormData,
+  onProgress?: (fraction: number) => void
+): Promise<UploadResult> {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open(method, url);
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable && onProgress) onProgress(e.loaded / e.total);
+    };
+    xhr.onload = () => {
+      let data: Record<string, unknown> = {};
+      try {
+        data = JSON.parse(xhr.responseText);
+      } catch {
+        // Respuesta que no es JSON (ej. el 413 de Vercel).
+      }
+      resolve({ ok: xhr.status >= 200 && xhr.status < 300, status: xhr.status, data });
+    };
+    xhr.onerror = () => reject(new Error("network"));
+    xhr.send(body);
+  });
 }
 
 // Mensaje para el error 413 de Vercel (envío demasiado pesado).

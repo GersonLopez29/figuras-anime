@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { cache } from "react";
 import { notFound, permanentRedirect } from "next/navigation";
+import { after } from "next/server";
 import type { Metadata } from "next";
 import { prisma } from "@/lib/db";
 import {
@@ -46,9 +47,13 @@ type FiguraPageProps = {
   params: Promise<{ slug: string }>;
 };
 
+// La metadata y la página buscan la misma figura: cache() hace que la búsqueda
+// se haga una sola vez por visita.
+const resolveParam = cache(resolveListingParam);
+
 export async function generateMetadata({ params }: FiguraPageProps): Promise<Metadata> {
   const { slug: param } = await params;
-  const resolved = await resolveListingParam(param);
+  const resolved = await resolveParam(param);
   if (!resolved) {
     return { title: "Figura no encontrada — FigurasAnime" };
   }
@@ -101,14 +106,15 @@ const getListingAndRegisterView = cache(async (id: string, viewerId: string | nu
 
   if (!listing) return null;
 
+  // La visita se cuenta después de enviar la página, para no hacer esperar.
   let views = listing.views;
   if (viewerId !== listing.userId) {
-    const updated = await prisma.listing.update({
-      where: { id: listing.id },
-      data: { views: { increment: 1 } },
-      select: { views: true },
-    });
-    views = updated.views;
+    views += 1;
+    after(() =>
+      prisma.listing
+        .update({ where: { id: listing.id }, data: { views: { increment: 1 } } })
+        .catch((err) => console.error("[vistas] No se pudo contar la visita:", err))
+    );
   }
 
   return { listing, views };
@@ -119,7 +125,7 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
 
   // Los enlaces anteriores (/figura/<id>, /figura/<nombre>-<id> o con un título
   // anterior) redirigen al enlace actual, antes de contar la visita.
-  const resolved = await resolveListingParam(param);
+  const [resolved, currentUser] = await Promise.all([resolveParam(param), getCurrentUser()]);
   if (!resolved) {
     notFound();
   }
@@ -128,19 +134,44 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
   }
   const id = resolved.id;
 
-  const currentUser = await getCurrentUser();
-
   const result = await getListingAndRegisterView(id, currentUser?.id ?? null);
   if (!result) {
     notFound();
   }
   const { listing, views } = result;
 
-  const ratingAgg = await prisma.review.aggregate({
-    where: { sellerId: listing.user.id },
-    _avg: { rating: true },
-    _count: true,
-  });
+  // "Más de este vendedor" y "Figuras similares" (misma categoría) para que el
+  // comprador siga explorando en vez de salir de la página. Todas estas
+  // consultas son independientes: van juntas (antes iban una tras otra).
+  const RELATED_LIMIT = 4;
+  const [ratingAgg, sellerListings, similarCandidates, trustedSellerIds, favorite] =
+    await Promise.all([
+      prisma.review.aggregate({
+        where: { sellerId: listing.user.id },
+        _avg: { rating: true },
+        _count: true,
+      }),
+      prisma.listing.findMany({
+        where: { userId: listing.user.id, sold: false, id: { not: listing.id } },
+        include: cardInclude,
+        orderBy: { createdAt: "desc" },
+        take: RELATED_LIMIT,
+      }),
+      // Se piden de más para descartar las que ya salen en "Más de este vendedor".
+      prisma.listing.findMany({
+        where: { category: listing.category, sold: false, id: { not: listing.id } },
+        include: cardInclude,
+        orderBy: { createdAt: "desc" },
+        take: RELATED_LIMIT * 2,
+      }),
+      getTrustedSellerIds(),
+      currentUser
+        ? prisma.favorite.findUnique({
+            where: { userId_listingId: { userId: currentUser.id, listingId: listing.id } },
+            select: { id: true },
+          })
+        : Promise.resolve(null),
+    ]);
   const averageRating = ratingAgg._avg.rating ?? 0;
   const reviewCount = ratingAgg._count;
   const memberSince = listing.user.createdAt.toLocaleDateString("es-PE", {
@@ -148,35 +179,12 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
     year: "numeric",
   });
 
-  // "Más de este vendedor" y "Figuras similares" (misma categoría) para que el
-  // comprador siga explorando en vez de salir de la página.
-  const RELATED_LIMIT = 4;
-  const sellerListings = await prisma.listing.findMany({
-    where: { userId: listing.user.id, sold: false, id: { not: listing.id } },
-    include: cardInclude,
-    orderBy: { createdAt: "desc" },
-    take: RELATED_LIMIT,
-  });
-  const similarListings = await prisma.listing.findMany({
-    where: {
-      category: listing.category,
-      sold: false,
-      id: { notIn: [listing.id, ...sellerListings.map((l) => l.id)] },
-    },
-    include: cardInclude,
-    orderBy: { createdAt: "desc" },
-    take: RELATED_LIMIT,
-  });
-
-
-  const trustedSellerIds = await getTrustedSellerIds();
+  const sellerListingIds = new Set(sellerListings.map((l) => l.id));
+  const similarListings = similarCandidates
+    .filter((l) => !sellerListingIds.has(l.id))
+    .slice(0, RELATED_LIMIT);
   const sellerIsTrusted = trustedSellerIds.has(listing.user.id);
-
-  const isFavorited = currentUser
-    ? !!(await prisma.favorite.findUnique({
-        where: { userId_listingId: { userId: currentUser.id, listingId: listing.id } },
-      }))
-    : false;
+  const isFavorited = !!favorite;
 
   const activeDiscount = getActiveDiscountAmount(listing.discountAmount, listing.discountExpiresAt);
   const reservation = listing.sold
@@ -216,7 +224,7 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
   };
 
   return (
-    <div className="mx-auto max-w-5xl px-4 pb-28 pt-8 sm:pb-8">
+    <div className="mx-auto max-w-5xl scroll-mt-20 px-4 pb-28 pt-8 sm:pb-8">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

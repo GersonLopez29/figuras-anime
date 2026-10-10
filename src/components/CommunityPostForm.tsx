@@ -9,7 +9,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { UploadCloud, X } from "lucide-react";
-import { prepareImagesForUpload, uploadErrorMessage } from "@/lib/compressImage";
+import {
+  prepareImagesForUpload,
+  sendFormWithProgress,
+  uploadErrorMessage,
+} from "@/lib/compressImage";
 
 export default function CommunityPostForm() {
   const router = useRouter();
@@ -17,6 +21,7 @@ export default function CommunityPostForm() {
   const [files, setFiles] = useState<File[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState("Publicando...");
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -54,28 +59,30 @@ export default function CommunityPostForm() {
     const formData = new FormData();
     formData.set("caption", caption);
     // Las fotos se achican antes de enviarlas (límite de 4.5 MB de Vercel).
+    setStatus("Preparando fotos...");
     const uploadFiles = await prepareImagesForUpload(files);
     uploadFiles.forEach((file) => formData.append("images", file));
 
-    let res: Response;
+    let res;
     try {
-      res = await fetch("/api/community", { method: "POST", body: formData });
+      res = await sendFormWithProgress("/api/community", "POST", formData, (fraction) =>
+        setStatus(fraction >= 1 ? "Guardando..." : `Subiendo fotos... ${Math.round(fraction * 100)} %`)
+      );
     } catch {
       setLoading(false);
       setError("No se pudo conectar. Revisa tu conexión e intenta de nuevo.");
       return;
     }
-    setLoading(false);
 
     if (!res.ok) {
-      const data = await res.json().catch(() => ({}));
-      setError(uploadErrorMessage(res.status, data.error));
+      setLoading(false);
+      setError(uploadErrorMessage(res.status, res.data.error as string | undefined));
       return;
     }
 
-    const post = await res.json();
-    router.push(`/comunidad/${post.id}`);
-    router.refresh();
+    // Sigue desactivado hasta que se abra la publicación.
+    setStatus("¡Listo! Abriendo...");
+    router.push(`/comunidad/${res.data.id as string}`);
   }
 
   return (
@@ -169,7 +176,7 @@ export default function CommunityPostForm() {
         )}
 
         <Button type="submit" disabled={loading} size="lg" className="w-full rounded-full">
-          {loading ? "Publicando..." : "Publicar en la comunidad"}
+          {loading ? status : "Publicar en la comunidad"}
         </Button>
       </form>
     </Card>
