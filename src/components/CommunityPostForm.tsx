@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { UploadCloud, X } from "lucide-react";
+import { prepareImagesForUpload, uploadErrorMessage } from "@/lib/compressImage";
 
 export default function CommunityPostForm() {
   const router = useRouter();
@@ -52,14 +53,23 @@ export default function CommunityPostForm() {
 
     const formData = new FormData();
     formData.set("caption", caption);
-    files.forEach((file) => formData.append("images", file));
+    // Las fotos se achican antes de enviarlas (límite de 4.5 MB de Vercel).
+    const uploadFiles = await prepareImagesForUpload(files);
+    uploadFiles.forEach((file) => formData.append("images", file));
 
-    const res = await fetch("/api/community", { method: "POST", body: formData });
+    let res: Response;
+    try {
+      res = await fetch("/api/community", { method: "POST", body: formData });
+    } catch {
+      setLoading(false);
+      setError("No se pudo conectar. Revisa tu conexión e intenta de nuevo.");
+      return;
+    }
     setLoading(false);
 
     if (!res.ok) {
       const data = await res.json().catch(() => ({}));
-      setError(data.error ?? "Ocurrió un error, intenta de nuevo");
+      setError(uploadErrorMessage(res.status, data.error));
       return;
     }
 

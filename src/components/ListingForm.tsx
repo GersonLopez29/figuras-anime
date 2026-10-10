@@ -14,6 +14,7 @@ import {
   isOpenBoxCondition,
 } from "@/lib/condition";
 import { PHOTO_TYPE_HELP, type PhotoType } from "@/lib/photoType";
+import { prepareImagesForUpload, uploadErrorMessage } from "@/lib/compressImage";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -174,7 +175,10 @@ export default function ListingForm(props: ListingFormProps) {
     formData.set("isPreorder", String(isPreorder));
     formData.set("preorderArrival", isPreorder ? preorderArrival : "");
     formData.set("preorderDeposit", isPreorder ? preorderDeposit : "");
-    newFiles.forEach((file) => formData.append("images", file));
+    // Las fotos se achican antes de enviarlas (Vercel no acepta envíos de más
+    // de 4.5 MB y las fotos de celular pesan varios MB cada una).
+    const uploadFiles = await prepareImagesForUpload(newFiles);
+    uploadFiles.forEach((file) => formData.append("images", file));
     if (isEdit) {
       removedImageIds.forEach((id) => formData.append("removeImageIds", id));
     }
@@ -182,12 +186,19 @@ export default function ListingForm(props: ListingFormProps) {
     const url = isEdit ? `/api/listings/${props.listingId}` : "/api/listings";
     const method = isEdit ? "PATCH" : "POST";
 
-    const res = await fetch(url, { method, body: formData });
+    let res: Response;
+    try {
+      res = await fetch(url, { method, body: formData });
+    } catch {
+      setLoading(false);
+      setError("No se pudo conectar. Revisa tu conexión e intenta de nuevo.");
+      return;
+    }
     setLoading(false);
 
     if (!res.ok) {
       const data = await res.json().catch(() => ({}));
-      setError(data.error ?? "Ocurrió un error, intenta de nuevo");
+      setError(uploadErrorMessage(res.status, data.error));
       return;
     }
 
