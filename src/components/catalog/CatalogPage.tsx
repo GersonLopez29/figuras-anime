@@ -47,7 +47,8 @@ const BANNER_OFFERS_LIMIT = 3;
 const BANNER_LATEST_LIMIT = 4;
 const BANNER_SLIDES_LIMIT = 5;
 const RECENTLY_SOLD_LIMIT = 8;
-const STORE_ROW_LIMIT = 4;
+// 5 en pantallas grandes (5 columnas); en las demás se ocultan las que sobran.
+const STORE_ROW_LIMIT = 5;
 
 const PAGE_SIZE = 24;
 
@@ -447,32 +448,32 @@ export default async function CatalogPage({ searchParams, fixedCategory }: Catal
       {bienvenida && <WelcomeBanner name={bienvenida} />}
 
       {showHero && (
-        <section className="relative overflow-hidden bg-gradient-to-br from-orange-50 via-orange-50 to-red-50">
+        <section className="relative overflow-hidden bg-gradient-to-br from-orange-50 dark:from-orange-950/40 via-orange-50 dark:via-orange-950/30 to-amber-50 dark:to-amber-950/20">
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-orange-200/40 blur-3xl"
+            className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-orange-200/40 dark:bg-orange-500/10 blur-3xl"
           />
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute -bottom-24 left-1/3 h-64 w-64 rounded-full bg-red-200/30 blur-3xl"
+            className="pointer-events-none absolute -bottom-24 left-1/3 h-64 w-64 rounded-full bg-amber-200/30 dark:bg-amber-500/10 blur-3xl"
           />
-          <div className="relative mx-auto max-w-6xl px-4 py-8 sm:py-10">
+          <div className="relative mx-auto max-w-7xl px-4 py-8 sm:py-10">
             <div
               className={`grid items-center gap-10 ${
                 bannerSlides.length > 0 ? "lg:grid-cols-2" : ""
               }`}
             >
               <div className="text-center sm:text-left">
-                <p className="inline-block rounded-full bg-white/70 px-3 py-1 text-sm font-semibold uppercase tracking-wide text-red-600 shadow-sm ring-1 ring-red-100">
+                <p className="inline-block rounded-full bg-card/70 px-3 py-1 text-sm font-semibold uppercase tracking-wide text-orange-700 dark:text-orange-300 shadow-sm ring-1 ring-orange-200 dark:ring-orange-800">
                   ¡Coleccionar nunca fue tan fácil!
                 </p>
-                <h1 className="mt-3 max-w-2xl text-3xl font-extrabold tracking-tight text-zinc-900 sm:text-5xl">
+                <h1 className="mt-3 max-w-2xl text-3xl font-extrabold tracking-tight text-foreground sm:text-5xl">
                   Compra y vende{" "}
-                  <span className="bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">
+                  <span className="bg-gradient-to-r from-orange-600 to-amber-500 bg-clip-text text-transparent">
                     figuras de anime
                   </span>
                 </h1>
-                <p className="mt-4 max-w-xl text-sm text-zinc-600 sm:text-base">
+                <p className="mt-4 max-w-xl text-sm text-muted-foreground sm:text-base">
                   Naruto, Dragon Ball Z, One Piece y muchas más. Publica las figuras que ya
                   no usas o encuentra tu próxima pieza de colección, y coordina todo directo
                   por WhatsApp.
@@ -482,7 +483,7 @@ export default async function CatalogPage({ searchParams, fixedCategory }: Catal
                     render={<a href={sellCtaHref} />}
                     nativeButton={false}
                     size="lg"
-                    className="rounded-full bg-red-600 px-6 py-3 text-sm font-bold text-white shadow-md shadow-red-600/20 transition hover:-translate-y-0.5 hover:bg-red-700 hover:shadow-lg"
+                    className="rounded-full bg-primary px-6 py-3 text-sm font-bold text-primary-foreground shadow-md shadow-orange-600/20 transition hover:-translate-y-0.5 hover:bg-primary/90 hover:shadow-lg"
                   >
                     Empieza a vender
                   </Button>
@@ -491,19 +492,19 @@ export default async function CatalogPage({ searchParams, fixedCategory }: Catal
                     nativeButton={false}
                     variant="outline"
                     size="lg"
-                    className="rounded-full border-orange-300 bg-white px-6 py-3 text-sm font-bold text-orange-700 transition hover:-translate-y-0.5 hover:bg-orange-100"
+                    className="rounded-full border-orange-300 dark:border-orange-800 bg-card px-6 py-3 text-sm font-bold text-orange-700 dark:text-orange-300 transition hover:-translate-y-0.5 hover:bg-orange-100 dark:hover:bg-orange-900/40"
                   >
                     Explorar catálogo
                   </Button>
                 </div>
-                <ol className="mt-5 flex flex-wrap justify-center gap-x-4 gap-y-1.5 text-xs text-zinc-600 sm:text-sm lg:justify-start">
+                <ol className="mt-5 flex flex-wrap justify-center gap-x-4 gap-y-1.5 text-xs text-muted-foreground sm:text-sm lg:justify-start">
                   {[
                     { icon: "📸", text: "Publica con fotos" },
                     { icon: "💬", text: "Te escriben por WhatsApp" },
                     { icon: "🤝", text: "Coordinan entrega y pago" },
                   ].map((step, i) => (
                     <li key={step.text} className="flex items-center gap-1.5">
-                      <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white text-[10px] font-bold text-orange-700 ring-1 ring-orange-200">
+                      <span className="flex h-5 w-5 items-center justify-center rounded-full bg-card text-[10px] font-bold text-orange-700 dark:text-orange-300 ring-1 ring-orange-200 dark:ring-orange-800">
                         {i + 1}
                       </span>
                       <span aria-hidden="true">{step.icon}</span>
@@ -521,11 +522,11 @@ export default async function CatalogPage({ searchParams, fixedCategory }: Catal
 
 
       {showHero && storeListings.length > 0 && (
-        <section className="border-b border-zinc-200 bg-gradient-to-br from-orange-50/60 to-white">
-          <div className="mx-auto max-w-6xl px-4 py-8">
+        <section className="border-b border-border bg-gradient-to-br from-orange-50/60 dark:from-orange-950/40 to-card">
+          <div className="mx-auto max-w-7xl px-4 py-8">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
               <div>
-                <h2 className="text-lg font-bold text-zinc-900">✔ {OFFICIAL_STORE_NAME}</h2>
+                <h2 className="text-lg font-bold text-foreground">✔ {OFFICIAL_STORE_NAME}</h2>
                 <p className="text-sm text-muted-foreground">
                   Figuras vendidas directamente por nosotros.
                 </p>
@@ -539,9 +540,12 @@ export default async function CatalogPage({ searchParams, fixedCategory }: Catal
                 </Link>
               )}
             </div>
-            <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
-              {storeListings.map((listing) => (
-                <ListingCard key={listing.id} {...toCardProps(listing, trustedSellerIds)} />
+            <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4 xl:grid-cols-5">
+              {storeListings.map((listing, i) => (
+                // La 5ª solo cabe con 5 columnas: en pantallas más chicas se oculta.
+                <div key={listing.id} className={i >= 4 ? "hidden xl:block" : undefined}>
+                  <ListingCard {...toCardProps(listing, trustedSellerIds)} />
+                </div>
               ))}
             </div>
           </div>
@@ -549,13 +553,13 @@ export default async function CatalogPage({ searchParams, fixedCategory }: Catal
       )}
 
 
-      <div id="catalogo" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-6">
+      <div id="catalogo" className="mx-auto max-w-7xl scroll-mt-20 px-4 py-6">
         {showLandingHeader && (
           <div className="mb-6">
-            <h1 className="text-2xl font-extrabold tracking-tight text-zinc-900 sm:text-3xl">
+            <h1 className="text-2xl font-extrabold tracking-tight text-foreground sm:text-3xl">
               {landingH1(landing)}
             </h1>
-            <p className="mt-1.5 max-w-3xl text-sm text-zinc-600">
+            <p className="mt-1.5 max-w-3xl text-sm text-muted-foreground">
               {landingIntro(landing, {
                 count: availablePrices.length,
                 lowest: priceSummary?.lowest ?? null,
@@ -576,27 +580,30 @@ export default async function CatalogPage({ searchParams, fixedCategory }: Catal
         </div>
 
         {featuredListings.length > 0 && (
-          <section className="mt-6 rounded-2xl bg-amber-50/70 p-4 ring-1 ring-amber-200">
+          <section className="mt-6 rounded-2xl bg-amber-50/70 dark:bg-amber-950/40 p-4 ring-1 ring-amber-200 dark:ring-amber-800">
             <div className="flex items-baseline justify-between gap-2">
-              <h2 className="flex items-center gap-2 text-lg font-bold text-zinc-900">
+              <h2 className="flex items-center gap-2 text-lg font-bold text-foreground">
                 <span aria-hidden="true">⭐</span> Destacadas
               </h2>
               {user && (
-                <Link href="/mis-figuras" className="text-xs font-medium text-amber-800 hover:underline">
+                <Link href="/mis-figuras" className="text-xs font-medium text-amber-800 dark:text-amber-300 hover:underline">
                   Destaca la tuya
                 </Link>
               )}
             </div>
-            <div className="mt-3 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-              {featuredListings.map((listing) => (
-                <ListingCard key={listing.id} {...toCardProps(listing, trustedSellerIds)} />
+            <div className="mt-3 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+              {featuredListings.map((listing, i) => (
+                // La 5ª solo cabe con 5 columnas: en pantallas más chicas se oculta.
+                <div key={listing.id} className={i >= 4 ? "hidden xl:block" : undefined}>
+                  <ListingCard {...toCardProps(listing, trustedSellerIds)} />
+                </div>
               ))}
             </div>
           </section>
         )}
 
         <div className="mt-6 flex flex-wrap items-baseline justify-between gap-2">
-          <h2 className="flex items-center gap-2 text-lg font-bold text-zinc-900">
+          <h2 className="flex items-center gap-2 text-lg font-bold text-foreground">
             <span aria-hidden="true">🔥</span>
             {heading}
           </h2>
@@ -607,7 +614,7 @@ export default async function CatalogPage({ searchParams, fixedCategory }: Catal
 
         {listings.length === 0 ? (
           <div className="mt-16 text-center">
-            <p className="text-sm text-zinc-400">No hay figuras publicadas todavía con ese criterio.</p>
+            <p className="text-sm text-muted-foreground/70">No hay figuras publicadas todavía con ese criterio.</p>
             {hasFilters && (
               <Link href="/#catalogo" className="mt-3 inline-block text-sm font-medium text-primary hover:underline">
                 Quitar filtros
@@ -615,7 +622,7 @@ export default async function CatalogPage({ searchParams, fixedCategory }: Catal
             )}
           </div>
         ) : (
-          <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+          <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
             {listings.map((listing) => (
               <ListingCard
                 key={listing.id}
@@ -629,15 +636,15 @@ export default async function CatalogPage({ searchParams, fixedCategory }: Catal
         <Pagination page={page} totalPages={totalPages} state={catalogState} />
 
         {showHero && (
-          <div className="mt-10 flex flex-col items-start gap-3 rounded-2xl bg-white p-5 ring-1 ring-zinc-200 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-sm text-zinc-700">
+          <div className="mt-10 flex flex-col items-start gap-3 rounded-2xl bg-card p-5 ring-1 ring-border sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-sm text-foreground/80">
               <span aria-hidden="true">📦</span>{" "}
               <strong>¿Tienes figuras que ya no usas y no tienes tiempo de venderlas?</strong>{" "}
               Nosotros las vendemos por ti.
             </p>
             <Link
               href="/te-la-vendemos"
-              className="shrink-0 rounded-full border border-orange-300 px-4 py-2 text-sm font-semibold text-orange-700 transition hover:bg-orange-50"
+              className="shrink-0 rounded-full border border-orange-300 dark:border-orange-800 px-4 py-2 text-sm font-semibold text-orange-700 dark:text-orange-300 transition hover:bg-orange-50 dark:hover:bg-orange-950/40"
             >
               Te la vendemos →
             </Link>
@@ -645,11 +652,11 @@ export default async function CatalogPage({ searchParams, fixedCategory }: Catal
         )}
 
         {q && page === totalPages && (
-          <div className="mx-auto mt-10 max-w-xl rounded-2xl bg-orange-50/70 p-5 ring-1 ring-orange-200">
-            <p className="font-semibold text-zinc-900">
+          <div className="mx-auto mt-10 max-w-xl rounded-2xl bg-orange-50/70 dark:bg-orange-950/40 p-5 ring-1 ring-orange-200 dark:ring-orange-800">
+            <p className="font-semibold text-foreground">
               🔔 {listings.length === 0 ? "¿No está lo que buscas?" : "¿No encontraste la que querías?"}
             </p>
-            <p className="mt-1 text-sm text-zinc-600">
+            <p className="mt-1 text-sm text-muted-foreground">
               Te avisamos por correo cuando alguien publique <strong>{q}</strong>.
             </p>
             <div className="mt-3">

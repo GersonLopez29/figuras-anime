@@ -46,7 +46,7 @@ export default async function AdminDestacadosPage() {
         </Card>
         <Card className="min-w-40 flex-1 p-4">
           <p className="text-xs text-muted-foreground">Cobrado este mes</p>
-          <p className="text-2xl font-bold text-green-700">
+          <p className="text-2xl font-bold text-green-700 dark:text-green-300">
             {formatPrice(earnedThisMonth._sum.amount ?? 0)}
           </p>
         </Card>
@@ -85,7 +85,7 @@ export default async function AdminDestacadosPage() {
                     )}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs font-medium text-green-700 underline"
+                    className="text-xs font-medium text-green-700 dark:text-green-300 underline"
                   >
                     Escribirle por WhatsApp
                   </a>

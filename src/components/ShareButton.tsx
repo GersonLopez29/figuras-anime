@@ -35,7 +35,7 @@ export default function ShareButton({ title, text, url }: ShareButtonProps) {
       type="button"
       onClick={handleClick}
       aria-label="Compartir esta figura"
-      className="flex h-10 w-10 items-center justify-center rounded-full border border-zinc-200 bg-white transition hover:border-primary/40"
+      className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-card transition hover:border-primary/40"
     >
       {copied ? (
         <Check className="h-4 w-4 text-green-600" />

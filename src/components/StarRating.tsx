@@ -18,7 +18,7 @@ export default function StarRating({ rating, reviewCount, size = "sm", label = "
         ))}
       </div>
       {reviewCount !== undefined && (
-        <span className="text-xs text-zinc-500">
+        <span className="text-xs text-muted-foreground">
           {reviewCount > 0
             ? `${rating.toFixed(1)} (${reviewCount} ${reviewCount === 1 ? label : plural})`
             : `Sin ${plural} todavía`}

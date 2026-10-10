@@ -94,8 +94,8 @@ export default async function ComunidadDetailPage({ params }: ComunidadDetailPag
 
         <Card className="p-5 shadow-sm sm:p-6">
           <div className="flex items-center gap-3">
-            <Avatar size="lg" className="ring-1 ring-fuchsia-100">
-              <AvatarFallback className="bg-gradient-to-br from-fuchsia-100 to-orange-50 font-bold text-fuchsia-700">
+            <Avatar size="lg" className="ring-1 ring-orange-100 dark:ring-orange-800">
+              <AvatarFallback className="bg-gradient-to-br from-orange-100 dark:from-orange-900/40 to-amber-50 dark:to-amber-950/20 font-bold text-orange-700">
                 {post.author.name.slice(0, 1).toUpperCase()}
               </AvatarFallback>
             </Avatar>

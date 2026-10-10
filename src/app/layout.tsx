@@ -16,6 +16,11 @@ import { SOCIAL_LINKS } from "@/lib/social";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://gerstore.club";
 
+// Modo oscuro: se aplica antes de pintar la página (sin destello blanco).
+// Usa lo que la persona eligió con el botón ☀️/🌙; si nunca eligió, sigue la
+// configuración de su celular o computadora.
+const themeScript = `(function(){try{var t=localStorage.getItem("theme");var d=t?t==="dark":window.matchMedia("(prefers-color-scheme: dark)").matches;if(d)document.documentElement.classList.add("dark");}catch(e){}})();`;
+
 // Le dice a Google cuáles son las redes oficiales de la tienda.
 const organizationJsonLd = {
   "@context": "https://schema.org",
@@ -55,9 +60,14 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="es"
+      // El script de abajo agrega la clase "dark" antes de que React cargue.
+      suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col bg-zinc-50 text-zinc-900">
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
+      <body className="flex min-h-full flex-col bg-zinc-50 text-foreground dark:bg-background">
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}

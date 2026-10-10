@@ -16,7 +16,7 @@ export default function ListingGallery({ images, title, imageFit = "cover" }: Li
 
   return (
     <div>
-      <div className="relative aspect-square w-full overflow-hidden rounded-xl border border-zinc-200 bg-zinc-100 shadow-sm">
+      <div className="relative aspect-square w-full overflow-hidden rounded-xl border border-border bg-muted shadow-sm">
         {active ? (
           <Image
             src={active.url}
@@ -28,14 +28,15 @@ export default function ListingGallery({ images, title, imageFit = "cover" }: Li
             fetchPriority="high"
           />
         ) : (
-          <div className="flex h-full items-center justify-center text-sm text-zinc-400">
+          <div className="flex h-full items-center justify-center text-sm text-muted-foreground/70">
             Sin imagen
           </div>
         )}
       </div>
 
+      {/* 6 columnas = máximo de fotos: todas las miniaturas en una sola fila. */}
       {images.length > 1 && (
-        <div className="mt-3 grid grid-cols-5 gap-2">
+        <div className="mt-3 grid grid-cols-6 gap-2">
           {images.map((img, index) => (
             <button
               key={img.id}
@@ -45,10 +46,10 @@ export default function ListingGallery({ images, title, imageFit = "cover" }: Li
               className={`relative aspect-square overflow-hidden rounded-lg border-2 bg-zinc-100 transition ${
                 index === activeIndex
                   ? "border-orange-600 shadow-sm"
-                  : "border-transparent opacity-80 hover:border-zinc-300 hover:opacity-100"
+                  : "border-transparent opacity-80 hover:border-input hover:opacity-100"
               }`}
             >
-              <Image src={img.url} alt="" fill className={fitClass} sizes="(min-width: 640px) 100px, 20vw" />
+              <Image src={img.url} alt="" fill className={fitClass} sizes="(min-width: 640px) 80px, 16vw" />
             </button>
           ))}
         </div>

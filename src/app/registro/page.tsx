@@ -45,14 +45,14 @@ export default function RegistroPage() {
     <div className="relative isolate overflow-hidden">
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-br from-orange-50 via-white to-red-50"
+        className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-br from-orange-50 dark:from-orange-950/40 via-white to-red-50 dark:to-red-950/20"
       />
       <div className="mx-auto flex min-h-[calc(100dvh-4rem)] max-w-md flex-col items-center justify-center px-4 py-12">
         <Link href="/" className="flex items-center gap-2 text-2xl font-extrabold">
           <span aria-hidden="true" className="text-3xl">
             🎌
           </span>
-          <span className="bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">
+          <span className="bg-gradient-to-r from-orange-600 to-amber-500 bg-clip-text text-transparent">
             FigurasAnime
           </span>
         </Link>

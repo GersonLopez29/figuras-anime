@@ -98,7 +98,7 @@ export default async function SeBuscaPage() {
                         <h3 className="font-semibold text-foreground">{post.title}</h3>
                         <div className="flex flex-wrap gap-1.5">
                           {post.maxPrice !== null && (
-                            <Badge variant="outline" className="border-green-200 bg-green-50 text-green-800">
+                            <Badge variant="outline" className="border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950/40 text-green-800 dark:text-green-300">
                               Hasta {formatPrice(post.maxPrice)}
                             </Badge>
                           )}

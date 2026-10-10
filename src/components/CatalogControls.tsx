@@ -72,7 +72,7 @@ export default function CatalogControls({
         value={state.orden ?? "recientes"}
         onValueChange={(v) => v && go({ ...state, orden: v as CatalogOrder })}
       >
-        <SelectTrigger aria-label="Ordenar por" className="h-9 rounded-full bg-white px-3">
+        <SelectTrigger aria-label="Ordenar por" className="h-9 rounded-full bg-card px-3">
           <SelectValue>
             {(v: string) => `↕️ ${ORDER_OPTIONS.find((o) => o.value === v)?.label ?? "Ordenar"}`}
           </SelectValue>
@@ -92,7 +92,7 @@ export default function CatalogControls({
           v && go({ ...state, linea: v === ALL_LINES ? undefined : (v as ProductLineSlug) })
         }
       >
-        <SelectTrigger aria-label="Línea o marca" className="h-9 rounded-full bg-white px-3">
+        <SelectTrigger aria-label="Línea o marca" className="h-9 rounded-full bg-card px-3">
           <SelectValue>
             {(v: string) =>
               v === ALL_LINES
@@ -117,7 +117,7 @@ export default function CatalogControls({
           v && go({ ...state, zona: v === ALL_ZONES ? undefined : (v as DeliveryZone) })
         }
       >
-        <SelectTrigger aria-label="Zona de entrega" className="h-9 rounded-full bg-white px-3">
+        <SelectTrigger aria-label="Zona de entrega" className="h-9 rounded-full bg-card px-3">
           <SelectValue>
             {(v: string) =>
               v === ALL_ZONES
@@ -144,7 +144,7 @@ export default function CatalogControls({
           value={currentPriceKey}
           onValueChange={(v) => v && go({ ...state, min: undefined, max: undefined, ...parsePriceKey(v) })}
         >
-          <SelectTrigger aria-label="Rango de precio" className="h-9 rounded-full bg-white px-3">
+          <SelectTrigger aria-label="Rango de precio" className="h-9 rounded-full bg-card px-3">
             <SelectValue>
               {(v: string) =>
                 v === ALL_PRICES

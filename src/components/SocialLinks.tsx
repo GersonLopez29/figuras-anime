@@ -14,7 +14,7 @@ const HOVER: Record<SocialNetwork, string> = {
 
 const ICON_COLOR: Record<SocialNetwork, string> = {
   facebook: "text-[#1877F2]",
-  tiktok: "text-zinc-900",
+  tiktok: "text-foreground",
 };
 
 export function SocialIcon({ network, className = "h-4 w-4" }: { network: SocialNetwork; className?: string }) {
@@ -36,7 +36,7 @@ export default function SocialLinks({ showHandle = false }: { showHandle?: boole
             target="_blank"
             rel="noopener noreferrer"
             aria-label={`FigurasAnime en ${s.name}`}
-            className={`group inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-white px-3.5 py-1.5 text-sm font-medium text-zinc-700 transition ${HOVER[s.network]}`}
+            className={`group inline-flex items-center gap-2 rounded-full border border-border bg-card px-3.5 py-1.5 text-sm font-medium text-foreground/80 transition ${HOVER[s.network]}`}
           >
             <span className={`${ICON_COLOR[s.network]} transition group-hover:text-white`}>
               <SocialIcon network={s.network} />

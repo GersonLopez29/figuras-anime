@@ -45,7 +45,7 @@ export default function StockAlertForm({
 
   if (done) {
     return (
-      <div className="rounded-lg bg-green-50 p-3 text-sm text-green-900 ring-1 ring-green-200" role="status">
+      <div className="rounded-lg bg-green-50 dark:bg-green-950/40 p-3 text-sm text-green-900 dark:text-green-300 ring-1 ring-green-200 dark:ring-green-800" role="status">
         {done.confirmed ? (
           <>
             ✅ ¡Listo! Te escribiremos a <strong>{email}</strong> cuando publiquen{" "}

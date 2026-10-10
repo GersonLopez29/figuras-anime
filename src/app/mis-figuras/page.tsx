@@ -119,14 +119,14 @@ export default async function MisFigurasPage({ searchParams }: MisFigurasPagePro
           </div>
           <Link
             href="/invitar"
-            className="rounded-lg bg-green-50 p-4 text-sm ring-1 ring-green-200 transition hover:bg-green-100/70"
+            className="rounded-lg bg-green-50 dark:bg-green-950/40 p-4 text-sm ring-1 ring-green-200 dark:ring-green-800 transition hover:bg-green-100/70 dark:hover:bg-green-900/40"
           >
-            <p className="font-semibold text-green-900">
+            <p className="font-semibold text-green-900 dark:text-green-300">
               🎁 {credits > 0
                 ? `Tienes ${credits} ${credits === 1 ? "destacado gratis" : "destacados gratis"}`
                 : "Gana destacados gratis"}
             </p>
-            <p className="mt-1 text-green-800">
+            <p className="mt-1 text-green-800 dark:text-green-300">
               {credits > 0
                 ? "Úsalo con el botón ⭐ Destacar de cualquier figura. Invita a más amigos para ganar otro →"
                 : "Invita a un amigo a vender: cuando publique su primera figura, ganas 7 días de destacado →"}
@@ -136,8 +136,8 @@ export default async function MisFigurasPage({ searchParams }: MisFigurasPagePro
       )}
 
       {missingPhotoTypeCount > 0 && (
-        <Alert className="mt-6 border-sky-200 bg-sky-50">
-          <AlertDescription className="text-sky-900">
+        <Alert className="mt-6 border-sky-200 dark:border-sky-800 bg-sky-50 dark:bg-sky-950/40">
+          <AlertDescription className="text-sky-900 dark:text-sky-300">
             📷 {missingPhotoTypeCount === 1 ? "1 figura no indica" : `${missingPhotoTypeCount} figuras no indican`}{" "}
             si sus fotos son reales o referenciales. Las que tienen <strong>Foto real</strong> muestran
             una etiqueta en el catálogo y generan más confianza. Toca <strong>Editar</strong> para
@@ -147,8 +147,8 @@ export default async function MisFigurasPage({ searchParams }: MisFigurasPagePro
       )}
 
       {missingZoneCount > 0 && (
-        <Alert className="mt-6 border-amber-200 bg-amber-50">
-          <AlertDescription className="text-amber-900">
+        <Alert className="mt-6 border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/40">
+          <AlertDescription className="text-amber-900 dark:text-amber-300">
             📍 {missingZoneCount === 1 ? "1 figura no tiene" : `${missingZoneCount} figuras no tienen`}{" "}
             zona de entrega. Los compradores ahora filtran por zona, así que esas figuras no
             aparecen en esos resultados. Toca <strong>Agregar zona</strong> para completarla.
@@ -214,7 +214,7 @@ export default async function MisFigurasPage({ searchParams }: MisFigurasPagePro
                     {!listing.sold && listing.deliveryZones.length === 0 && (
                       <Badge
                         variant="outline"
-                        className="shrink-0 border-amber-300 bg-amber-50 text-amber-800"
+                        className="shrink-0 border-amber-300 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300"
                         render={<Link href={`/mis-figuras/${listing.id}/editar`} />}
                       >
                         📍 Agregar zona
@@ -225,7 +225,7 @@ export default async function MisFigurasPage({ searchParams }: MisFigurasPagePro
                     {activeDiscount ? (
                       <>
                         <span className="mr-1.5 line-through">{formatPrice(listing.price)}</span>
-                        <span className="font-semibold text-green-700">
+                        <span className="font-semibold text-green-700 dark:text-green-300">
                           {formatPrice(getFinalPrice(listing.price, activeDiscount))}
                         </span>
                       </>

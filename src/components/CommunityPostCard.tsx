@@ -42,7 +42,7 @@ export default function CommunityPostCard({
           )}
           <Badge
             variant="secondary"
-            className="absolute right-2 bottom-2 gap-1 bg-white/90 shadow-sm backdrop-blur"
+            className="absolute right-2 bottom-2 gap-1 bg-card/90 shadow-sm backdrop-blur"
           >
             💬 {commentCount}
           </Badge>

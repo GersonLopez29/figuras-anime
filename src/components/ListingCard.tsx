@@ -87,7 +87,10 @@ export default function ListingCard({
   ].filter(Boolean) as string[];
 
   return (
-    <Link href={listingPath({ id, slug: slug ?? null })} className="group block h-full transition hover:-translate-y-1">
+    <Link
+      href={listingPath({ id, slug: slug ?? null })}
+      className="reveal group block h-full transition duration-300 ease-out hover:-translate-y-1"
+    >
       <Card
         className={`h-full gap-0 overflow-hidden py-0 ring-1 transition group-hover:shadow-xl ${
           featured
@@ -101,8 +104,8 @@ export default function ListingCard({
               src={imageUrl}
               alt={title}
               fill
-              className={`object-cover transition duration-300 group-hover:scale-105 ${sold ? "grayscale" : ""}`}
-              sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
+              className={`object-cover transition duration-500 ease-out group-hover:scale-105 ${sold ? "grayscale" : ""}`}
+              sizes="(min-width: 1280px) 240px, (min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
             />
           ) : (
             <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
@@ -131,7 +134,7 @@ export default function ListingCard({
           )}
         </div>
         <CardContent className="flex flex-1 flex-col p-3">
-          <p className="truncate text-[11px] font-semibold uppercase tracking-wide text-orange-700">
+          <p className="truncate text-[11px] font-semibold uppercase tracking-wide text-orange-700 dark:text-orange-300">
             {category}
           </p>
           <h3 className="mt-0.5 line-clamp-2 min-h-[2.5rem] text-sm font-medium leading-5 text-foreground">
@@ -161,7 +164,7 @@ export default function ListingCard({
           <div aria-hidden="true" className="min-h-2 flex-1" />
           <div className="flex items-center justify-between gap-2 border-t border-border pt-1.5">
             {officialStore ? (
-              <p className="truncate text-xs font-semibold text-orange-700">✔ {OFFICIAL_STORE_NAME}</p>
+              <p className="truncate text-xs font-semibold text-orange-700 dark:text-orange-300">✔ {OFFICIAL_STORE_NAME}</p>
             ) : (
               sellerName && (
                 <p className="truncate text-xs text-muted-foreground">

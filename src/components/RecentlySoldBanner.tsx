@@ -15,9 +15,9 @@ export default function RecentlySoldBanner({ items }: { items: SoldItem[] }) {
   if (items.length === 0) return null;
 
   return (
-    <div className="border-b border-zinc-200 bg-zinc-50">
-      <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-2.5">
-        <span className="flex shrink-0 items-center gap-1.5 text-xs font-bold text-zinc-600">
+    <div className="border-b border-border bg-muted/40">
+      <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-2.5">
+        <span className="flex shrink-0 items-center gap-1.5 text-xs font-bold text-muted-foreground">
           <span className="relative flex h-2 w-2">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-500 opacity-75" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-green-600" />
@@ -29,7 +29,7 @@ export default function RecentlySoldBanner({ items }: { items: SoldItem[] }) {
             <Link
               key={item.id}
               href={listingPath(item)}
-              className="flex shrink-0 items-center gap-2 rounded-full bg-white py-1 pr-3 pl-1 text-xs shadow-sm ring-1 ring-zinc-200 transition hover:-translate-y-0.5 hover:shadow-md"
+              className="flex shrink-0 items-center gap-2 rounded-full bg-card py-1 pr-3 pl-1 text-xs shadow-sm ring-1 ring-border transition hover:-translate-y-0.5 hover:shadow-md"
             >
               {item.imageUrl && (
                 <Image
@@ -40,10 +40,10 @@ export default function RecentlySoldBanner({ items }: { items: SoldItem[] }) {
                   className="h-6 w-6 shrink-0 rounded-full object-cover"
                 />
               )}
-              <span className="max-w-[9rem] truncate font-medium text-zinc-800">
+              <span className="max-w-[9rem] truncate font-medium text-foreground">
                 {item.title}
               </span>
-              <span className="shrink-0 font-bold text-green-700">
+              <span className="shrink-0 font-bold text-green-700 dark:text-green-300">
                 {formatPrice(item.price)}
               </span>
             </Link>

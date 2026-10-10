@@ -50,7 +50,7 @@ function DeleteCategoryButton({
           <Button
             variant="outline"
             size="sm"
-            className="rounded-full border-red-200 text-destructive hover:bg-red-50"
+            className="rounded-full border-red-200 dark:border-red-800 text-destructive hover:bg-red-50 dark:hover:bg-red-950/40"
           />
         }
       >

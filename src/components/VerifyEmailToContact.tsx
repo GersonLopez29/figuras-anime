@@ -14,8 +14,8 @@ export default function VerifyEmailToContact() {
   }
 
   return (
-    <Alert className="mt-6 border-amber-200 bg-amber-50 text-center">
-      <AlertDescription className="justify-center text-center text-amber-800">
+    <Alert className="mt-6 border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/40 text-center">
+      <AlertDescription className="justify-center text-center text-amber-800 dark:text-amber-300">
         {status === "sent"
           ? "✓ Te reenviamos el correo de verificación, revisa tu bandeja."
           : "Debes verificar tu correo para contactar al vendedor."}

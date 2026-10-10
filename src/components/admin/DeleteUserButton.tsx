@@ -61,7 +61,7 @@ export default function DeleteUserButton({
   return (
     <AlertDialog open={open} onOpenChange={(next) => (next ? setOpen(true) : closeModal())}>
       <AlertDialogTrigger
-        render={<Button variant="outline" size="sm" className="rounded-full border-red-200 text-destructive hover:bg-red-50" />}
+        render={<Button variant="outline" size="sm" className="rounded-full border-red-200 dark:border-red-800 text-destructive hover:bg-red-50 dark:hover:bg-red-950/40" />}
       >
         Eliminar
       </AlertDialogTrigger>

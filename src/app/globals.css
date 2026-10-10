@@ -153,19 +153,20 @@ body {
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
+  color-scheme: dark;
+  --background: oklch(0.16 0.006 56);
+  --foreground: oklch(0.975 0.004 56);
+  --card: oklch(0.205 0.008 56);
   --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.215 0.008 56);
+  --popover-foreground: oklch(0.975 0.004 56);
   --primary: oklch(70.5% 0.213 47.604);
   --primary-foreground: oklch(0.145 0 0);
-  --secondary: oklch(0.269 0 0);
+  --secondary: oklch(0.27 0.01 56);
   --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
+  --muted: oklch(0.26 0.01 56);
+  --muted-foreground: oklch(0.72 0.012 56);
+  --accent: oklch(0.27 0.01 56);
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
@@ -214,4 +215,30 @@ body {
 }
 html[data-sticky-bar] .suggestion-fab {
   bottom: 6rem;
+}
+
+/* Animaciones suaves. Las tarjetas aparecen con un leve desvanecido al entrar
+   en pantalla (solo CSS, en navegadores que lo soportan). Se anima "scale" y
+   no "translate" para no chocar con el efecto de elevación al pasar el mouse. */
+@keyframes reveal-in {
+  from {
+    opacity: 0;
+    scale: 0.96;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+  @supports (animation-timeline: view()) {
+    .reveal {
+      animation: reveal-in linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 30%;
+    }
+  }
 }

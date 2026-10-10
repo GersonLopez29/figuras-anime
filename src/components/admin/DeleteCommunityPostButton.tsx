@@ -34,7 +34,7 @@ export default function DeleteCommunityPostButton({ postId }: { postId: string }
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger
-        render={<Button variant="outline" size="sm" className="shrink-0 rounded-full border-red-200 text-destructive hover:bg-red-50" />}
+        render={<Button variant="outline" size="sm" className="shrink-0 rounded-full border-red-200 dark:border-red-800 text-destructive hover:bg-red-50 dark:hover:bg-red-950/40" />}
       >
         Eliminar
       </AlertDialogTrigger>

@@ -42,7 +42,7 @@ export default async function TeLaVendemosPage() {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-10">
-      <p className="inline-block rounded-full bg-orange-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-orange-700 ring-1 ring-orange-100">
+      <p className="inline-block rounded-full bg-orange-50 dark:bg-orange-950/40 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-orange-700 dark:text-orange-300 ring-1 ring-orange-100 dark:ring-orange-800">
         📦 Venta por consignación
       </p>
       <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-foreground">
@@ -56,7 +56,7 @@ export default async function TeLaVendemosPage() {
       <div className="mt-8 grid gap-3 sm:grid-cols-2">
         {STEPS.map((step, i) => (
           <Card key={step.title} className="flex-row items-start gap-4 p-4">
-            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-orange-100 to-red-50 text-xl ring-1 ring-orange-100">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-orange-100 dark:from-orange-900/40 to-red-50 dark:to-red-950/20 text-xl ring-1 ring-orange-100 dark:ring-orange-800">
               {step.icon}
             </span>
             <div>

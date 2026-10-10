@@ -49,9 +49,9 @@ export default async function MensajesPage() {
                   unread ? "bg-primary/5" : ""
                 }`}
               >
-                <Avatar className="h-11 w-11 shrink-0 ring-1 ring-orange-100">
+                <Avatar className="h-11 w-11 shrink-0 ring-1 ring-orange-100 dark:ring-orange-800">
                   {c.listing.images[0] && <AvatarImage src={c.listing.images[0].url} alt="" />}
-                  <AvatarFallback className="bg-gradient-to-br from-orange-100 to-red-50 font-bold text-orange-700">
+                  <AvatarFallback className="bg-gradient-to-br from-orange-100 dark:from-orange-900/40 to-red-50 dark:to-red-950/20 font-bold text-orange-700">
                     {otherUser.name.slice(0, 1).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>

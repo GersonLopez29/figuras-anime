@@ -35,8 +35,8 @@ export default function ConsignmentForm({ whatsapp }: { whatsapp: string }) {
 
   if (sent) {
     return (
-      <Alert className="border-green-200 bg-green-50">
-        <AlertDescription className="text-green-800">
+      <Alert className="border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950/40">
+        <AlertDescription className="text-green-800 dark:text-green-300">
           ✓ ¡Listo! Recibimos tu solicitud. Te escribiremos al WhatsApp {whatsapp} para coordinar.
           <button
             type="button"
@@ -46,7 +46,7 @@ export default function ConsignmentForm({ whatsapp }: { whatsapp: string }) {
               setDetails("");
               setExpectedPrice("");
             }}
-            className="mt-2 block font-medium text-green-900 underline"
+            className="mt-2 block font-medium text-green-900 dark:text-green-300 underline"
           >
             Enviar otra figura
           </button>

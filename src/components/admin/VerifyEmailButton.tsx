@@ -39,7 +39,7 @@ export default function VerifyEmailButton({
       size="sm"
       onClick={toggle}
       disabled={loading}
-      className="rounded-full border-orange-200 text-orange-700 hover:bg-orange-50"
+      className="rounded-full border-orange-200 dark:border-orange-800 text-orange-700 dark:text-orange-300 hover:bg-orange-50 dark:hover:bg-orange-950/40"
     >
       {loading ? "Guardando..." : "Verificar correo"}
     </Button>
