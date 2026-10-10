@@ -33,7 +33,7 @@ export default function BannerCarousel({ slides }: { slides: BannerSlide[] }) {
 
   return (
     <div
-      className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl shadow-lg ring-1 ring-black/5 sm:aspect-[16/11]"
+      className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl bg-zinc-800 shadow-lg ring-1 ring-black/5 sm:aspect-[16/11]"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
@@ -52,6 +52,12 @@ export default function BannerCarousel({ slides }: { slides: BannerSlide[] }) {
               index === active ? "opacity-100" : "pointer-events-none opacity-0"
             }`}
           >
+            {/* Fondo animado debajo de la foto: se ve mientras la foto carga
+                (en vez de un recuadro vacío) y la foto lo tapa al llegar. */}
+            <div
+              aria-hidden="true"
+              className="absolute inset-0 animate-pulse bg-gradient-to-br from-zinc-700 via-zinc-800 to-orange-950"
+            />
             <Image
               src={slide.imageUrl}
               alt={slide.title}

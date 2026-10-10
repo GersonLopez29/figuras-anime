@@ -206,3 +206,12 @@ body {
     display: none;
   }
 }
+
+/* Con la barra fija de contacto (celular) visible, el botón de sugerencias
+   sube para no taparla. */
+.suggestion-fab {
+  transition: bottom 0.3s ease, opacity 0.15s ease;
+}
+html[data-sticky-bar] .suggestion-fab {
+  bottom: 6rem;
+}

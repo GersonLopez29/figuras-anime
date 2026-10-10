@@ -30,6 +30,26 @@ export default async function Navbar() {
           <span className="logo-shine">FigurasAnime</span>
         </Link>
 
+        {/* Buscador siempre a mano en pantallas grandes (en las chicas está
+            arriba del catálogo). */}
+        <form action="/" method="get" role="search" className="hidden max-w-sm flex-1 xl:flex">
+          <label htmlFor="nav-search" className="sr-only">
+            Buscar figuras
+          </label>
+          <div className="relative w-full">
+            <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-sm text-zinc-400">
+              🔍
+            </span>
+            <input
+              id="nav-search"
+              type="search"
+              name="q"
+              placeholder="Buscar figuras (ej: Goku, Naruto...)"
+              className="w-full rounded-full border border-zinc-300 bg-zinc-50 py-2 pl-10 pr-4 text-sm transition focus:border-orange-500 focus:bg-white focus:outline-none"
+            />
+          </div>
+        </form>
+
         <nav className="hidden items-center gap-5 md:flex">
           <Badge
             render={<Link href="/comunidad" />}

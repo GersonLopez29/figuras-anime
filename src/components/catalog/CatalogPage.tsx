@@ -42,7 +42,6 @@ import {
   type LandingInput,
 } from "@/lib/catalogSeo";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 
 const BANNER_OFFERS_LIMIT = 3;
 const BANNER_LATEST_LIMIT = 4;
@@ -233,26 +232,6 @@ export default async function CatalogPage({ searchParams, fixedCategory }: Catal
       : {}),
   };
 
-  // El sistema detecta la figura disponible más barata y la más cara y arma
-  // los rangos de precio automáticamente; el comprador solo elige uno.
-  const availablePrices = await prisma.listing.findMany({
-    where: { ...whereWithoutPrice, sold: false },
-    select: { price: true },
-    orderBy: { price: "asc" },
-  });
-  const priceSummary = computePriceSummary(availablePrices.map((l) => l.price));
-
-  // Búsqueda anónima para el reporte "Demanda" del admin (solo la primera
-  // página, sin contar al admin ni a los bots). El user-agent se lee antes:
-  // dentro de after() no se puede usar headers().
-  if (q && (!pagina || pagina === "1") && !isAdmin(user)) {
-    const userAgent = (await headers()).get("user-agent");
-    if (!isBotUserAgent(userAgent)) {
-      const hadResults = availablePrices.length > 0;
-      after(() => recordSearch(q, hadResults));
-    }
-  }
-
   const landing: LandingInput = { categoria: category, zona, linea };
   const showLandingHeader = isLandingPage(landing) && !q;
 
@@ -268,20 +247,107 @@ export default async function CatalogPage({ searchParams, fixedCategory }: Catal
     { createdAt: "desc" as const },
   ];
 
-  const totalCount = await prisma.listing.count({ where });
-  const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
+  const hasFilters =
+    !!category ||
+    !!q ||
+    !!estado ||
+    oferta ||
+    preventa ||
+    !!linea ||
+    !!zona ||
+    min !== undefined ||
+    max !== undefined;
   const requestedPage = Math.max(1, parseInt(pagina ?? "1", 10) || 1);
+  // La portada (banner, tienda) solo se arma en la página 1 sin filtros.
+  const wantsHero = !hasFilters && !orden && requestedPage === 1;
+  const now = new Date();
+
+  const listingsForPage = (pageNumber: number) =>
+    prisma.listing.findMany({
+      where,
+      include: cardInclude,
+      orderBy,
+      skip: (pageNumber - 1) * PAGE_SIZE,
+      take: PAGE_SIZE,
+    });
+
+  // Todas las consultas que no dependen entre sí van juntas: antes se hacían
+  // una tras otra y la portada tardaba en llegar (y con ella la foto del banner).
+  const [
+    availablePrices,
+    totalCount,
+    requestedListings,
+    trustedSellerIds,
+    featuredCandidates,
+    storeListings,
+    offerListings,
+    latestListings,
+  ] = await Promise.all([
+    // El sistema detecta la figura disponible más barata y la más cara y arma
+    // los rangos de precio automáticamente; el comprador solo elige uno.
+    prisma.listing.findMany({
+      where: { ...whereWithoutPrice, sold: false },
+      select: { price: true },
+      orderBy: { price: "asc" },
+    }),
+    prisma.listing.count({ where }),
+    listingsForPage(requestedPage),
+    getTrustedSellerIds(),
+    // Destacadas pagadas que coinciden con los filtros actuales: se muestran
+    // arriba del catálogo (solo en la página 1), rotando el orden en cada visita.
+    requestedPage === 1
+      ? prisma.listing.findMany({
+          where: { ...where, sold: false, ...activeFeaturedWhere(now) },
+          include: cardInclude,
+        })
+      : Promise.resolve([]),
+    // Fila "Tienda FigurasAnime" en la portada, con las figuras de la tienda oficial.
+    wantsHero
+      ? prisma.listing.findMany({
+          where: { sold: false, user: { isOfficialStore: true } },
+          include: cardInclude,
+          orderBy: { createdAt: "desc" },
+          take: STORE_ROW_LIMIT,
+        })
+      : Promise.resolve([]),
+    wantsHero
+      ? prisma.listing.findMany({
+          where: {
+            sold: false,
+            discountAmount: { not: null },
+            discountExpiresAt: { gt: now },
+          },
+          include: { images: { take: 1 } },
+          orderBy: { discountExpiresAt: "asc" },
+          take: BANNER_OFFERS_LIMIT,
+        })
+      : Promise.resolve([]),
+    wantsHero
+      ? prisma.listing.findMany({
+          where: { sold: false },
+          include: { images: { take: 1 } },
+          orderBy: { createdAt: "desc" },
+          take: BANNER_LATEST_LIMIT,
+        })
+      : Promise.resolve([]),
+  ]);
+  const priceSummary = computePriceSummary(availablePrices.map((l) => l.price));
+
+  // Búsqueda anónima para el reporte "Demanda" del admin (solo la primera
+  // página, sin contar al admin ni a los bots). El user-agent se lee antes:
+  // dentro de after() no se puede usar headers().
+  if (q && (!pagina || pagina === "1") && !isAdmin(user)) {
+    const userAgent = (await headers()).get("user-agent");
+    if (!isBotUserAgent(userAgent)) {
+      const hadResults = availablePrices.length > 0;
+      after(() => recordSearch(q, hadResults));
+    }
+  }
+
+  const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
   const page = Math.min(requestedPage, totalPages);
-
-  const listings = await prisma.listing.findMany({
-    where,
-    include: cardInclude,
-    orderBy,
-    skip: (page - 1) * PAGE_SIZE,
-    take: PAGE_SIZE,
-  });
-
-  const trustedSellerIds = await getTrustedSellerIds();
+  // Página pedida fuera de rango (ej. ?pagina=99): se muestra la última.
+  const listings = page === requestedPage ? requestedListings : await listingsForPage(page);
 
   const favoritedIds = user
     ? new Set(
@@ -294,63 +360,10 @@ export default async function CatalogPage({ searchParams, fixedCategory }: Catal
       )
     : null;
 
-  const hasFilters =
-    !!category ||
-    !!q ||
-    !!estado ||
-    oferta ||
-    preventa ||
-    !!linea ||
-    !!zona ||
-    min !== undefined ||
-    max !== undefined;
-  const showHero = !hasFilters && !orden && page === 1;
-
-  // Destacadas pagadas que coinciden con los filtros actuales: se muestran
-  // arriba del catálogo (solo en la página 1), rotando el orden en cada visita.
-  const now = new Date();
+  const showHero = wantsHero && page === 1;
   const featuredListings =
-    page === 1
-      ? pickRandom(
-          await prisma.listing.findMany({
-            where: { ...where, sold: false, ...activeFeaturedWhere(now) },
-            include: cardInclude,
-          }),
-          FEATURED_SECTION_LIMIT
-        )
-      : [];
-
-  // Fila "Tienda FigurasAnime" en la portada, con las figuras de la tienda oficial.
-  const storeListings = showHero
-    ? await prisma.listing.findMany({
-        where: { sold: false, user: { isOfficialStore: true } },
-        include: cardInclude,
-        orderBy: { createdAt: "desc" },
-        take: STORE_ROW_LIMIT,
-      })
-    : [];
+    page === 1 ? pickRandom(featuredCandidates, FEATURED_SECTION_LIMIT) : [];
   const storeSellerId = storeListings[0]?.userId;
-
-  const [offerListings, latestListings] = showHero
-    ? await Promise.all([
-        prisma.listing.findMany({
-          where: {
-            sold: false,
-            discountAmount: { not: null },
-            discountExpiresAt: { gt: new Date() },
-          },
-          include: { images: { take: 1 } },
-          orderBy: { discountExpiresAt: "asc" },
-          take: BANNER_OFFERS_LIMIT,
-        }),
-        prisma.listing.findMany({
-          where: { sold: false },
-          include: { images: { take: 1 } },
-          orderBy: { createdAt: "desc" },
-          take: BANNER_LATEST_LIMIT,
-        }),
-      ])
-    : [[], []];
 
   // El banner muestra primero las destacadas, luego ofertas y novedades.
   const featuredIds = new Set(featuredListings.map((l) => l.id));
@@ -443,7 +456,7 @@ export default async function CatalogPage({ searchParams, fixedCategory }: Catal
             aria-hidden="true"
             className="pointer-events-none absolute -bottom-24 left-1/3 h-64 w-64 rounded-full bg-red-200/30 blur-3xl"
           />
-          <div className="relative mx-auto max-w-6xl px-4 py-12 sm:py-16">
+          <div className="relative mx-auto max-w-6xl px-4 py-8 sm:py-10">
             <div
               className={`grid items-center gap-10 ${
                 bannerSlides.length > 0 ? "lg:grid-cols-2" : ""
@@ -453,7 +466,7 @@ export default async function CatalogPage({ searchParams, fixedCategory }: Catal
                 <p className="inline-block rounded-full bg-white/70 px-3 py-1 text-sm font-semibold uppercase tracking-wide text-red-600 shadow-sm ring-1 ring-red-100">
                   ¡Coleccionar nunca fue tan fácil!
                 </p>
-                <h1 className="mt-4 max-w-2xl text-3xl font-extrabold tracking-tight text-zinc-900 sm:text-5xl">
+                <h1 className="mt-3 max-w-2xl text-3xl font-extrabold tracking-tight text-zinc-900 sm:text-5xl">
                   Compra y vende{" "}
                   <span className="bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">
                     figuras de anime
@@ -464,7 +477,7 @@ export default async function CatalogPage({ searchParams, fixedCategory }: Catal
                   no usas o encuentra tu próxima pieza de colección, y coordina todo directo
                   por WhatsApp.
                 </p>
-                <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:justify-center lg:justify-start">
+                <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center lg:justify-start">
                   <Button
                     render={<a href={sellCtaHref} />}
                     nativeButton={false}
@@ -483,6 +496,21 @@ export default async function CatalogPage({ searchParams, fixedCategory }: Catal
                     Explorar catálogo
                   </Button>
                 </div>
+                <ol className="mt-5 flex flex-wrap justify-center gap-x-4 gap-y-1.5 text-xs text-zinc-600 sm:text-sm lg:justify-start">
+                  {[
+                    { icon: "📸", text: "Publica con fotos" },
+                    { icon: "💬", text: "Te escriben por WhatsApp" },
+                    { icon: "🤝", text: "Coordinan entrega y pago" },
+                  ].map((step, i) => (
+                    <li key={step.text} className="flex items-center gap-1.5">
+                      <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white text-[10px] font-bold text-orange-700 ring-1 ring-orange-200">
+                        {i + 1}
+                      </span>
+                      <span aria-hidden="true">{step.icon}</span>
+                      {step.text}
+                    </li>
+                  ))}
+                </ol>
               </div>
 
               {bannerSlides.length > 0 && <BannerCarousel slides={bannerSlides} />}
@@ -491,29 +519,6 @@ export default async function CatalogPage({ searchParams, fixedCategory }: Catal
         </section>
       )}
 
-      {showHero && (
-        <section className="border-b border-zinc-200 bg-white">
-          <div className="mx-auto max-w-6xl px-4 py-6">
-            <div className="grid gap-3 sm:grid-cols-3">
-              {[
-                { icon: "📸", title: "1. Publica", text: "Sube fotos de tu figura, ponle precio y categoría." },
-                { icon: "💬", title: "2. Conecta", text: "Los interesados te escriben directo a tu WhatsApp." },
-                { icon: "🤝", title: "3. Vende", text: "Coordinan la entrega y el pago entre ustedes." },
-              ].map((step) => (
-                <Card key={step.title} className="flex-row items-center gap-4 p-4">
-                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-orange-100 to-red-50 text-xl ring-1 ring-orange-100">
-                    {step.icon}
-                  </span>
-                  <div>
-                    <h3 className="font-semibold text-foreground">{step.title}</h3>
-                    <p className="mt-0.5 text-sm text-muted-foreground">{step.text}</p>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
 
       {showHero && storeListings.length > 0 && (
         <section className="border-b border-zinc-200 bg-gradient-to-br from-orange-50/60 to-white">
@@ -543,25 +548,8 @@ export default async function CatalogPage({ searchParams, fixedCategory }: Catal
         </section>
       )}
 
-      {showHero && (
-        <section className="border-b border-zinc-200 bg-white">
-          <div className="mx-auto flex max-w-6xl flex-col items-start gap-3 px-4 py-5 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-sm text-zinc-700">
-              <span aria-hidden="true">📦</span>{" "}
-              <strong>¿Tienes figuras que ya no usas y no tienes tiempo de venderlas?</strong>{" "}
-              Nosotros las vendemos por ti.
-            </p>
-            <Link
-              href="/te-la-vendemos"
-              className="shrink-0 rounded-full border border-orange-300 px-4 py-2 text-sm font-semibold text-orange-700 transition hover:bg-orange-50"
-            >
-              Te la vendemos →
-            </Link>
-          </div>
-        </section>
-      )}
 
-      <div id="catalogo" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-8">
+      <div id="catalogo" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-6">
         {showLandingHeader && (
           <div className="mb-6">
             <h1 className="text-2xl font-extrabold tracking-tight text-zinc-900 sm:text-3xl">
@@ -639,6 +627,22 @@ export default async function CatalogPage({ searchParams, fixedCategory }: Catal
         )}
 
         <Pagination page={page} totalPages={totalPages} state={catalogState} />
+
+        {showHero && (
+          <div className="mt-10 flex flex-col items-start gap-3 rounded-2xl bg-white p-5 ring-1 ring-zinc-200 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-sm text-zinc-700">
+              <span aria-hidden="true">📦</span>{" "}
+              <strong>¿Tienes figuras que ya no usas y no tienes tiempo de venderlas?</strong>{" "}
+              Nosotros las vendemos por ti.
+            </p>
+            <Link
+              href="/te-la-vendemos"
+              className="shrink-0 rounded-full border border-orange-300 px-4 py-2 text-sm font-semibold text-orange-700 transition hover:bg-orange-50"
+            >
+              Te la vendemos →
+            </Link>
+          </div>
+        )}
 
         {q && page === totalPages && (
           <div className="mx-auto mt-10 max-w-xl rounded-2xl bg-orange-50/70 p-5 ring-1 ring-orange-200">

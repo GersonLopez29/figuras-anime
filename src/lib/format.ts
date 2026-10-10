@@ -30,3 +30,9 @@ export function getDaysRemaining(discountExpiresAt: Date | string | null | undef
   const msLeft = new Date(discountExpiresAt).getTime() - Date.now();
   return Math.max(0, Math.ceil(msLeft / (24 * 60 * 60 * 1000)));
 }
+
+// Porcentaje de descuento redondeado, para mostrar "-17 %".
+export function discountPercent(price: number, discountAmount: number): number {
+  if (price <= 0) return 0;
+  return Math.round((discountAmount / price) * 100);
+}

@@ -5,11 +5,11 @@ import { Button } from "@/components/ui/button";
 
 // El enlace de WhatsApp se pide al servidor recién al tocar el botón (así el
 // número del vendedor no queda escrito en la página).
-export default function WhatsAppContactButton({ listingId }: { listingId: string }) {
+export function useWhatsAppContact(listingId: string) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function handleClick() {
+  async function open() {
     setError(null);
     setLoading(true);
     // La pestaña se abre en el mismo clic: si se abriera después de la
@@ -38,14 +38,23 @@ export default function WhatsAppContactButton({ listingId }: { listingId: string
     }
   }
 
+  return { open, loading, error };
+}
+
+export const WHATSAPP_BUTTON_CLASS =
+  "rounded-full bg-green-600 text-sm font-bold text-white shadow-md shadow-green-600/20 transition hover:-translate-y-0.5 hover:bg-green-700 hover:shadow-lg";
+
+export default function WhatsAppContactButton({ listingId }: { listingId: string }) {
+  const { open, loading, error } = useWhatsAppContact(listingId);
+
   return (
     <div>
       <Button
         type="button"
-        onClick={handleClick}
+        onClick={open}
         disabled={loading}
         size="lg"
-        className="w-full rounded-full bg-green-600 text-sm font-bold text-white shadow-md shadow-green-600/20 transition hover:-translate-y-0.5 hover:bg-green-700 hover:shadow-lg"
+        className={`w-full ${WHATSAPP_BUTTON_CLASS}`}
       >
         <span aria-hidden="true">💬</span>
         {loading ? "Abriendo WhatsApp..." : "Contactar por WhatsApp"}
