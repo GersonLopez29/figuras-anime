@@ -120,17 +120,20 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  // Las fotos se suben (en paralelo) mientras se elige el nombre del enlace.
+  const slugPromise = uniqueListingSlug(parsed.data.title);
   let imageUrls: string[];
   try {
     imageUrls = await Promise.all(files.map(saveUploadedImage));
   } catch (err) {
+    await slugPromise.catch(() => null);
     const message = err instanceof Error ? err.message : "No se pudieron subir las imágenes";
     return NextResponse.json({ error: message }, { status: 400 });
   }
 
   const listing = await prisma.listing.create({
     data: {
-      slug: await uniqueListingSlug(parsed.data.title),
+      slug: await slugPromise,
       ...parsed.data,
       ...preorder.data,
       photoType,
