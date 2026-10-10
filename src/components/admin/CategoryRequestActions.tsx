@@ -34,7 +34,7 @@ export default function CategoryRequestActions({ requestId }: CategoryRequestAct
         size="sm"
         onClick={() => resolve("approve")}
         disabled={loading !== null}
-        className="rounded-full border-green-200 text-green-700 hover:bg-green-50"
+        className="rounded-full border-green-200 dark:border-green-800 text-green-700 dark:text-green-300 hover:bg-green-50 dark:hover:bg-green-950/40"
       >
         {loading === "approve" ? "Agregando..." : "Agregar categoría"}
       </Button>
@@ -44,7 +44,7 @@ export default function CategoryRequestActions({ requestId }: CategoryRequestAct
         size="sm"
         onClick={() => resolve("reject")}
         disabled={loading !== null}
-        className="rounded-full text-muted-foreground hover:border-red-200 hover:bg-red-50 hover:text-destructive"
+        className="rounded-full text-muted-foreground hover:border-red-200 dark:hover:border-red-800 hover:bg-red-50 dark:hover:bg-red-950/40 hover:text-destructive"
       >
         {loading === "reject" ? "Rechazando..." : "Rechazar"}
       </Button>

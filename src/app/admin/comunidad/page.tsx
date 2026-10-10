@@ -25,7 +25,7 @@ export default async function AdminComunidadPage() {
       <h2 className="flex items-center gap-2 text-lg font-semibold text-foreground">
         Publicaciones de comunidad ({posts.length})
         {reportedCount > 0 && (
-          <Badge className="bg-red-100 text-red-700 hover:bg-red-100">
+          <Badge className="bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 hover:bg-red-100 dark:hover:bg-red-900/40">
             {reportedCount} con reportes
           </Badge>
         )}

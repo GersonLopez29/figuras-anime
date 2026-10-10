@@ -31,6 +31,7 @@ import ShareButton from "@/components/ShareButton";
 import MessageButton from "@/components/MessageButton";
 import WhatsAppContactButton from "@/components/WhatsAppContactButton";
 import StickyContactBar from "@/components/StickyContactBar";
+import ListingDescription from "@/components/ListingDescription";
 import StoryShareButton from "@/components/StoryShareButton";
 import StockAlertForm from "@/components/StockAlertForm";
 import { normalizeAlertQuery } from "@/lib/alertMatch";
@@ -225,24 +226,27 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
       </Link>
 
       <div className="mt-4 grid gap-8 sm:grid-cols-2">
-        <ListingGallery images={listing.images} title={listing.title} />
+        {/* En computadora la galería acompaña al bajar por la ficha. */}
+        <div className="sm:sticky sm:top-24 sm:self-start">
+          <ListingGallery images={listing.images} title={listing.title} />
+        </div>
 
         <Card className="p-5 shadow-sm sm:p-6">
           <div className="flex flex-wrap items-center gap-2">
             <Badge variant="secondary">{listing.category}</Badge>
-            <Badge variant="outline" className="border-blue-200 bg-blue-50 text-blue-700">
+            <Badge variant="outline" className="border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300">
               {getConditionIcon(listing.condition)} {getConditionLabel(listing.condition)}
             </Badge>
             {!listing.sold && !!activeDiscount && (
               <Badge className="bg-green-600 text-white">Oferta</Badge>
             )}
             {reservation && (
-              <Badge variant="outline" className="border-sky-200 bg-sky-50 text-sky-700">
+              <Badge variant="outline" className="border-sky-200 dark:border-sky-800 bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300">
                 🔖 Separada
               </Badge>
             )}
             {!listing.sold && listing.isPreorder && (
-              <Badge variant="outline" className="border-violet-200 bg-violet-50 text-violet-700">
+              <Badge variant="outline" className="border-violet-200 dark:border-violet-800 bg-violet-50 dark:bg-violet-950/40 text-violet-700 dark:text-violet-300">
                 🕒 Preventa
               </Badge>
             )}
@@ -256,8 +260,8 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
                 title={PHOTO_TYPE_HELP[listing.photoType]}
                 className={
                   listing.photoType === "real"
-                    ? "border-emerald-200 bg-emerald-50 text-emerald-700"
-                    : "border-zinc-200 bg-zinc-50 text-zinc-600"
+                    ? "border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300"
+                    : "border-border bg-muted/40 text-muted-foreground"
                 }
               >
                 {PHOTO_TYPE_LABEL[listing.photoType]}
@@ -314,8 +318,8 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
           )}
 
           {!listing.sold && activeDiscount && (
-            <Alert className="mt-3 border-green-200 bg-green-50 text-green-800">
-              <AlertDescription className="flex items-center gap-2 text-green-800">
+            <Alert className="mt-3 border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950/40 text-green-800 dark:text-green-300">
+              <AlertDescription className="flex items-center gap-2 text-green-800 dark:text-green-300">
                 <span aria-hidden="true">⏰</span>
                 <span>
                   Oferta por tiempo limitado: válida hasta el {discountExpiresLabel} (
@@ -327,7 +331,7 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
           )}
 
           {reservation && (
-            <div className="mt-4 rounded-lg bg-sky-50 p-3 text-sm text-sky-900 ring-1 ring-sky-200">
+            <div className="mt-4 rounded-lg bg-sky-50 dark:bg-sky-950/40 p-3 text-sm text-sky-900 dark:text-sky-300 ring-1 ring-sky-200 dark:ring-sky-800">
               <p className="font-semibold">🔖 Figura separada</p>
               <p className="mt-1">
                 Alguien dejó un adelanto de <strong>{formatPrice(reservation.amount)}</strong>
@@ -341,7 +345,7 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
           )}
 
           {!listing.sold && listing.isPreorder && listing.preorderArrival && (
-            <div className="mt-4 rounded-lg bg-violet-50 p-3 text-sm text-violet-900 ring-1 ring-violet-200">
+            <div className="mt-4 rounded-lg bg-violet-50 dark:bg-violet-950/40 p-3 text-sm text-violet-900 dark:text-violet-300 ring-1 ring-violet-200 dark:ring-violet-800">
               <p className="font-semibold">🕒 Preventa</p>
               <p className="mt-1">
                 Llega aprox. en <strong>{formatArrival(listing.preorderArrival)}</strong>.
@@ -366,7 +370,7 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
                   Este producto ya fue vendido.
                 </AlertDescription>
               </Alert>
-              <div className="mt-4 rounded-lg bg-orange-50/70 p-4 ring-1 ring-orange-200">
+              <div className="mt-4 rounded-lg bg-orange-50/70 dark:bg-orange-950/40 p-4 ring-1 ring-orange-200 dark:ring-orange-800">
                 <p className="text-sm font-semibold text-foreground">🔔 ¿Llegaste tarde?</p>
                 <p className="mt-1 text-sm text-muted-foreground">
                   Te avisamos por correo cuando alguien publique otra igual.
@@ -394,8 +398,8 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
             href={`/vendedor/${listing.user.id}`}
             className="mt-4 flex items-center gap-3 rounded-xl border border-border p-3 transition hover:border-primary/40 hover:bg-primary/5"
           >
-            <Avatar size="lg" className="ring-1 ring-orange-100">
-              <AvatarFallback className="bg-gradient-to-br from-orange-100 to-red-50 font-bold text-orange-700">
+            <Avatar size="lg" className="ring-1 ring-orange-100 dark:ring-orange-800">
+              <AvatarFallback className="bg-gradient-to-br from-orange-100 dark:from-orange-900/40 to-red-50 dark:to-red-950/20 font-bold text-orange-700">
                 {listing.user.name.slice(0, 1).toUpperCase()}
               </AvatarFallback>
             </Avatar>
@@ -405,7 +409,7 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
                 <span className="font-medium text-foreground">{listing.user.name}</span>
               </p>
               {listing.user.isOfficialStore && (
-                <p className="text-xs font-semibold text-orange-700">✔ {OFFICIAL_STORE_NAME}</p>
+                <p className="text-xs font-semibold text-orange-700 dark:text-orange-300">✔ {OFFICIAL_STORE_NAME}</p>
               )}
               {sellerIsTrusted && (
                 <div className="mt-0.5">
@@ -425,9 +429,7 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
             </div>
           </Link>
 
-          <p className="mt-4 whitespace-pre-line text-sm leading-relaxed text-foreground/80">
-            {listing.description}
-          </p>
+          <ListingDescription text={listing.description} />
 
           {listing.deliveryZones.length > 0 && (
             <div className="mt-4 rounded-lg bg-muted/50 p-3 text-sm">
@@ -437,7 +439,7 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
                   <Badge
                     key={zone}
                     variant="outline"
-                    className="bg-white"
+                    className="bg-card"
                     render={<Link href={`/?zona=${zone}#catalogo`} />}
                   >
                     {getDeliveryZoneLabel(zone)}

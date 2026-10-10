@@ -33,7 +33,7 @@ export default function StoreToggleButton({
       onClick={handleClick}
       disabled={loading}
       className={`rounded-full whitespace-nowrap ${
-        isOfficialStore ? "border-orange-300 text-orange-700" : "text-muted-foreground"
+        isOfficialStore ? "border-orange-300 dark:border-orange-800 text-orange-700 dark:text-orange-300" : "text-muted-foreground"
       }`}
     >
       {loading ? "Guardando..." : isOfficialStore ? "Quitar de la tienda" : "Marcar como tienda"}

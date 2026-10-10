@@ -44,7 +44,7 @@ export default function MobileMenu({ isLoggedIn, userName, isAdmin, unreadCount 
           <nav className="flex flex-col gap-0.5 px-3">
             <Badge
               render={<Link href="/comunidad" onClick={() => setOpen(false)} />}
-              className="mb-1 h-auto gap-1.5 bg-gradient-to-r from-fuchsia-500 to-orange-500 px-3.5 py-2.5 text-sm font-bold text-white shadow-sm"
+              className="mb-1 h-auto gap-1.5 bg-orange-50 dark:bg-orange-950/40 text-orange-700 dark:text-orange-300 ring-1 ring-orange-200 dark:ring-orange-800 hover:bg-orange-100 dark:hover:bg-orange-900/40 px-3.5 py-2.5 text-sm font-semibold"
             >
               <span aria-hidden="true">✨</span>
               Comunidad
@@ -110,7 +110,7 @@ export default function MobileMenu({ isLoggedIn, userName, isAdmin, unreadCount 
                   <Link
                     href="/admin"
                     onClick={() => setOpen(false)}
-                    className="rounded-xl px-3 py-2.5 text-sm font-medium text-red-600 transition hover:bg-red-50"
+                    className="rounded-xl px-3 py-2.5 text-sm font-medium text-red-600 transition hover:bg-red-50 dark:hover:bg-red-950/40"
                   >
                     Panel admin
                   </Link>

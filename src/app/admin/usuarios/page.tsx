@@ -65,7 +65,7 @@ export default async function AdminUsuariosPage() {
                     </Badge>
                   )}
                   {user.isOfficialStore && (
-                    <Badge className="ml-2 bg-orange-100 text-orange-800 hover:bg-orange-100">
+                    <Badge className="ml-2 bg-orange-100 dark:bg-orange-900/40 text-orange-800 dark:text-orange-300 hover:bg-orange-100 dark:hover:bg-orange-900/40">
                       ✔ {OFFICIAL_STORE_NAME}
                     </Badge>
                   )}
@@ -98,12 +98,12 @@ export default async function AdminUsuariosPage() {
                 <TableCell>
                   <div className="flex flex-wrap gap-1">
                     {user.isBlocked ? (
-                      <Badge className="bg-red-100 text-red-700 hover:bg-red-100">Bloqueado</Badge>
+                      <Badge className="bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 hover:bg-red-100 dark:hover:bg-red-900/40">Bloqueado</Badge>
                     ) : (
-                      <Badge className="bg-green-100 text-green-700 hover:bg-green-100">Activo</Badge>
+                      <Badge className="bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 hover:bg-green-100 dark:hover:bg-green-900/40">Activo</Badge>
                     )}
                     {!user.emailVerified && (
-                      <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100">
+                      <Badge className="bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/40">
                         Correo sin verificar
                       </Badge>
                     )}

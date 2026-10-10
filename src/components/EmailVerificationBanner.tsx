@@ -13,8 +13,8 @@ export default function EmailVerificationBanner() {
   }
 
   return (
-    <div className="border-b border-amber-200 bg-amber-50">
-      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-2 px-4 py-2 text-center text-sm text-amber-800">
+    <div className="border-b border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/40">
+      <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-2 px-4 py-2 text-center text-sm text-amber-800 dark:text-amber-300">
         {status === "sent" ? (
           <span>✓ Te reenviamos el correo de verificación, revisa tu bandeja.</span>
         ) : (
@@ -26,12 +26,12 @@ export default function EmailVerificationBanner() {
               variant="link"
               onClick={handleResend}
               disabled={status === "loading"}
-              className="h-auto p-0 font-semibold text-amber-800 underline hover:text-amber-900"
+              className="h-auto p-0 font-semibold text-amber-800 dark:text-amber-300 underline hover:text-amber-900 dark:hover:text-amber-300"
             >
               {status === "loading" ? "Enviando..." : "Reenviar correo"}
             </Button>
             {status === "error" && (
-              <span className="text-red-700">No se pudo reenviar, intenta de nuevo.</span>
+              <span className="text-red-700 dark:text-red-300">No se pudo reenviar, intenta de nuevo.</span>
             )}
           </>
         )}

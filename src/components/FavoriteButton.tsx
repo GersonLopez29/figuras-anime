@@ -42,8 +42,8 @@ export default function FavoriteButton({
 
   const baseClass =
     variant === "overlay"
-      ? "absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 shadow-sm backdrop-blur transition hover:scale-110"
-      : "flex h-10 w-10 items-center justify-center rounded-full border border-zinc-200 bg-white transition hover:border-red-300";
+      ? "absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-card/90 shadow-sm backdrop-blur transition hover:scale-110"
+      : "flex h-10 w-10 items-center justify-center rounded-full border border-border bg-card transition hover:border-red-300 dark:hover:border-red-800";
 
   return (
     <button

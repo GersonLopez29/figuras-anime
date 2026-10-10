@@ -52,7 +52,7 @@ export default async function AdminConsignacionesPage() {
                     )}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-block text-xs font-medium text-green-700 underline"
+                    className="inline-block text-xs font-medium text-green-700 dark:text-green-300 underline"
                   >
                     Escribirle por WhatsApp
                   </a>

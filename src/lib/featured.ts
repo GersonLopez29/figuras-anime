@@ -6,7 +6,8 @@ export const FEATURE_PRICE = 10;
 export const FEATURE_DAYS = 7;
 
 // Cuántas destacadas se muestran como máximo arriba del catálogo.
-export const FEATURED_SECTION_LIMIT = 4;
+// 5 para llenar la fila en pantallas grandes; en las más chicas se muestran 4.
+export const FEATURED_SECTION_LIMIT = 5;
 
 export function isFeatured(featuredUntil: Date | null | undefined, now = new Date()): boolean {
   return !!featuredUntil && featuredUntil > now;

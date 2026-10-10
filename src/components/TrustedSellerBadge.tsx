@@ -8,7 +8,7 @@ export default function TrustedSellerBadge({ size = "sm" }: { size?: "sm" | "md"
     <Badge
       variant="outline"
       title={TRUSTED_SELLER_EXPLANATION}
-      className={`border-amber-300 bg-amber-50 font-semibold text-amber-800 ${size === "md" ? "h-auto px-2.5 py-1 text-sm" : ""}`}
+      className={`border-amber-300 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/40 font-semibold text-amber-800 dark:text-amber-300 ${size === "md" ? "h-auto px-2.5 py-1 text-sm" : ""}`}
     >
       🏅 Vendedor confiable
     </Badge>

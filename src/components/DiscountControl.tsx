@@ -62,7 +62,7 @@ export default function DiscountControl({
       <div className="flex flex-wrap items-center gap-2">
         {discountAmount ? (
           <>
-            <Badge className="bg-green-100 text-green-700 hover:bg-green-100">
+            <Badge className="bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 hover:bg-green-100 dark:hover:bg-green-900/40">
               Descuento de {formatPrice(discountAmount)} · vence en {daysRemaining}{" "}
               {daysRemaining === 1 ? "día" : "días"}
             </Badge>
@@ -75,7 +75,7 @@ export default function DiscountControl({
               size="sm"
               disabled={loading}
               onClick={() => applyDiscount(null)}
-              className="rounded-full border-red-200 text-destructive hover:border-red-300 hover:bg-red-50"
+              className="rounded-full border-red-200 dark:border-red-800 text-destructive hover:border-red-300 dark:hover:border-red-800 hover:bg-red-50 dark:hover:bg-red-950/40"
             >
               Quitar
             </Button>
@@ -86,7 +86,7 @@ export default function DiscountControl({
             variant="outline"
             size="sm"
             onClick={() => setEditing(true)}
-            className="rounded-full border-green-200 text-green-700 hover:bg-green-50"
+            className="rounded-full border-green-200 dark:border-green-800 text-green-700 dark:text-green-300 hover:bg-green-50 dark:hover:bg-green-950/40"
           >
             Agregar descuento
           </Button>

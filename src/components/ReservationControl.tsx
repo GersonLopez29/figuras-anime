@@ -60,7 +60,7 @@ export default function ReservationControl({
       <div className="flex flex-wrap items-center gap-2">
         {reservedAmount ? (
           <>
-            <Badge className="bg-sky-100 text-sky-800 hover:bg-sky-100">
+            <Badge className="bg-sky-100 dark:bg-sky-900/40 text-sky-800 dark:text-sky-300 hover:bg-sky-100 dark:hover:bg-sky-900/40">
               🔖 Separada con {formatPrice(reservedAmount)}
               {reservedUntil ? ` · hasta el ${formatReservationDate(reservedUntil)}` : ""}
             </Badge>
@@ -79,7 +79,7 @@ export default function ReservationControl({
               size="sm"
               disabled={loading}
               onClick={() => save({ amount: null, until: "" })}
-              className="rounded-full border-red-200 text-destructive hover:border-red-300 hover:bg-red-50"
+              className="rounded-full border-red-200 dark:border-red-800 text-destructive hover:border-red-300 dark:hover:border-red-800 hover:bg-red-50 dark:hover:bg-red-950/40"
             >
               Quitar separación
             </Button>
@@ -90,7 +90,7 @@ export default function ReservationControl({
             variant="outline"
             size="sm"
             onClick={() => setEditing(true)}
-            className="rounded-full border-sky-200 text-sky-700 hover:bg-sky-50"
+            className="rounded-full border-sky-200 dark:border-sky-800 text-sky-700 dark:text-sky-300 hover:bg-sky-50 dark:hover:bg-sky-950/40"
           >
             🔖 Marcar como separada
           </Button>

@@ -343,7 +343,7 @@ export default function ListingForm(props: ListingFormProps) {
 
         <div
           className={`rounded-lg border p-3 transition ${
-            isPreorder ? "border-violet-300 bg-violet-50/60" : "border-input"
+            isPreorder ? "border-violet-300 dark:border-violet-800 bg-violet-50/60 dark:bg-violet-950/40" : "border-input"
           }`}
         >
           <label className="flex cursor-pointer items-start gap-2.5 text-sm">

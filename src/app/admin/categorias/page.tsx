@@ -37,7 +37,7 @@ export default async function AdminCategoriasPage() {
         <h2 className="flex items-center gap-2 text-lg font-semibold text-foreground">
           Solicitudes de categoría
           {pending.length > 0 && (
-            <Badge className="bg-orange-100 text-orange-700 hover:bg-orange-100">
+            <Badge className="bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300 hover:bg-orange-100 dark:hover:bg-orange-900/40">
               {pending.length} pendiente{pending.length === 1 ? "" : "s"}
             </Badge>
           )}
@@ -77,7 +77,7 @@ export default async function AdminCategoriasPage() {
                 </div>
                 <Badge
                   variant="secondary"
-                  className={req.status === "approved" ? "bg-green-100 text-green-700 hover:bg-green-100" : ""}
+                  className={req.status === "approved" ? "bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 hover:bg-green-100 dark:hover:bg-green-900/40" : ""}
                 >
                   {req.status === "approved" ? "Agregada" : "Rechazada"}
                 </Badge>

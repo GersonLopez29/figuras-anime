@@ -46,7 +46,7 @@ export default function FeatureListingButton({
 
   if (pending) {
     return (
-      <span className="inline-flex items-center rounded-full bg-amber-50 px-3 py-1 text-xs font-medium text-amber-800 ring-1 ring-amber-200">
+      <span className="inline-flex items-center rounded-full bg-amber-50 dark:bg-amber-950/40 px-3 py-1 text-xs font-medium text-amber-800 dark:text-amber-300 ring-1 ring-amber-200 dark:ring-amber-800">
         ⏳ Destacado por confirmar
       </span>
     );
@@ -80,7 +80,7 @@ export default function FeatureListingButton({
             type="button"
             variant="outline"
             size="sm"
-            className="rounded-full border-amber-300 text-amber-800 hover:bg-amber-50"
+            className="rounded-full border-amber-300 dark:border-amber-800 text-amber-800 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-950/40"
           />
         }
       >
@@ -98,7 +98,7 @@ export default function FeatureListingButton({
         </DialogHeader>
 
         {freeCredits > 0 && !isAdmin && (
-          <div className="rounded-lg bg-green-50 p-3 text-sm text-green-900 ring-1 ring-green-200">
+          <div className="rounded-lg bg-green-50 dark:bg-green-950/40 p-3 text-sm text-green-900 dark:text-green-300 ring-1 ring-green-200 dark:ring-green-800">
             <p>
               🎁 Tienes <strong>{freeCredits}</strong>{" "}
               {freeCredits === 1 ? "destacado gratis" : "destacados gratis"} por invitar amigos.
@@ -131,7 +131,7 @@ export default function FeatureListingButton({
                 href={buildWhatsAppLink(payment.number, proofMessage)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="font-medium text-green-700 underline"
+                className="font-medium text-green-700 dark:text-green-300 underline"
               >
                 WhatsApp
               </a>

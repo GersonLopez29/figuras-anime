@@ -78,7 +78,7 @@ export default function BannerCarousel({ slides }: { slides: BannerSlide[] }) {
                     ? "bg-amber-400 text-amber-950"
                     : slide.isOffer
                       ? "bg-green-600 text-white"
-                      : "bg-gradient-to-r from-red-600 to-orange-600 text-white"
+                      : "bg-primary text-primary-foreground"
                 }`}
               >
                 {slide.isFeatured

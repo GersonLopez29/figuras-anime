@@ -101,15 +101,15 @@ export default async function VendedorPage({ params }: VendedorPageProps) {
   return (
     <div className="mx-auto max-w-3xl px-4 py-10">
       <Card className="flex-row items-center gap-4 p-6">
-        <Avatar className="h-16 w-16 ring-1 ring-orange-100">
-          <AvatarFallback className="bg-gradient-to-br from-orange-100 to-red-50 text-2xl font-bold text-orange-700">
+        <Avatar className="h-16 w-16 ring-1 ring-orange-100 dark:ring-orange-800">
+          <AvatarFallback className="bg-gradient-to-br from-orange-100 dark:from-orange-900/40 to-red-50 dark:to-red-950/20 text-2xl font-bold text-orange-700">
             {seller.name.slice(0, 1).toUpperCase()}
           </AvatarFallback>
         </Avatar>
         <div>
           <h1 className="text-2xl font-bold text-foreground">{seller.name}</h1>
           {seller.isOfficialStore && (
-            <p className="text-sm font-semibold text-orange-700">✔ {OFFICIAL_STORE_NAME}</p>
+            <p className="text-sm font-semibold text-orange-700 dark:text-orange-300">✔ {OFFICIAL_STORE_NAME}</p>
           )}
           {trust?.trusted && (
             <div className="mt-1">

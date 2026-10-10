@@ -105,7 +105,7 @@ export default async function GuidePage({ params }: GuidePageProps) {
         ))}
       </div>
 
-      <div className="mt-10 rounded-2xl bg-orange-50/70 p-5 ring-1 ring-orange-200">
+      <div className="mt-10 rounded-2xl bg-orange-50/70 dark:bg-orange-950/40 p-5 ring-1 ring-orange-200 dark:ring-orange-800">
         <p className="font-semibold text-foreground">🔔 ¿Buscas una figura en particular?</p>
         <p className="mt-1 text-sm text-muted-foreground">
           Te avisamos por correo cuando alguien la publique, sin registrarte.

@@ -15,20 +15,20 @@ export default function Footer({ totalVisits, categories }: FooterProps) {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="mt-16 overflow-hidden rounded-t-3xl border-t border-zinc-200 bg-white">
-      <div aria-hidden="true" className="h-1 bg-gradient-to-r from-red-600 via-orange-500 to-fuchsia-500" />
-      <div className="mx-auto max-w-6xl px-4 py-12">
+    <footer className="mt-16 overflow-hidden rounded-t-3xl border-t border-border bg-card">
+      <div aria-hidden="true" className="h-1 bg-gradient-to-r from-orange-600 via-orange-500 to-amber-400" />
+      <div className="mx-auto max-w-7xl px-4 py-12">
         <div className="grid gap-8 sm:grid-cols-3">
           <div>
-            <p className="flex items-center gap-1.5 text-base font-extrabold text-zinc-900">
+            <p className="flex items-center gap-1.5 text-base font-extrabold text-foreground">
               <span aria-hidden="true">🎌</span>
               Figuras<span className="text-orange-600">Anime</span>
             </p>
-            <p className="mt-2 max-w-xs text-sm text-zinc-500">
+            <p className="mt-2 max-w-xs text-sm text-muted-foreground">
               El marketplace para comprar y vender figuras de anime entre coleccionistas,
               coordinando todo directo por WhatsApp.
             </p>
-            <h3 className="mt-5 text-xs font-semibold uppercase tracking-wide text-zinc-400">
+            <h3 className="mt-5 text-xs font-semibold uppercase tracking-wide text-muted-foreground/70">
               Síguenos
             </h3>
             <div className="mt-3">
@@ -37,7 +37,7 @@ export default function Footer({ totalVisits, categories }: FooterProps) {
           </div>
 
           <div>
-            <h3 className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
+            <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground/70">
               Categorías
             </h3>
             <ul className="mt-3 space-y-2">
@@ -45,7 +45,7 @@ export default function Footer({ totalVisits, categories }: FooterProps) {
                 <li key={cat.name}>
                   <Link
                     href={categoryPath(cat.name)}
-                    className="inline-block text-sm text-zinc-600 transition hover:translate-x-0.5 hover:text-orange-600"
+                    className="inline-block text-sm text-muted-foreground transition hover:translate-x-0.5 hover:text-orange-600"
                   >
                     {cat.icon} {cat.name}
                   </Link>
@@ -55,67 +55,67 @@ export default function Footer({ totalVisits, categories }: FooterProps) {
           </div>
 
           <div>
-            <h3 className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
+            <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground/70">
               Información
             </h3>
             <ul className="mt-3 space-y-2">
               <li>
-                <Link href="/" className="inline-block text-sm text-zinc-600 transition hover:translate-x-0.5 hover:text-orange-600">
+                <Link href="/" className="inline-block text-sm text-muted-foreground transition hover:translate-x-0.5 hover:text-orange-600">
                   Explorar catálogo
                 </Link>
               </li>
               <li>
-                <Link href="/publicar" className="inline-block text-sm text-zinc-600 transition hover:translate-x-0.5 hover:text-orange-600">
+                <Link href="/publicar" className="inline-block text-sm text-muted-foreground transition hover:translate-x-0.5 hover:text-orange-600">
                   Publicar una figura
                 </Link>
               </li>
               <li>
-                <Link href="/te-la-vendemos" className="inline-block text-sm text-zinc-600 transition hover:translate-x-0.5 hover:text-orange-600">
+                <Link href="/te-la-vendemos" className="inline-block text-sm text-muted-foreground transition hover:translate-x-0.5 hover:text-orange-600">
                   Te la vendemos
                 </Link>
               </li>
               <li>
-                <Link href="/comunidad" className="inline-block text-sm text-zinc-600 transition hover:translate-x-0.5 hover:text-orange-600">
+                <Link href="/comunidad" className="inline-block text-sm text-muted-foreground transition hover:translate-x-0.5 hover:text-orange-600">
                   Comunidad de coleccionistas
                 </Link>
               </li>
               <li>
-                <Link href="/se-busca" className="inline-block text-sm text-zinc-600 transition hover:translate-x-0.5 hover:text-orange-600">
+                <Link href="/se-busca" className="inline-block text-sm text-muted-foreground transition hover:translate-x-0.5 hover:text-orange-600">
                   Se busca
                 </Link>
               </li>
               <li>
-                <Link href="/avisame" className="inline-block text-sm text-zinc-600 transition hover:translate-x-0.5 hover:text-orange-600">
+                <Link href="/avisame" className="inline-block text-sm text-muted-foreground transition hover:translate-x-0.5 hover:text-orange-600">
                   Avísame cuando llegue
                 </Link>
               </li>
               <li>
-                <Link href="/guias" className="inline-block text-sm text-zinc-600 transition hover:translate-x-0.5 hover:text-orange-600">
+                <Link href="/guias" className="inline-block text-sm text-muted-foreground transition hover:translate-x-0.5 hover:text-orange-600">
                   Guías para coleccionistas
                 </Link>
               </li>
               <li>
-                <Link href="/registro" className="inline-block text-sm text-zinc-600 transition hover:translate-x-0.5 hover:text-orange-600">
+                <Link href="/registro" className="inline-block text-sm text-muted-foreground transition hover:translate-x-0.5 hover:text-orange-600">
                   Crear cuenta
                 </Link>
               </li>
               <li>
-                <Link href="/sobre-nosotros" className="inline-block text-sm text-zinc-600 transition hover:translate-x-0.5 hover:text-orange-600">
+                <Link href="/sobre-nosotros" className="inline-block text-sm text-muted-foreground transition hover:translate-x-0.5 hover:text-orange-600">
                   Sobre nosotros
                 </Link>
               </li>
               <li>
-                <Link href="/terminos-condiciones" className="inline-block text-sm text-zinc-600 transition hover:translate-x-0.5 hover:text-orange-600">
+                <Link href="/terminos-condiciones" className="inline-block text-sm text-muted-foreground transition hover:translate-x-0.5 hover:text-orange-600">
                   Términos y Condiciones
                 </Link>
               </li>
               <li>
-                <Link href="/politica-privacidad" className="inline-block text-sm text-zinc-600 transition hover:translate-x-0.5 hover:text-orange-600">
+                <Link href="/politica-privacidad" className="inline-block text-sm text-muted-foreground transition hover:translate-x-0.5 hover:text-orange-600">
                   Política de Privacidad
                 </Link>
               </li>
               <li>
-                <Link href="/contacto" className="inline-block text-sm text-zinc-600 transition hover:translate-x-0.5 hover:text-orange-600">
+                <Link href="/contacto" className="inline-block text-sm text-muted-foreground transition hover:translate-x-0.5 hover:text-orange-600">
                   Contacto
                 </Link>
               </li>

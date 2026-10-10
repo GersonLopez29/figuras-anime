@@ -20,7 +20,7 @@ export default function ConfirmAlertButton({ token, query }: { token: string; qu
   if (status === "done") {
     return (
       <>
-        <p className="mt-6 text-sm font-medium text-green-700">
+        <p className="mt-6 text-sm font-medium text-green-700 dark:text-green-300">
           ✓ ¡Aviso activado! Te escribiremos cuando publiquen <strong>{query}</strong>.
         </p>
         <Button

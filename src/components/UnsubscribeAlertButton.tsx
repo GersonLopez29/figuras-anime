@@ -17,7 +17,7 @@ export default function UnsubscribeAlertButton({ token }: { token: string }) {
   }
 
   if (status === "done") {
-    return <p className="mt-6 text-sm font-medium text-green-700">✓ Listo, ya no te escribiremos por este aviso.</p>;
+    return <p className="mt-6 text-sm font-medium text-green-700 dark:text-green-300">✓ Listo, ya no te escribiremos por este aviso.</p>;
   }
 
   return (
