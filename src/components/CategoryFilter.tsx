@@ -15,7 +15,8 @@ export default function CategoryFilter({ state, categories }: CategoryFilterProp
   const { categoria: activeCategory, q } = state;
   return (
     <div className="space-y-5">
-      <form action="/" method="get" className="flex gap-2">
+      {/* En pantallas grandes el buscador está en la barra de arriba. */}
+      <form action="/" method="get" className="flex gap-2 xl:hidden">
         <div className="relative w-full max-w-md">
           <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400">
             🔍

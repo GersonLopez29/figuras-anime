@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { formatPrice, getFinalPrice } from "@/lib/format";
+import { discountPercent, formatPrice, getFinalPrice } from "@/lib/format";
 import { isNewCondition, isOpenBoxCondition } from "@/lib/condition";
 import { getDeliveryZoneLabel, sortDeliveryZones } from "@/lib/delivery";
 import { isFeatured } from "@/lib/featured";
@@ -60,10 +60,36 @@ export default function ListingCard({
     zones.length === 0 ? null : zones.length === 1 ? zones[0] : `${zones[0]} +${zones.length - 1}`;
   const zoneTitle = zones.length > 0 ? `Entrega en: ${zones.join(", ")}` : undefined;
   const hasDiscount = !!discountAmount && !sold;
+  const percentOff = hasDiscount ? discountPercent(price, discountAmount!) : 0;
+  const conditionLabel = condition
+    ? isNewCondition(condition)
+      ? "Nueva"
+      : isOpenBoxCondition(condition)
+        ? "Open box"
+        : "Usada"
+    : null;
+  // Sobre la foto van como máximo dos etiquetas: el estado más importante
+  // (arriba) y el descuento (abajo). El resto va en una línea de texto.
+  const statusBadge = sold
+    ? null
+    : featured
+      ? { label: "⭐ Destacada", className: "bg-amber-400 text-amber-950" }
+      : isPreorder
+        ? { label: "🕒 Preventa", className: "bg-violet-600 text-white" }
+        : isReserved
+          ? { label: "🔖 Separada", className: "bg-sky-600 text-white" }
+          : null;
+  const details = [
+    conditionLabel,
+    featured && isPreorder && !sold ? "Preventa" : null,
+    (featured || isPreorder) && isReserved && !sold ? "Separada" : null,
+    realPhotos && !sold ? "📷 Foto real" : null,
+  ].filter(Boolean) as string[];
+
   return (
-    <Link href={listingPath({ id, slug: slug ?? null })} className="group block transition hover:-translate-y-1">
+    <Link href={listingPath({ id, slug: slug ?? null })} className="group block h-full transition hover:-translate-y-1">
       <Card
-        className={`gap-0 overflow-hidden py-0 ring-1 transition group-hover:shadow-xl ${
+        className={`h-full gap-0 overflow-hidden py-0 ring-1 transition group-hover:shadow-xl ${
           featured
             ? "ring-2 ring-amber-400 group-hover:ring-amber-500"
             : "ring-border group-hover:ring-primary/30"
@@ -83,17 +109,14 @@ export default function ListingCard({
               Sin imagen
             </div>
           )}
-          <Badge className="absolute left-2 top-2 bg-gradient-to-r from-red-600 to-orange-600 text-white shadow-sm">
-            {category}
-          </Badge>
-          {hasDiscount && (
-            <Badge className="absolute left-2 bottom-2 bg-green-600 text-white shadow-sm">
-              🏷️ Oferta
+          {statusBadge && (
+            <Badge className={`absolute left-2 top-2 shadow-sm ${statusBadge.className}`}>
+              {statusBadge.label}
             </Badge>
           )}
-          {featured && (
-            <Badge className="absolute right-2 bottom-2 bg-amber-400 text-amber-950 shadow-sm">
-              ⭐ Destacada
+          {hasDiscount && percentOff > 0 && (
+            <Badge className="absolute bottom-2 left-2 bg-green-600 font-bold text-white shadow-sm">
+              -{percentOff} %
             </Badge>
           )}
           {typeof isFavorited === "boolean" && (
@@ -107,54 +130,42 @@ export default function ListingCard({
             </div>
           )}
         </div>
-        <CardContent className="p-3">
-          <h3 className="line-clamp-1 text-sm font-medium text-foreground">{title}</h3>
-          <div className="mt-1.5 flex flex-wrap gap-1">
-            {isReserved && !sold && (
-              <Badge variant="outline" className="border-sky-200 bg-sky-50 text-sky-700">
-                🔖 Separada
-              </Badge>
-            )}
-            {isPreorder && !sold && (
-              <Badge variant="outline" className="border-violet-200 bg-violet-50 text-violet-700">
-                🕒 Preventa
-              </Badge>
-            )}
-            {condition && (
-              <Badge variant="outline" className="border-blue-200 bg-blue-50 text-blue-700">
-                {isNewCondition(condition)
-                  ? "🆕 Nueva"
-                  : isOpenBoxCondition(condition)
-                    ? "📦 Open box"
-                    : "♻️ Usada"}
-              </Badge>
-            )}
-            {realPhotos && !sold && (
-              <Badge variant="outline" className="border-emerald-200 bg-emerald-50 text-emerald-700" title="Fotos de la figura que se vende">
-                📷 Foto real
-              </Badge>
-            )}
-          </div>
-          {hasDiscount ? (
-            <p className="mt-1.5 flex flex-wrap items-baseline gap-1.5">
+        <CardContent className="flex flex-1 flex-col p-3">
+          <p className="truncate text-[11px] font-semibold uppercase tracking-wide text-orange-700">
+            {category}
+          </p>
+          <h3 className="mt-0.5 line-clamp-2 min-h-[2.5rem] text-sm font-medium leading-5 text-foreground">
+            {title}
+          </h3>
+          <p className="mt-1.5 flex flex-wrap items-baseline gap-x-1.5">
+            <span className="text-base font-bold text-primary sm:text-lg">
+              {formatPrice(hasDiscount ? finalPrice : price)}
+            </span>
+            {hasDiscount && (
               <span className="text-xs text-muted-foreground line-through">{formatPrice(price)}</span>
-              <span className="text-base font-bold text-green-700 sm:text-lg">{formatPrice(finalPrice)}</span>
-            </p>
-          ) : (
-            <p className="mt-1.5 text-base font-bold text-primary sm:text-lg">{formatPrice(price)}</p>
-          )}
-          {zoneSummary && (
+            )}
+          </p>
+          {(details.length > 0 || zoneSummary) && (
             <p className="mt-0.5 truncate text-xs text-muted-foreground" title={zoneTitle}>
-              <span aria-hidden="true">📍</span> {zoneSummary}
+              {details.join(" · ")}
+              {zoneSummary && (
+                <>
+                  {details.length > 0 && " · "}
+                  <span aria-hidden="true">📍</span> {zoneSummary}
+                </>
+              )}
             </p>
           )}
-          <div className="mt-1 flex items-center justify-between gap-2 border-t border-border pt-1.5">
+          {/* Empuja el vendedor al fondo para que todas las tarjetas de la fila
+              terminen a la misma altura. */}
+          <div aria-hidden="true" className="min-h-2 flex-1" />
+          <div className="flex items-center justify-between gap-2 border-t border-border pt-1.5">
             {officialStore ? (
               <p className="truncate text-xs font-semibold text-orange-700">✔ {OFFICIAL_STORE_NAME}</p>
             ) : (
               sellerName && (
                 <p className="truncate text-xs text-muted-foreground">
-                  Vende: {sellerName}
+                  {sellerName}
                   {trustedSeller && (
                     <span className="ml-1" title="Vendedor confiable" aria-label="Vendedor confiable">
                       🏅

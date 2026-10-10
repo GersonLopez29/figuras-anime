@@ -3,7 +3,13 @@ import { cache } from "react";
 import { notFound, permanentRedirect } from "next/navigation";
 import type { Metadata } from "next";
 import { prisma } from "@/lib/db";
-import { formatPrice, getFinalPrice, getActiveDiscountAmount, getDaysRemaining } from "@/lib/format";
+import {
+  formatPrice,
+  getFinalPrice,
+  getActiveDiscountAmount,
+  getDaysRemaining,
+  discountPercent,
+} from "@/lib/format";
 import { getCurrentUser } from "@/lib/session";
 import { getConditionLabel, getConditionIcon, isNewCondition } from "@/lib/condition";
 import ListingGallery from "@/components/ListingGallery";
@@ -24,6 +30,7 @@ import FavoriteButton from "@/components/FavoriteButton";
 import ShareButton from "@/components/ShareButton";
 import MessageButton from "@/components/MessageButton";
 import WhatsAppContactButton from "@/components/WhatsAppContactButton";
+import StickyContactBar from "@/components/StickyContactBar";
 import StoryShareButton from "@/components/StoryShareButton";
 import StockAlertForm from "@/components/StockAlertForm";
 import { normalizeAlertQuery } from "@/lib/alertMatch";
@@ -208,7 +215,7 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
   };
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8">
+    <div className="mx-auto max-w-5xl px-4 pb-28 pt-8 sm:pb-8">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -289,13 +296,16 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
             </div>
           </div>
           {!listing.sold && activeDiscount ? (
-            <p className="mt-2 flex items-baseline gap-2">
+            <p className="mt-2 flex flex-wrap items-baseline gap-x-2 gap-y-1">
+              <span className="text-3xl font-bold text-primary">
+                {formatPrice(getFinalPrice(listing.price, activeDiscount))}
+              </span>
               <span className="text-lg text-muted-foreground line-through">
                 {formatPrice(listing.price)}
               </span>
-              <span className="text-3xl font-bold text-green-700">
-                {formatPrice(getFinalPrice(listing.price, activeDiscount))}
-              </span>
+              <Badge className="self-center bg-green-600 text-white">
+                -{discountPercent(listing.price, activeDiscount)} %
+              </Badge>
             </p>
           ) : (
             <p className="mt-2 text-3xl font-bold text-primary">
@@ -349,29 +359,33 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
             </div>
           )}
 
-          <p className="mt-4 whitespace-pre-line text-sm leading-relaxed text-foreground/80">
-            {listing.description}
-          </p>
-
-          {listing.deliveryZones.length > 0 && (
-            <div className="mt-4 rounded-lg bg-muted/50 p-3 text-sm">
-              <p className="font-semibold text-foreground">📍 Entrega en</p>
-              <div className="mt-2 flex flex-wrap gap-1.5">
-                {sortDeliveryZones(listing.deliveryZones).map((zone) => (
-                  <Badge
-                    key={zone}
-                    variant="outline"
-                    className="bg-white"
-                    render={<Link href={`/?zona=${zone}#catalogo`} />}
-                  >
-                    {getDeliveryZoneLabel(zone)}
-                  </Badge>
-                ))}
-              </div>
-              {listing.deliveryNotes && (
-                <p className="mt-2 text-muted-foreground">
-                  Puntos de encuentro: {listing.deliveryNotes}
+          {listing.sold ? (
+            <>
+              <Alert className="mt-5 text-center">
+                <AlertDescription className="justify-center text-center font-medium">
+                  Este producto ya fue vendido.
+                </AlertDescription>
+              </Alert>
+              <div className="mt-4 rounded-lg bg-orange-50/70 p-4 ring-1 ring-orange-200">
+                <p className="text-sm font-semibold text-foreground">🔔 ¿Llegaste tarde?</p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Te avisamos por correo cuando alguien publique otra igual.
                 </p>
+                <div className="mt-3">
+                  <StockAlertForm
+                    defaultQuery={normalizeAlertQuery(listing.title).split(" ").slice(0, 5).join(" ")}
+                    defaultEmail={currentUser?.email ?? ""}
+                  />
+                </div>
+              </div>
+            </>
+          ) : (
+            // Cualquiera puede contactar al vendedor, tenga cuenta o no. En celular,
+            // si este bloque sale de la pantalla aparece una barra fija abajo.
+            <div id="contacto" className="mt-5 scroll-mt-24">
+              <WhatsAppContactButton listingId={listing.id} />
+              {currentUser && currentUser.id !== listing.user.id && (
+                <MessageButton listingId={listing.id} />
               )}
             </div>
           )}
@@ -411,39 +425,41 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
             </div>
           </Link>
 
-          {listing.sold ? (
-            <>
-              <Alert className="mt-6 text-center">
-                <AlertDescription className="justify-center text-center font-medium">
-                  Este producto ya fue vendido.
-                </AlertDescription>
-              </Alert>
-              <div className="mt-4 rounded-lg bg-orange-50/70 p-4 ring-1 ring-orange-200">
-                <p className="text-sm font-semibold text-foreground">🔔 ¿Llegaste tarde?</p>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Te avisamos por correo cuando alguien publique otra igual.
-                </p>
-                <div className="mt-3">
-                  <StockAlertForm
-                    defaultQuery={normalizeAlertQuery(listing.title).split(" ").slice(0, 5).join(" ")}
-                    defaultEmail={currentUser?.email ?? ""}
-                  />
-                </div>
+          <p className="mt-4 whitespace-pre-line text-sm leading-relaxed text-foreground/80">
+            {listing.description}
+          </p>
+
+          {listing.deliveryZones.length > 0 && (
+            <div className="mt-4 rounded-lg bg-muted/50 p-3 text-sm">
+              <p className="font-semibold text-foreground">📍 Entrega en</p>
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {sortDeliveryZones(listing.deliveryZones).map((zone) => (
+                  <Badge
+                    key={zone}
+                    variant="outline"
+                    className="bg-white"
+                    render={<Link href={`/?zona=${zone}#catalogo`} />}
+                  >
+                    {getDeliveryZoneLabel(zone)}
+                  </Badge>
+                ))}
               </div>
-            </>
-          ) : (
-            // Cualquiera puede contactar al vendedor, tenga cuenta o no.
-            <div className="mt-6">
-              <WhatsAppContactButton listingId={listing.id} />
-              {currentUser && currentUser.id !== listing.user.id && (
-                <MessageButton listingId={listing.id} />
+              {listing.deliveryNotes && (
+                <p className="mt-2 text-muted-foreground">
+                  Puntos de encuentro: {listing.deliveryNotes}
+                </p>
               )}
+            </div>
+          )}
+
+          {!listing.sold && (
+            <div className="mt-4">
               <StoryShareButton
                 imageUrl={`${listingPath(listing)}/historia`}
                 fileName={`figurasanime-${listing.id}-historia.png`}
                 shareText={`${listing.title} — ${formatPrice(totalPrice)} en ${pageUrl}`}
                 label="📲 Compartir en historias o TikTok"
-                className="mt-3 w-full"
+                className="w-full"
                 showHint
               />
             </div>
@@ -484,6 +500,15 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
           href={categoryPath(listing.category)}
           listings={similarListings}
           trustedSellerIds={trustedSellerIds}
+        />
+      )}
+
+      {!listing.sold && (
+        <StickyContactBar
+          listingId={listing.id}
+          priceLabel={formatPrice(totalPrice)}
+          originalPriceLabel={activeDiscount ? formatPrice(listing.price) : null}
+          targetId="contacto"
         />
       )}
     </div>

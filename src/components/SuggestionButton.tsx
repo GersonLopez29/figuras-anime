@@ -64,7 +64,7 @@ export default function SuggestionButton() {
         render={
           <Button
             aria-label="Enviar una sugerencia"
-            className="fixed bottom-4 right-4 z-40 size-11 gap-1.5 rounded-full p-0 opacity-90 shadow-lg shadow-orange-600/20 transition-opacity hover:opacity-100 sm:bottom-5 sm:right-5 sm:h-11 sm:w-auto sm:px-4"
+            className="suggestion-fab fixed bottom-4 right-4 z-40 size-11 gap-1.5 rounded-full p-0 opacity-90 shadow-lg shadow-orange-600/20 transition-opacity hover:opacity-100 sm:bottom-5 sm:right-5 sm:h-11 sm:w-auto sm:px-4"
           />
         }
       >
