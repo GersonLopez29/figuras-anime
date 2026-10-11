@@ -110,9 +110,11 @@ const getListingAndRegisterView = cache(async (id: string, viewerId: string | nu
   let views = listing.views;
   if (viewerId !== listing.userId) {
     views += 1;
+    // SQL directo: con prisma.update, Prisma cambia también updatedAt, y una
+    // visita no es una modificación de la publicación.
     after(() =>
-      prisma.listing
-        .update({ where: { id: listing.id }, data: { views: { increment: 1 } } })
+      prisma.$executeRaw`UPDATE "Listing" SET "views" = "views" + 1 WHERE "id" = ${listing.id}`
+        .then(() => undefined)
         .catch((err) => console.error("[vistas] No se pudo contar la visita:", err))
     );
   }
