@@ -217,6 +217,68 @@ html[data-sticky-bar] .suggestion-fab {
   bottom: 6rem;
 }
 
+/* Efecto 3D de las fotos (componente Tilt3D). Con el mouse, el componente
+   pone --tilt-*; en celular Android, gyroTilt.ts pone --gyro-* en <html>. */
+.tilt-3d {
+  --rx: var(--tilt-rx, var(--gyro-rx, 0deg));
+  --ry: var(--tilt-ry, var(--gyro-ry, 0deg));
+  /* En reposo sin transform: el texto se ve nítido. Al soltar, vuelve suave. */
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.tilt-3d[data-tilting],
+html[data-gyro] .tilt-3d {
+  transform: perspective(900px) rotateX(var(--rx)) rotateY(var(--ry));
+  will-change: transform;
+}
+.tilt-3d[data-tilting] {
+  transition: transform 0.12s ease-out;
+}
+html[data-gyro] .tilt-3d {
+  transition: transform 0.2s ease-out;
+}
+/* Brillo tipo carta holográfica: un reflejo blanco donde está la luz y un
+   arcoíris suave que se desliza con la inclinación. */
+.tilt-glare {
+  --gx: var(--tilt-gx, var(--gyro-gx, 50%));
+  --gy: var(--tilt-gy, var(--gyro-gy, 50%));
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  border-radius: inherit;
+  background:
+    radial-gradient(circle at var(--gx) var(--gy), rgb(255 255 255 / 0.65), transparent 45%),
+    linear-gradient(
+      115deg,
+      transparent 20%,
+      rgb(255 160 60 / 0.4) 36%,
+      rgb(110 220 255 / 0.38) 50%,
+      rgb(200 140 255 / 0.38) 64%,
+      transparent 80%
+    );
+  background-size: 100% 100%, 260% 260%;
+  background-position: center, var(--gx) var(--gy);
+  mix-blend-mode: overlay;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.tilt-3d[data-tilting] > .tilt-glare {
+  opacity: 1;
+}
+html[data-gyro] .tilt-3d > .tilt-glare {
+  opacity: 0.55;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tilt-3d,
+  .tilt-3d[data-tilting],
+  html[data-gyro] .tilt-3d {
+    transform: none;
+  }
+  .tilt-glare {
+    display: none;
+  }
+}
+
 /* Animaciones suaves. Las tarjetas aparecen con un leve desvanecido al entrar
    en pantalla (solo CSS, en navegadores que lo soportan). Se anima "scale" y
    no "translate" para no chocar con el efecto de elevación al pasar el mouse. */
