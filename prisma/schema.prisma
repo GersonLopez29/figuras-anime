@@ -181,6 +181,9 @@ model Listing {
   // null en publicaciones anteriores a esta opción.
   photoType         String?
   sold              Boolean        @default(false)
+  // Momento en que se marcó como vendida (null si está disponible). La barra
+  // "Vendidas hace poco" ordena por esto: updatedAt cambia con cada visita.
+  soldAt            DateTime?
   views             Int            @default(0)
   createdAt         DateTime       @default(now())
   updatedAt         DateTime       @updatedAt
@@ -193,6 +196,7 @@ model Listing {
   featureRequests   FeatureRequest[]
 
   @@index([featuredUntil])
+  @@index([sold, soldAt])
 }
 
 // Pedido de un vendedor para destacar una figura. Paga por Yape/Plin y el

@@ -171,7 +171,9 @@ export default async function CatalogPage({ searchParams, fixedCategory }: Catal
     prisma.listing.findMany({
       where: { sold: true },
       include: { images: { take: 1 } },
-      orderBy: { updatedAt: "desc" },
+      // Por fecha de venta. Antes era updatedAt, que cambia cada vez que
+      // alguien abre la ficha (contador de visitas): salían las más vistas.
+      orderBy: [{ soldAt: { sort: "desc", nulls: "last" } }, { updatedAt: "desc" }],
       take: RECENTLY_SOLD_LIMIT,
     }),
   ]);
