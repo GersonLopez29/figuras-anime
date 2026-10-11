@@ -34,7 +34,12 @@ export async function PATCH(
 
   const updated = await prisma.listing.update({
     where: { id },
-    data: { sold: parsed.data.sold },
+    data: {
+      sold: parsed.data.sold,
+      // Guarda cuándo se vendió (para "Vendidas hace poco"). Si ya estaba
+      // vendida se conserva la fecha original; al volver a disponible se borra.
+      soldAt: parsed.data.sold ? (existing.sold ? (existing.soldAt ?? new Date()) : new Date()) : null,
+    },
   });
 
   return NextResponse.json(updated);
