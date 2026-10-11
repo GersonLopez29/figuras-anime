@@ -27,17 +27,21 @@ export default function Tilt3D({ children, className = "", max = 10, glare = tru
   }, []);
 
   function onPointerMove(e: React.PointerEvent<HTMLDivElement>) {
-    if (e.pointerType !== "mouse" || reduced.current) return;
+    if (e.pointerType !== "mouse") return;
     const el = ref.current;
     if (!el) return;
     const { clientX, clientY } = e;
+    // Con "reducir movimiento" (en Windows basta con tener las animaciones
+    // del sistema apagadas) el efecto sigue, pero más suave: solo se mueve
+    // cuando la persona mueve el mouse encima, nunca solo.
+    const tilt = reduced.current ? max * 0.6 : max;
     cancelAnimationFrame(frame.current);
     frame.current = requestAnimationFrame(() => {
       const r = el.getBoundingClientRect();
       const px = clamp01((clientX - r.left) / r.width);
       const py = clamp01((clientY - r.top) / r.height);
-      el.style.setProperty("--tilt-rx", `${((0.5 - py) * max * 2).toFixed(2)}deg`);
-      el.style.setProperty("--tilt-ry", `${((px - 0.5) * max * 2).toFixed(2)}deg`);
+      el.style.setProperty("--tilt-rx", `${((0.5 - py) * tilt * 2).toFixed(2)}deg`);
+      el.style.setProperty("--tilt-ry", `${((px - 0.5) * tilt * 2).toFixed(2)}deg`);
       el.style.setProperty("--tilt-gx", `${(px * 100).toFixed(1)}%`);
       el.style.setProperty("--tilt-gy", `${(py * 100).toFixed(1)}%`);
       el.dataset.tilting = "1";
