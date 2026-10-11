@@ -268,16 +268,10 @@ html[data-gyro] .tilt-3d {
 html[data-gyro] .tilt-3d > .tilt-glare {
   opacity: 0.55;
 }
-@media (prefers-reduced-motion: reduce) {
-  .tilt-3d,
-  .tilt-3d[data-tilting],
-  html[data-gyro] .tilt-3d {
-    transform: none;
-  }
-  .tilt-glare {
-    display: none;
-  }
-}
+/* Con "reducir movimiento" el giro del celular no se activa (gyroTilt.ts) y
+   la inclinación con el mouse es más suave (Tilt3D.tsx), pero no se apaga:
+   Windows lo informa con solo tener las animaciones del sistema desactivadas,
+   y muchas PCs vienen así. */
 
 /* Animaciones suaves. Las tarjetas aparecen con un leve desvanecido al entrar
    en pantalla (solo CSS, en navegadores que lo soportan). Se anima "scale" y
