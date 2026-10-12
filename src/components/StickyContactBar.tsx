@@ -57,7 +57,7 @@ export default function StickyContactBar({
         </div>
         <Button
           type="button"
-          onClick={open}
+          onClick={() => open()}
           disabled={loading}
           tabIndex={visible ? 0 : -1}
           className={`h-11 flex-1 ${WHATSAPP_BUTTON_CLASS}`}

@@ -3,6 +3,7 @@ import { categoryPath } from "@/lib/slug";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import SocialLinks from "@/components/SocialLinks";
+import InstallAppButton from "@/components/InstallAppButton";
 
 type CategoryOption = { name: string; icon: string };
 
@@ -33,6 +34,9 @@ export default function Footer({ totalVisits, categories }: FooterProps) {
             </h3>
             <div className="mt-3">
               <SocialLinks />
+            </div>
+            <div className="mt-4">
+              <InstallAppButton />
             </div>
           </div>
 

@@ -71,6 +71,9 @@ model Favorite {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   listingId String
   listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  // Último precio avisado por correo ("¡bajó de precio!"). null = nunca se
+  // avisó. Ver lib/priceAlerts.ts.
+  notifiedPrice Float?
 
   @@unique([userId, listingId])
 }
@@ -186,6 +189,8 @@ model Listing {
   // null en publicaciones anteriores a esta opción.
   photoType         String?
   sold              Boolean        @default(false)
+  // El comprador puede proponer un precio ("Hacer una oferta"). Ver lib/offers.ts.
+  acceptsOffers     Boolean        @default(true)
   // Momento en que se marcó como vendida (null si está disponible). La barra
   // "Vendidas hace poco" ordena por esto: updatedAt cambia con cada visita.
   soldAt            DateTime?
@@ -243,6 +248,8 @@ model ConsignmentRequest {
 model WhatsAppClick {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
+  // Monto ofrecido si el contacto fue con "Hacer una oferta" (null = consulta normal).
+  offerAmount Float?
   userId    String?
   user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
   ip        String?

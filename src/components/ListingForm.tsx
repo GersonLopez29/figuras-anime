@@ -61,6 +61,7 @@ type ListingFormProps =
       initialPreorderArrival: string;
       initialPreorderDeposit: number | null;
       initialPhotoType: string | null;
+      initialAcceptsOffers: boolean;
       categories: CategoryOption[];
     };
 
@@ -89,6 +90,7 @@ export default function ListingForm(props: ListingFormProps) {
       : ""
   );
   const [isPreorder, setIsPreorder] = useState(isEdit ? props.initialIsPreorder : false);
+  const [acceptsOffers, setAcceptsOffers] = useState(isEdit ? props.initialAcceptsOffers : true);
   const [preorderArrival, setPreorderArrival] = useState(
     isEdit ? props.initialPreorderArrival : ""
   );
@@ -181,6 +183,7 @@ export default function ListingForm(props: ListingFormProps) {
     deliveryZones.forEach((zone) => formData.append("deliveryZones", zone));
     formData.set("deliveryNotes", deliveryNotes);
     formData.set("isPreorder", String(isPreorder));
+    formData.set("acceptsOffers", String(acceptsOffers));
     formData.set("preorderArrival", isPreorder ? preorderArrival : "");
     formData.set("preorderDeposit", isPreorder ? preorderDeposit : "");
     // Las fotos se achican antes de enviarlas (Vercel no acepta envíos de más
@@ -382,6 +385,22 @@ export default function ListingForm(props: ListingFormProps) {
             </Select>
           )}
         </div>
+
+        <label className="flex cursor-pointer items-start gap-2.5 rounded-lg border border-input p-3 text-sm">
+          <input
+            type="checkbox"
+            checked={acceptsOffers}
+            onChange={(e) => setAcceptsOffers(e.target.checked)}
+            className="mt-0.5 size-4 accent-green-600"
+          />
+          <span>
+            <span className="block font-medium text-foreground">🤝 Acepto ofertas</span>
+            <span className="block text-xs text-muted-foreground">
+              Los compradores pueden proponerte un precio por WhatsApp (mínimo la mitad). Desmárcalo
+              si tu precio es fijo.
+            </span>
+          </span>
+        </label>
 
         <div
           className={`rounded-lg border p-3 transition ${

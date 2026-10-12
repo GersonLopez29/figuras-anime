@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { getCurrentUser, isAdmin } from "@/lib/session";
 import { prisma } from "@/lib/db";
 import DeleteListingButton from "@/components/DeleteListingButton";
+import { getListingStats, listingTip } from "@/lib/listingStats";
 import FeatureListingButton from "@/components/FeatureListingButton";
 import StoryShareButton from "@/components/StoryShareButton";
 import {
@@ -74,6 +75,7 @@ export default async function MisFigurasPage({ searchParams }: MisFigurasPagePro
       .then((u) => u?.freeFeatureCredits ?? 0),
   ]);
   const userIsAdmin = isAdmin(user);
+  const stats = await getListingStats(listings.map((l) => l.id));
   const soldCount = listings.filter((l) => l.sold).length;
   const counts = soldCounts(listings.length - soldCount, soldCount);
   const visibleListings = listings.filter((l) => matchesSoldFilter(filter, l.sold));
@@ -271,10 +273,53 @@ export default async function MisFigurasPage({ searchParams }: MisFigurasPagePro
                     )}{" "}
                     · {listing.category} · {getConditionLabel(listing.condition)}
                   </p>
-                  <p className="flex items-center gap-1 text-xs text-muted-foreground">
-                    <span aria-hidden="true">👁️</span>
-                    {listing.views} {listing.views === 1 ? "vista" : "vistas"}
-                  </p>
+                  {(() => {
+                    const st = stats.get(listing.id)!;
+                    const tip = listingTip({
+                      views: listing.views,
+                      contacts: st.contacts,
+                      favorites: st.favorites,
+                      createdAt: listing.createdAt,
+                      sold: listing.sold,
+                      featured: isFeatured(listing.featuredUntil),
+                    });
+                    return (
+                      <>
+                        <p className="flex flex-wrap items-center gap-x-2.5 gap-y-0.5 text-xs text-muted-foreground">
+                          <span title="Veces que abrieron la ficha">
+                            👁️ {listing.views} {listing.views === 1 ? "vista" : "vistas"}
+                          </span>
+                          <span title="Personas que tocaron Contactar por WhatsApp">
+                            💬 {st.contacts} {st.contacts === 1 ? "contacto" : "contactos"}
+                            {st.contactsWeek > 0 && (
+                              <span className="font-semibold text-green-700 dark:text-green-300">
+                                {" "}(+{st.contactsWeek} esta semana)
+                              </span>
+                            )}
+                          </span>
+                          {st.offers > 0 && (
+                            <span title="Contactos con Hacer una oferta (incluidos en los contactos)">
+                              🤝 {st.offers} {st.offers === 1 ? "oferta" : "ofertas"}
+                            </span>
+                          )}
+                          <span title="Personas que la guardaron en Favoritos">
+                            ❤️ {st.favorites} {st.favorites === 1 ? "la guardó" : "la guardaron"}
+                          </span>
+                        </p>
+                        {tip && (
+                          <p
+                            className={`mt-1 text-xs ${
+                              tip.tone === "good"
+                                ? "text-green-700 dark:text-green-300"
+                                : "text-amber-700 dark:text-amber-300"
+                            }`}
+                          >
+                            {tip.tone === "good" ? "🔥" : "💡"} {tip.text}
+                          </p>
+                        )}
+                      </>
+                    );
+                  })()}
                   <div className="mt-1.5">
                     <DiscountControl
                       listingId={listing.id}
