@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse, after } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
-import { getCurrentUser } from "@/lib/session";
+import { getCurrentUser, isAdmin } from "@/lib/session";
 import { saveUploadedImage } from "@/lib/uploads";
 import { getCategoryNames, isValidCategory } from "@/lib/categories";
 import { isValidCondition } from "@/lib/condition";
@@ -10,6 +10,9 @@ import { deliveryFieldsSchema, readDeliveryFields } from "@/lib/delivery";
 import { preorderFieldsSchema, readPreorderFields } from "@/lib/preorder";
 import { uniqueListingSlug } from "@/lib/listingSlug";
 import { notifyNewListing } from "@/lib/newListingNotifications";
+import { applyWelcomeBonus, WELCOME_BONUS_DAYS } from "@/lib/sellerRewards";
+import { sendWelcomeBonusEmail } from "@/lib/email";
+import { listingPath } from "@/lib/slug";
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const category = searchParams.get("categoria");
@@ -143,6 +146,16 @@ export async function POST(request: NextRequest) {
     include: { images: true },
   });
 
+  // Bono de bienvenida: la primera figura con fotos reales de una cuenta
+  // nueva sale destacada gratis (el admin destaca las suyas sin bono).
+  let welcomeBonusUntil: Date | null = null;
+  if (photoType === "real" && !isAdmin(user)) {
+    welcomeBonusUntil = await applyWelcomeBonus(user.id, listing.id).catch((err) => {
+      console.error("[bienvenida] No se pudo aplicar el bono:", err);
+      return null;
+    });
+  }
+
   // Correos a quienes esperaban esta figura ("Avísame" y "Se busca"), después
   // de responder para que publicar no se demore.
   after(async () => {
@@ -151,7 +164,22 @@ export async function POST(request: NextRequest) {
     } catch (err) {
       console.error("[avisos] No se pudieron enviar los avisos de la figura nueva:", err);
     }
+    if (welcomeBonusUntil) {
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://gerstore.club";
+      await sendWelcomeBonusEmail(
+        user.email,
+        user.name,
+        listing.title,
+        `${siteUrl}${listingPath(listing)}`,
+        WELCOME_BONUS_DAYS
+      );
+    }
   });
 
-  return NextResponse.json(listing, { status: 201 });
+  return NextResponse.json(
+    welcomeBonusUntil
+      ? { ...listing, featuredUntil: welcomeBonusUntil, welcomeBonus: true }
+      : listing,
+    { status: 201 }
+  );
 }

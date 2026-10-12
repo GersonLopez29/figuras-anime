@@ -53,8 +53,13 @@ model User {
   referredBy                 User?             @relation("Referrals", fields: [referredById], references: [id], onDelete: SetNull)
   referrals                  User[]            @relation("Referrals")
   referralRewardedAt         DateTime?
-  // Destacados gratis ganados por invitar amigos.
+  // Destacados gratis ganados (invitando amigos y por logros de ventas).
   freeFeatureCredits         Int               @default(0)
+  // Bono de bienvenida: cuándo se usó (su primera figura con fotos reales
+  // salió destacada gratis). null = aún lo tiene. Ver lib/sellerRewards.ts.
+  welcomeBonusAt             DateTime?
+  // Logro de ventas más alto ya premiado (0, 1, 5 o 10).
+  salesMilestoneReached      Int               @default(0)
 
   @@index([referredById])
 }

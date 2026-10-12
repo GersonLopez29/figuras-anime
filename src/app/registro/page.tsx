@@ -62,6 +62,13 @@ export default function RegistroPage() {
           <p className="mt-1 text-sm text-muted-foreground">
             Regístrate para publicar y vender tus figuras.
           </p>
+          <div className="mt-4 rounded-lg bg-amber-50 dark:bg-amber-950/40 p-3 text-sm text-amber-900 dark:text-amber-200 ring-1 ring-amber-200 dark:ring-amber-800">
+            <p className="font-semibold">🎁 Regalo de bienvenida</p>
+            <p className="mt-0.5">
+              Tu primera figura con fotos reales sale ⭐ destacada 7 días gratis. Y con cada logro de
+              ventas (1, 5 y 10) ganas otro destacado.
+            </p>
+          </div>
 
           <form onSubmit={handleSubmit} className="mt-6 space-y-4">
             <div className="space-y-1.5">

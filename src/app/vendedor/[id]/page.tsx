@@ -11,6 +11,8 @@ import { OFFICIAL_STORE_NAME } from "@/lib/store";
 import { cardInclude, toCardProps } from "@/lib/listingCard";
 import { getTrustProgress } from "@/lib/trust";
 import TrustedSellerBadge, { TRUSTED_SELLER_EXPLANATION } from "@/components/TrustedSellerBadge";
+import SalesBadge from "@/components/SalesBadge";
+import { countQualifyingSales } from "@/lib/sellerRewards";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -77,7 +79,10 @@ export default async function VendedorPage({ params }: VendedorPageProps) {
       : 0;
 
   const isOwnProfile = currentUser?.id === seller.id;
-  const trust = await getTrustProgress(seller.id);
+  const [trust, badgeSales] = await Promise.all([
+    getTrustProgress(seller.id),
+    countQualifyingSales(seller.id),
+  ]);
 
   const favoritedIds = currentUser
     ? new Set(
@@ -111,10 +116,15 @@ export default async function VendedorPage({ params }: VendedorPageProps) {
           {seller.isOfficialStore && (
             <p className="text-sm font-semibold text-orange-700 dark:text-orange-300">✔ {OFFICIAL_STORE_NAME}</p>
           )}
-          {trust?.trusted && (
+          {(trust?.trusted || badgeSales > 0) && (
             <div className="mt-1">
-              <TrustedSellerBadge size="md" />
-              <p className="mt-1 text-xs text-muted-foreground">{TRUSTED_SELLER_EXPLANATION}</p>
+              <div className="flex flex-wrap gap-1.5">
+                {trust?.trusted && <TrustedSellerBadge size="md" />}
+                <SalesBadge sales={badgeSales} size="md" />
+              </div>
+              {trust?.trusted && (
+                <p className="mt-1 text-xs text-muted-foreground">{TRUSTED_SELLER_EXPLANATION}</p>
+              )}
             </div>
           )}
           <p className="text-xs text-muted-foreground">

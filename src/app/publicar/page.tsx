@@ -1,7 +1,8 @@
 import { redirect } from "next/navigation";
-import { getCurrentUser } from "@/lib/session";
+import { getCurrentUser, isAdmin } from "@/lib/session";
 import { getCategories } from "@/lib/categories";
 import { prisma } from "@/lib/db";
+import { hasWelcomeBonus, WELCOME_BONUS_DAYS } from "@/lib/sellerRewards";
 import ListingForm from "@/components/ListingForm";
 import EmailVerificationBanner from "@/components/EmailVerificationBanner";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
@@ -29,13 +30,14 @@ export default async function PublicarPage() {
     );
   }
 
-  const [categories, lastListing] = await Promise.all([
+  const [categories, lastListing, welcomeBonus] = await Promise.all([
     getCategories(),
     prisma.listing.findFirst({
       where: { userId: user.id, NOT: { deliveryZones: { isEmpty: true } } },
       orderBy: { createdAt: "desc" },
       select: { deliveryZones: true, deliveryNotes: true },
     }),
+    isAdmin(user) ? Promise.resolve(false) : hasWelcomeBonus(user.id),
   ]);
 
   return (
@@ -45,6 +47,16 @@ export default async function PublicarPage() {
         Los compradores te contactarán por WhatsApp al número{" "}
         <span className="font-medium text-foreground/80">{user.whatsapp}</span>.
       </p>
+
+      {welcomeBonus && (
+        <Alert className="mt-6 border-amber-300 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/40">
+          <AlertTitle className="text-amber-900 dark:text-amber-200">🎁 Regalo de bienvenida</AlertTitle>
+          <AlertDescription className="text-amber-900 dark:text-amber-200">
+            Tu primera figura con 📷 fotos reales sale ⭐ destacada {WELCOME_BONUS_DAYS} días gratis
+            apenas la publiques: aparece arriba del catálogo.
+          </AlertDescription>
+        </Alert>
+      )}
 
       <div className="mt-8">
         <ListingForm

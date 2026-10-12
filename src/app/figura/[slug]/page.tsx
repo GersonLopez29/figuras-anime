@@ -21,6 +21,8 @@ import { cardInclude, toCardProps } from "@/lib/listingCard";
 import { getTrustedSellerIds } from "@/lib/trust";
 import { PHOTO_TYPE_HELP, PHOTO_TYPE_LABEL, isValidPhotoType } from "@/lib/photoType";
 import TrustedSellerBadge from "@/components/TrustedSellerBadge";
+import SalesBadge from "@/components/SalesBadge";
+import { WELCOME_BONUS_DAYS, countQualifyingSales } from "@/lib/sellerRewards";
 import { formatArrival } from "@/lib/preorder";
 import { getActiveReservation, formatReservationDate } from "@/lib/reservation";
 import { isFeatured } from "@/lib/featured";
@@ -45,6 +47,8 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://gerstore.club";
 
 type FiguraPageProps = {
   params: Promise<{ slug: string }>;
+  // ?destacada=bienvenida: recién publicada con el bono de bienvenida.
+  searchParams: Promise<{ destacada?: string }>;
 };
 
 // La metadata y la página buscan la misma figura: cache() hace que la búsqueda
@@ -122,7 +126,7 @@ const getListingAndRegisterView = cache(async (id: string, viewerId: string | nu
   return { listing, views };
 });
 
-export default async function FiguraPage({ params }: FiguraPageProps) {
+export default async function FiguraPage({ params, searchParams }: FiguraPageProps) {
   const { slug: param } = await params;
 
   // Los enlaces anteriores (/figura/<id>, /figura/<nombre>-<id> o con un título
@@ -146,7 +150,7 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
   // comprador siga explorando en vez de salir de la página. Todas estas
   // consultas son independientes: van juntas (antes iban una tras otra).
   const RELATED_LIMIT = 4;
-  const [ratingAgg, sellerListings, similarCandidates, trustedSellerIds, favorite] =
+  const [ratingAgg, sellerListings, similarCandidates, trustedSellerIds, favorite, sellerSales, { destacada }] =
     await Promise.all([
       prisma.review.aggregate({
         where: { sellerId: listing.user.id },
@@ -173,6 +177,8 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
             select: { id: true },
           })
         : Promise.resolve(null),
+      countQualifyingSales(listing.user.id),
+      searchParams,
     ]);
   const averageRating = ratingAgg._avg.rating ?? 0;
   const reviewCount = ratingAgg._count;
@@ -186,6 +192,11 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
     .filter((l) => !sellerListingIds.has(l.id))
     .slice(0, RELATED_LIMIT);
   const sellerIsTrusted = trustedSellerIds.has(listing.user.id);
+  // Aviso del bono de bienvenida: solo para el dueño y si sigue destacada.
+  const showWelcomeBonus =
+    destacada === "bienvenida" &&
+    currentUser?.id === listing.user.id &&
+    isFeatured(listing.featuredUntil);
   const isFavorited = !!favorite;
 
   const activeDiscount = getActiveDiscountAmount(listing.discountAmount, listing.discountExpiresAt);
@@ -234,6 +245,16 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
       <Link href="/" className="text-sm text-muted-foreground hover:text-foreground">
         &larr; Volver al catálogo
       </Link>
+
+      {showWelcomeBonus && (
+        <Alert className="mt-4 border-amber-300 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/40">
+          <AlertDescription className="text-amber-900 dark:text-amber-200">
+            <span className="font-bold">🎁 ¡Bienvenido! Tu primera figura ya está ⭐ destacada {WELCOME_BONUS_DAYS} días gratis.</span>{" "}
+            Aparece arriba del catálogo para que más coleccionistas la vean. Cuando la vendas,
+            márcala como vendida: con tu primera venta ganas otro destacado gratis.
+          </AlertDescription>
+        </Alert>
+      )}
 
       <div className="mt-4 grid gap-8 sm:grid-cols-2">
         {/* En computadora la galería acompaña al bajar por la ficha. */}
@@ -421,9 +442,10 @@ export default async function FiguraPage({ params }: FiguraPageProps) {
               {listing.user.isOfficialStore && (
                 <p className="text-xs font-semibold text-orange-700 dark:text-orange-300">✔ {OFFICIAL_STORE_NAME}</p>
               )}
-              {sellerIsTrusted && (
-                <div className="mt-0.5">
-                  <TrustedSellerBadge />
+              {(sellerIsTrusted || sellerSales > 0) && (
+                <div className="mt-0.5 flex flex-wrap gap-1">
+                  {sellerIsTrusted && <TrustedSellerBadge />}
+                  <SalesBadge sales={sellerSales} />
                 </div>
               )}
               <div className="mt-0.5">

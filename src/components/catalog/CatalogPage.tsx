@@ -514,6 +514,12 @@ export default async function CatalogPage({ searchParams, fixedCategory }: Catal
                     </li>
                   ))}
                 </ol>
+                {/* Regalo de bienvenida (lib/sellerRewards.ts): solo a visitantes. */}
+                {!user && (
+                  <p className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-amber-100 dark:bg-amber-950/50 px-3 py-1 text-xs font-semibold text-amber-900 dark:text-amber-200 ring-1 ring-amber-300 dark:ring-amber-800 sm:text-sm">
+                    🎁 Regístrate: tu primera figura sale ⭐ destacada gratis
+                  </p>
+                )}
               </div>
 
               {bannerSlides.length > 0 && <BannerCarousel slides={bannerSlides} />}
