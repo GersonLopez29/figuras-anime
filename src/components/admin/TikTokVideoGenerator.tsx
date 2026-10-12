@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ACCENTS, H, W, planVideo, recordVideo, pickRecorderType } from "@/lib/animeVideo";
+import SaveToDriveButton from "@/components/admin/SaveToDriveButton";
 
 export type VideoListing = {
   id: string;
@@ -68,7 +69,7 @@ export default function TikTokVideoGenerator({ listings }: { listings: VideoList
   const [status, setStatus] = useState<"idle" | "loading" | "recording" | "done" | "error">("idle");
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
-  const [result, setResult] = useState<{ url: string; ext: string; size: number } | null>(null);
+  const [result, setResult] = useState<{ url: string; ext: string; size: number; blob: Blob } | null>(null);
 
   const selected = listings.find((l) => l.id === selectedId);
   const filtered = listings.filter((l) => l.title.toLowerCase().includes(query.trim().toLowerCase()));
@@ -125,7 +126,7 @@ export default function TikTokVideoGenerator({ listings }: { listings: VideoList
       });
       setStatus("recording");
       const { blob, ext } = await recordVideo(canvasRef.current, plan, setProgress);
-      setResult({ url: URL.createObjectURL(blob), ext, size: blob.size });
+      setResult({ url: URL.createObjectURL(blob), ext, size: blob.size, blob });
       setStatus("done");
     } catch (err) {
       setError(err instanceof Error ? err.message : "No se pudo generar el video");
@@ -277,6 +278,7 @@ export default function TikTokVideoGenerator({ listings }: { listings: VideoList
             >
               ⬇️ Descargar {fileName}
             </a>
+            <SaveToDriveButton key={result.url} blob={result.blob} fileName={fileName} />
             <p className="mt-2 text-xs">
               Va sin música: al subirlo, agrega un sonido en tendencia desde TikTok o Instagram.
             </p>

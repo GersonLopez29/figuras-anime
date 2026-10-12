@@ -2,14 +2,15 @@ import type { NextConfig } from "next";
 
 const contentSecurityPolicy = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' https://pagead2.googlesyndication.com",
-  "style-src 'self' 'unsafe-inline'",
+  "script-src 'self' 'unsafe-inline' https://pagead2.googlesyndication.com https://accounts.google.com",
+  "style-src 'self' 'unsafe-inline' https://accounts.google.com",
   "img-src 'self' data: blob: https://*.public.blob.vercel-storage.com https://flagcdn.com",
   "font-src 'self' data:",
   // Vista previa de los videos para TikTok que se generan en el panel admin.
   "media-src 'self' blob:",
-  "connect-src 'self'",
-  "frame-src https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://www.google.com https://pagead2.googlesyndication.com",
+  // Google Drive (guardar videos desde el panel admin) y su inicio de sesión.
+  "connect-src 'self' https://www.googleapis.com https://accounts.google.com",
+  "frame-src https://accounts.google.com https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://www.google.com https://pagead2.googlesyndication.com",
   "frame-ancestors 'none'",
 ].join("; ");
 
