@@ -28,6 +28,12 @@ import {
   getTrustProgress,
 } from "@/lib/trust";
 import TrustedSellerBadge from "@/components/TrustedSellerBadge";
+import {
+  SALES_MILESTONES,
+  MILESTONE_MIN_LISTED_HOURS,
+  countQualifyingSales,
+  nextSalesMilestone,
+} from "@/lib/sellerRewards";
 import { claimReferralRewards } from "@/lib/referrals";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -51,7 +57,7 @@ export default async function MisFigurasPage({ searchParams }: MisFigurasPagePro
 
   // Entrega los destacados gratis de invitados que ya cumplen las condiciones.
   await claimReferralRewards(user.id);
-  const [listings, payment, trust, credits] = await Promise.all([
+  const [listings, payment, trust, badgeSales, credits] = await Promise.all([
     prisma.listing.findMany({
       where: { userId: user.id },
       include: {
@@ -62,6 +68,7 @@ export default async function MisFigurasPage({ searchParams }: MisFigurasPagePro
     }),
     getFeaturePaymentInfo(),
     getTrustProgress(user.id),
+    countQualifyingSales(user.id),
     prisma.user
       .findUnique({ where: { id: user.id }, select: { freeFeatureCredits: true } })
       .then((u) => u?.freeFeatureCredits ?? 0),
@@ -88,6 +95,11 @@ export default async function MisFigurasPage({ searchParams }: MisFigurasPagePro
           `${TRUST_MIN_ACCOUNT_DAYS - trust.accountDays} días más de antigüedad`,
       ].filter((x): x is string => typeof x === "string")
     : [];
+
+  // Logros por ventas: cuántas faltan para el siguiente.
+  const totalSales = badgeSales;
+  const nextMilestone = nextSalesMilestone(totalSales);
+  const salesToNext = nextMilestone ? nextMilestone.sales - totalSales : 0;
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-10">
@@ -132,6 +144,31 @@ export default async function MisFigurasPage({ searchParams }: MisFigurasPagePro
                 : "Invita a un amigo a vender: cuando publique su primera figura, ganas 7 días de destacado →"}
             </p>
           </Link>
+          <div className="rounded-lg bg-muted/50 p-4 text-sm sm:col-span-2">
+            <p className="font-semibold text-foreground">🏆 Logros de ventas</p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {SALES_MILESTONES.map((m) => {
+                const reached = totalSales >= m.sales;
+                return (
+                  <span
+                    key={m.sales}
+                    className={`rounded-full px-3 py-1 text-xs font-semibold ring-1 ${
+                      reached
+                        ? "bg-orange-50 text-orange-800 ring-orange-200 dark:bg-orange-950/40 dark:text-orange-300 dark:ring-orange-800"
+                        : "bg-background text-muted-foreground ring-border"
+                    }`}
+                  >
+                    {reached ? m.icon : "🔒"} {m.label}
+                  </span>
+                );
+              })}
+            </div>
+            <p className="mt-2 text-muted-foreground">
+              {nextMilestone
+                ? `Te ${salesToNext === 1 ? "falta 1 venta" : `faltan ${salesToNext} ventas`} para ${nextMilestone.icon} ${nextMilestone.label}. Cada logro te regala un destacado gratis de 7 días y una insignia en tu perfil. Marca tus figuras como vendidas para que cuenten (desde que la publicas tiene que pasar al menos ${MILESTONE_MIN_LISTED_HOURS / 24} día).`
+                : "¡Desbloqueaste todos los logros! Gracias por vender en FigurasAnime."}
+            </p>
+          </div>
         </div>
       )}
 

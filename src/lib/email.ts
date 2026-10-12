@@ -379,3 +379,58 @@ export async function sendReferralRewardEmail(
     )
   );
 }
+
+// --- Recompensas para vendedores ------------------------------------------------
+
+export async function sendWelcomeBonusEmail(
+  to: string,
+  name: string,
+  listingTitle: string,
+  listingUrl: string,
+  days: number
+) {
+  await sendEmail(
+    to,
+    "⭐ Tu primera figura está destacada gratis",
+    wrapper(
+      `¡Bienvenido a FigurasAnime, ${escapeHtml(name)}!`,
+      `
+        <p style="font-size: 14px; color: #3f3f46; line-height: 1.6;">
+          Como regalo de bienvenida, <strong>${escapeHtml(listingTitle)}</strong> sale
+          <strong>destacada ${days} días gratis</strong>: aparece arriba del catálogo para que más
+          coleccionistas la vean.
+        </p>
+        <p style="font-size: 14px; color: #3f3f46; line-height: 1.6;">
+          Y cuando vendas, márcala como vendida: con tu primera venta ganas otro destacado gratis.
+        </p>
+        ${button(listingUrl, "Ver mi figura")}
+      `
+    )
+  );
+}
+
+export async function sendSalesMilestoneEmail(
+  to: string,
+  name: string,
+  milestones: { icon: string; label: string }[],
+  days: number
+) {
+  const count = milestones.length;
+  const last = milestones[milestones.length - 1];
+  await sendEmail(
+    to,
+    `${last.icon} Logro desbloqueado: ${last.label}`,
+    wrapper(
+      `¡Felicitaciones, ${escapeHtml(name)}!`,
+      `
+        <p style="font-size: 14px; color: #3f3f46; line-height: 1.6;">
+          Desbloqueaste ${milestones.map((m) => `<strong>${m.icon} ${escapeHtml(m.label)}</strong>`).join(" y ")}.
+          La insignia ya se ve en tu perfil y ganaste
+          <strong>${count === 1 ? "un destacado gratis" : `${count} destacados gratis`} de ${days} días</strong>
+          para la figura que quieras.
+        </p>
+        ${button(`${SITE_URL}/mis-figuras`, "Usar mi destacado")}
+      `
+    )
+  );
+}

@@ -1,7 +1,10 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, after } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { getCurrentUser, isAdmin } from "@/lib/session";
+import { claimSalesMilestones } from "@/lib/sellerRewards";
+import { sendSalesMilestoneEmail } from "@/lib/email";
+import { FEATURE_DAYS } from "@/lib/featured";
 
 const soldSchema = z.object({ sold: z.boolean() });
 
@@ -41,6 +44,25 @@ export async function PATCH(
       soldAt: parsed.data.sold ? (existing.sold ? (existing.soldAt ?? new Date()) : new Date()) : null,
     },
   });
+
+  // Logros por ventas (1, 5 y 10): al marcar una venta nueva se revisa si el
+  // vendedor llegó a uno y se le entrega su destacado gratis.
+  if (parsed.data.sold && !existing.sold) {
+    const sellerId = existing.userId;
+    after(async () => {
+      try {
+        const reached = await claimSalesMilestones(sellerId);
+        if (reached.length === 0) return;
+        const seller = await prisma.user.findUnique({
+          where: { id: sellerId },
+          select: { email: true, name: true },
+        });
+        if (seller) await sendSalesMilestoneEmail(seller.email, seller.name, reached, FEATURE_DAYS);
+      } catch (err) {
+        console.error("[logros] No se pudo revisar los logros de ventas:", err);
+      }
+    });
+  }
 
   return NextResponse.json(updated);
 }

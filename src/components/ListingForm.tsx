@@ -219,7 +219,9 @@ export default function ListingForm(props: ListingFormProps) {
     // El botón sigue desactivado hasta que se abra la ficha: así no queda la
     // sensación de que no pasó nada (ni se publica dos veces por error).
     setStage({ step: "opening" });
-    router.push(listingPath(res.data as { id: string; slug: string | null }));
+    const created = res.data as { id: string; slug: string | null; welcomeBonus?: boolean };
+    // Con el bono de bienvenida, la ficha muestra el aviso "¡ya está destacada!".
+    router.push(listingPath(created) + (created.welcomeBonus ? "?destacada=bienvenida" : ""));
   }
 
   const buttonLabel = !loading
