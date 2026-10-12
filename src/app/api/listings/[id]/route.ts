@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, after } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { getCurrentUser, isAdmin } from "@/lib/session";
@@ -9,6 +9,7 @@ import { isValidPhotoType } from "@/lib/photoType";
 import { deliveryFieldsSchema, readDeliveryFields } from "@/lib/delivery";
 import { preorderFieldsSchema, readPreorderFields } from "@/lib/preorder";
 import { slugUpdateForTitle } from "@/lib/listingSlug";
+import { effectivePrice, notifyPriceDrop } from "@/lib/priceAlerts";
 
 export async function GET(
   _request: NextRequest,
@@ -152,6 +153,10 @@ export async function PATCH(
         ...parsed.data,
         ...preorder.data,
         photoType,
+        // Formularios viejos (sin el campo) no lo cambian.
+        ...(formData.has("acceptsOffers")
+          ? { acceptsOffers: formData.get("acceptsOffers") !== "false" }
+          : {}),
         ...(slugChange ?? {}),
         images: {
           deleteMany: { id: { in: removeImageIds } },
@@ -167,6 +172,16 @@ export async function PATCH(
     where: { id },
     include: { images: true },
   });
+
+  // Si bajó el precio, avisa a quienes la guardaron en Favoritos.
+  const previousPrice = effectivePrice(existing);
+  if (updated && effectivePrice(updated) < previousPrice) {
+    after(() =>
+      notifyPriceDrop(id, previousPrice).catch((err) =>
+        console.error("[rebaja] No se pudo avisar la rebaja:", err)
+      )
+    );
+  }
 
   return NextResponse.json(updated);
 }

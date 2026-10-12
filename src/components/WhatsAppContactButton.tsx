@@ -9,7 +9,8 @@ export function useWhatsAppContact(listingId: string) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function open() {
+  // offer: monto de "Hacer una oferta" (el mensaje de WhatsApp lo incluye).
+  async function open(offer?: number) {
     setError(null);
     setLoading(true);
     // La pestaña se abre en el mismo clic: si se abriera después de la
@@ -17,7 +18,11 @@ export function useWhatsAppContact(listingId: string) {
     const tab = window.open("", "_blank");
 
     try {
-      const res = await fetch(`/api/listings/${listingId}/whatsapp-click`, { method: "POST" });
+      const res = await fetch(`/api/listings/${listingId}/whatsapp-click`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(typeof offer === "number" ? { offer } : {}),
+      });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data.link) {
         tab?.close();
@@ -51,7 +56,7 @@ export default function WhatsAppContactButton({ listingId }: { listingId: string
     <div>
       <Button
         type="button"
-        onClick={open}
+        onClick={() => open()}
         disabled={loading}
         size="lg"
         className={`w-full ${WHATSAPP_BUTTON_CLASS}`}

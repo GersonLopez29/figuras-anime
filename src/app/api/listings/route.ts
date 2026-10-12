@@ -140,6 +140,7 @@ export async function POST(request: NextRequest) {
       ...parsed.data,
       ...preorder.data,
       photoType,
+      acceptsOffers: formData.get("acceptsOffers") !== "false",
       userId: user.id,
       images: { create: imageUrls.map((url) => ({ url })) },
     },

@@ -51,6 +51,11 @@ export default function FavoriteButton({
       onClick={handleClick}
       disabled={loading}
       aria-label={favorited ? "Quitar de favoritos" : "Guardar en favoritos"}
+      title={
+        favorited
+          ? "Guardada: te avisamos por correo si baja de precio"
+          : "Guardar en favoritos y recibir un aviso si baja de precio"
+      }
       className={`${baseClass} disabled:opacity-60`}
     >
       <span aria-hidden="true">{favorited ? "❤️" : "🤍"}</span>

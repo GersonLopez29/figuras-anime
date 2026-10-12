@@ -434,3 +434,44 @@ export async function sendSalesMilestoneEmail(
     )
   );
 }
+
+// --- Aviso de rebaja (Favoritos) -------------------------------------------------
+
+export async function sendPriceDropEmail(
+  to: string,
+  name: string,
+  data: {
+    title: string;
+    oldPrice: number;
+    newPrice: number;
+    url: string;
+    imageUrl: string | null;
+    discountUntil: Date | null;
+  }
+) {
+  const soles = (n: number) => `S/ ${n.toFixed(2)}`;
+  const saved = data.oldPrice - data.newPrice;
+  const until = data.discountUntil
+    ? data.discountUntil.toLocaleDateString("es-PE", { day: "numeric", month: "long", timeZone: "America/Lima" })
+    : null;
+  await sendEmail(
+    to,
+    `📉 ¡Bajó de precio! ${data.title}`,
+    wrapper(
+      `${escapeHtml(name)}, una figura que guardaste bajó de precio`,
+      `
+        ${data.imageUrl ? `<img src="${escapeHtml(data.imageUrl)}" alt="" width="200" style="display:block;max-width:200px;border-radius:12px;margin:0 0 12px;" />` : ""}
+        <p style="font-size: 15px; font-weight: 700; color: #18181b; margin: 0 0 6px;">${escapeHtml(data.title)}</p>
+        <p style="font-size: 14px; color: #3f3f46; margin: 0 0 4px;">
+          <span style="text-decoration: line-through; color: #a1a1aa;">${soles(data.oldPrice)}</span>
+          &nbsp;→&nbsp;<strong style="font-size: 20px; color: #15803d;">${soles(data.newPrice)}</strong>
+        </p>
+        <p style="font-size: 13px; color: #3f3f46; margin: 0 0 4px;">Ahorras ${soles(saved)}.${until ? ` Oferta válida hasta el ${until}.` : ""}</p>
+        ${button(data.url, "Ver la figura")}
+        <p style="font-size: 12px; color: #a1a1aa; margin-top: 16px;">
+          Te avisamos porque la tienes en tus Favoritos. Para no recibir más avisos de esta figura, quítala de Favoritos.
+        </p>
+      `
+    )
+  );
+}

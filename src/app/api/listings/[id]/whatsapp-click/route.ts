@@ -4,6 +4,7 @@ import { getCurrentUser } from "@/lib/session";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 import { formatPrice, getActiveDiscountAmount, getFinalPrice } from "@/lib/format";
 import { getActiveReservation } from "@/lib/reservation";
+import { offerError } from "@/lib/offers";
 
 // Cualquier visitante (con o sin cuenta) puede contactar al vendedor. El número
 // no se escribe en el HTML de la figura: se entrega aquí recién al tocar el
@@ -35,6 +36,7 @@ export async function POST(
       discountExpiresAt: true,
       reservedAmount: true,
       reservedUntil: true,
+      acceptsOffers: true,
       user: { select: { name: true, whatsapp: true } },
     },
   });
@@ -46,6 +48,27 @@ export async function POST(
   }
 
   const isOwner = user?.id === listing.userId;
+
+  // Si el comprador toca "Hacer una oferta", llega el monto ofrecido.
+  const body = await request.json().catch(() => null);
+  const rawOffer = body && typeof body.offer === "number" ? body.offer : null;
+  const reserved = getActiveReservation(listing.reservedAmount, listing.reservedUntil);
+  const total = getFinalPrice(
+    listing.price,
+    getActiveDiscountAmount(listing.discountAmount, listing.discountExpiresAt)
+  );
+  let offer: number | null = null;
+  if (rawOffer !== null) {
+    if (!listing.acceptsOffers || reserved) {
+      return NextResponse.json(
+        { error: "Esta figura tiene precio fijo: el vendedor no recibe ofertas." },
+        { status: 400 }
+      );
+    }
+    const err = offerError(rawOffer, total);
+    if (err) return NextResponse.json({ error: err }, { status: 400 });
+    offer = Math.round(rawOffer * 100) / 100;
+  }
 
   if (!isOwner) {
     const recent = await prisma.whatsAppClick.count({
@@ -59,17 +82,14 @@ export async function POST(
     }
     // No registramos cuando el vendedor toca el botón de su propia publicación.
     await prisma.whatsAppClick.create({
-      data: { listingId: id, userId: user?.id ?? null, ip },
+      data: { listingId: id, userId: user?.id ?? null, ip, offerAmount: offer },
     });
   }
 
   // Si está separada, el comprador ya avisa que pagaría el total.
-  const reserved = getActiveReservation(listing.reservedAmount, listing.reservedUntil);
-  const total = getFinalPrice(
-    listing.price,
-    getActiveDiscountAmount(listing.discountAmount, listing.discountExpiresAt)
-  );
-  const message = reserved
+  const message = offer !== null
+    ? `Hola ${listing.user.name}, vi tu figura "${listing.title}" en FigurasAnime (publicada a ${formatPrice(total)}). ¿Aceptarías ${formatPrice(offer)}? Si te parece, coordinamos la entrega.`
+    : reserved
     ? `Hola ${listing.user.name}, vi tu figura "${listing.title}" en FigurasAnime. Sé que está separada, pero me interesa comprarla pagando el total de ${formatPrice(total)}. ¿Es posible?`
     : `Hola ${listing.user.name}, vi tu figura "${listing.title}" en FigurasAnime y me interesa. ¿Sigue disponible?`;
   return NextResponse.json({ link: buildWhatsAppLink(listing.user.whatsapp, message) });

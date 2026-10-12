@@ -33,6 +33,7 @@ import FavoriteButton from "@/components/FavoriteButton";
 import ShareButton from "@/components/ShareButton";
 import MessageButton from "@/components/MessageButton";
 import WhatsAppContactButton from "@/components/WhatsAppContactButton";
+import OfferButton from "@/components/OfferButton";
 import StickyContactBar from "@/components/StickyContactBar";
 import ListingDescription from "@/components/ListingDescription";
 import StoryShareButton from "@/components/StoryShareButton";
@@ -419,6 +420,10 @@ export default async function FiguraPage({ params, searchParams }: FiguraPagePro
             // si este bloque sale de la pantalla aparece una barra fija abajo.
             <div id="contacto" className="mt-5 scroll-mt-24">
               <WhatsAppContactButton listingId={listing.id} />
+              {/* Ofertas: si el vendedor las acepta y no está separada. */}
+              {listing.acceptsOffers && !reservation && currentUser?.id !== listing.user.id && (
+                <OfferButton listingId={listing.id} price={totalPrice} />
+              )}
               {currentUser && currentUser.id !== listing.user.id && (
                 <MessageButton listingId={listing.id} />
               )}

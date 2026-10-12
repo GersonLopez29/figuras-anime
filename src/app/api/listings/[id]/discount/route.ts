@@ -1,8 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, after } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { getCurrentUser, isAdmin } from "@/lib/session";
 import { DISCOUNT_DURATION_MS } from "@/lib/format";
+import { effectivePrice, notifyPriceDrop } from "@/lib/priceAlerts";
 
 const discountSchema = z.object({
   discountAmount: z.number().positive("Ingresa un monto de descuento válido").nullable(),
@@ -54,6 +55,14 @@ export async function PATCH(
         : null,
     },
   });
+
+  // Si el precio final bajó, avisa a quienes la guardaron en Favoritos.
+  const previousPrice = effectivePrice(existing);
+  after(() =>
+    notifyPriceDrop(id, previousPrice).catch((err) =>
+      console.error("[rebaja] No se pudo avisar la rebaja:", err)
+    )
+  );
 
   return NextResponse.json(updated);
 }

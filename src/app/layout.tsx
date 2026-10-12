@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
 import { Analytics } from "@vercel/analytics/next";
@@ -40,6 +40,11 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+// Color de la barra del navegador y de la app instalada (naranja de la marca).
+export const viewport: Viewport = {
+  themeColor: "#ea580c",
+};
+
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: "FigurasAnime — Compra y venta de figuras de anime",
@@ -48,6 +53,8 @@ export const metadata: Metadata = {
   other: {
     "google-adsense-account": "ca-pub-3110338196429688",
   },
+  // En iPhone, la app instalada usa este nombre bajo el ícono.
+  appleWebApp: { capable: true, title: "FigurasAnime", statusBarStyle: "default" },
 };
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {

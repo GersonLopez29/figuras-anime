@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Menu } from "lucide-react";
 import LogoutButton from "@/components/LogoutButton";
 import MessagesNavLink from "@/components/MessagesNavLink";
+import InstallAppButton from "@/components/InstallAppButton";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -140,6 +141,10 @@ export default function MobileMenu({ isLoggedIn, userName, isAdmin, unreadCount 
                 </Link>
               </>
             )}
+            {/* Solo aparece si el navegador permite instalarla (o en iPhone). */}
+            <div className="mt-3 px-1">
+              <InstallAppButton className="w-full" />
+            </div>
           </nav>
         </SheetContent>
       </Sheet>
