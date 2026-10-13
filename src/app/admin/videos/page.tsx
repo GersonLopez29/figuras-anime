@@ -3,6 +3,8 @@ import { formatPrice, getActiveDiscountAmount, getFinalPrice } from "@/lib/forma
 import { isNewCondition, isOpenBoxCondition } from "@/lib/condition";
 import { listingPath } from "@/lib/slug";
 import TikTokVideoGenerator, { type VideoListing } from "@/components/admin/TikTokVideoGenerator";
+import { Clapperboard } from "lucide-react";
+import { AdminPageHeader } from "@/components/admin/AdminUi";
 
 // Generador de videos estilo anime para TikTok/Reels de cualquier figura
 // disponible. El video se arma en el navegador (lib/animeVideo.ts).
@@ -42,5 +44,14 @@ export default async function AdminVideosPage() {
     };
   });
 
-  return <TikTokVideoGenerator listings={items} />;
+  return (
+    <div>
+      <AdminPageHeader
+        icon={Clapperboard}
+        title="Videos TikTok"
+        description="Elige una figura disponible y arma un video vertical estilo anime para TikTok, Reels o historias. Al terminar puedes descargarlo o guardarlo en tu Google Drive."
+      />
+      <TikTokVideoGenerator listings={items} />
+    </div>
+  );
 }

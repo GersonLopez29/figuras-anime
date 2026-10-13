@@ -3,6 +3,8 @@ import { formatPrice, getActiveDiscountAmount, getFinalPrice } from "@/lib/forma
 import StoryShareButton from "@/components/StoryShareButton";
 import CopyTextButton from "@/components/admin/CopyTextButton";
 import { Card } from "@/components/ui/card";
+import { Share2 } from "lucide-react";
+import { AdminPageHeader } from "@/components/admin/AdminUi";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://gerstore.club";
 const SITE_HOST = SITE_URL.replace(/^https?:\/\//, "");
@@ -44,15 +46,18 @@ export default async function AdminRedesPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-lg font-semibold text-foreground">Imágenes para redes</h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          &quot;Novedades de la semana&quot; con las figuras disponibles publicadas en los últimos 7
-          días (o las más recientes, si hay pocas). Se generan al momento con los precios
-          actuales. Para una sola figura, usa el botón &quot;📲 Historia&quot; en Mis figuras o en la
-          ficha.
-        </p>
-      </div>
+      <AdminPageHeader
+        icon={Share2}
+        title="Imágenes para redes"
+        description={
+          <>
+            &quot;Novedades de la semana&quot; con las figuras disponibles publicadas en los últimos 7
+            días (o las más recientes, si hay pocas). Se generan al momento con los precios
+            actuales. Para una sola figura, usa el botón &quot;📲 Historia&quot; en Mis figuras o en la
+            ficha, o haz un video en Videos TikTok.
+          </>
+        }
+      />
 
       <div className="grid gap-4 sm:grid-cols-2">
         {formats.map((f) => (

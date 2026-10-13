@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser, isAdmin } from "@/lib/session";
-import { prisma } from "@/lib/db";
-import AdminNavTabs from "@/components/admin/AdminNavTabs";
+import { getAdminPendingCounts } from "@/lib/adminPending";
+import { AdminMobileNav, AdminSidebar } from "@/components/admin/AdminNav";
 
 export const dynamic = "force-dynamic";
 
@@ -14,25 +14,28 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     redirect("/");
   }
 
-  const [pendingCategoryRequests, pendingFeatureRequests, newConsignments] = await Promise.all([
-    prisma.categoryRequest.count({ where: { status: "pending" } }),
-    prisma.featureRequest.count({ where: { status: "pending" } }),
-    prisma.consignmentRequest.count({ where: { status: "nuevo" } }),
-  ]);
+  const pending = await getAdminPendingCounts();
+  const pendingCounts = {
+    "/admin/destacados": pending.featureRequests,
+    "/admin/consignaciones": pending.consignments,
+    "/admin/categorias": pending.categoryRequests,
+    "/admin/comunidad": pending.reportedPosts,
+  };
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-10">
-      <h1 className="text-2xl font-bold text-foreground">Panel de administrador</h1>
-      <div className="mt-4">
-        <AdminNavTabs
-          pendingCounts={{
-            "/admin/categorias": pendingCategoryRequests,
-            "/admin/destacados": pendingFeatureRequests,
-            "/admin/consignaciones": newConsignments,
-          }}
-        />
+    <div className="mx-auto max-w-7xl px-4 py-6 lg:py-10">
+      <div className="mb-6 lg:hidden">
+        <AdminMobileNav pendingCounts={pendingCounts} />
       </div>
-      <div className="mt-6">{children}</div>
+      <div className="lg:grid lg:grid-cols-[13.5rem_minmax(0,1fr)] lg:gap-10">
+        <aside className="hidden lg:block">
+          <div className="sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto pb-6">
+            <p className="mb-4 px-3 text-lg font-bold text-foreground">Panel admin</p>
+            <AdminSidebar pendingCounts={pendingCounts} />
+          </div>
+        </aside>
+        <div className="min-w-0">{children}</div>
+      </div>
     </div>
   );
 }

@@ -3,6 +3,8 @@ import CategoryRequestActions from "@/components/admin/CategoryRequestActions";
 import CategoryManager from "@/components/admin/CategoryManager";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Tags } from "lucide-react";
+import { AdminEmpty, AdminPageHeader, AdminSectionTitle } from "@/components/admin/AdminUi";
 
 export default async function AdminCategoriasPage() {
   const [pending, resolved, categories, listingCounts] = await Promise.all([
@@ -33,20 +35,25 @@ export default async function AdminCategoriasPage() {
 
   return (
     <div className="space-y-10">
+      <AdminPageHeader
+        icon={Tags}
+        title="Categorías"
+        description="Las categorías que pueden elegir los vendedores, y las que piden agregar."
+      />
       <div>
-        <h2 className="flex items-center gap-2 text-lg font-semibold text-foreground">
+        <AdminSectionTitle>
           Solicitudes de categoría
           {pending.length > 0 && (
             <Badge className="bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300 hover:bg-orange-100 dark:hover:bg-orange-900/40">
               {pending.length} pendiente{pending.length === 1 ? "" : "s"}
             </Badge>
           )}
-        </h2>
+        </AdminSectionTitle>
 
         {pending.length === 0 ? (
-          <p className="mt-4 text-sm text-muted-foreground">No hay solicitudes pendientes.</p>
+          <AdminEmpty>No hay solicitudes pendientes.</AdminEmpty>
         ) : (
-          <Card className="mt-4 gap-0 divide-y divide-border py-0 shadow-sm">
+          <Card className="gap-0 divide-y divide-border py-0 shadow-sm">
             {pending.map((req) => (
               <div key={req.id} className="flex items-start justify-between gap-4 p-4">
                 <div className="min-w-0 flex-1">
@@ -65,8 +72,8 @@ export default async function AdminCategoriasPage() {
 
       {resolved.length > 0 && (
         <div>
-          <h2 className="text-lg font-semibold text-foreground">Resueltas recientemente</h2>
-          <Card className="mt-4 gap-0 divide-y divide-border py-0 shadow-sm">
+          <AdminSectionTitle>Resueltas recientemente</AdminSectionTitle>
+          <Card className="gap-0 divide-y divide-border py-0 shadow-sm">
             {resolved.map((req) => (
               <div key={req.id} className="flex items-center justify-between gap-4 p-4">
                 <div className="min-w-0 flex-1">
@@ -88,13 +95,10 @@ export default async function AdminCategoriasPage() {
       )}
 
       <div>
-        <h2 className="text-lg font-semibold text-foreground">
+        <AdminSectionTitle description="Crea, renombra o elimina las categorías disponibles para todos los vendedores.">
           Categorías actuales ({categories.length})
-        </h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Crea, renombra o elimina las categorías disponibles para todos los vendedores.
-        </p>
-        <div className="mt-4">
+        </AdminSectionTitle>
+        <div>
           <CategoryManager categories={categoryRows} />
         </div>
       </div>

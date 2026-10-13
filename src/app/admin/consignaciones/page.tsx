@@ -5,6 +5,8 @@ import { CONSIGNMENT_COMMISSION_PERCENT, getConsignmentStatus } from "@/lib/cons
 import ConsignmentStatusSelect from "@/components/admin/ConsignmentStatusSelect";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Handshake } from "lucide-react";
+import { AdminEmpty, AdminPageHeader } from "@/components/admin/AdminUi";
 
 // Abiertas primero (nuevas, contactadas, en venta), después las cerradas.
 const STATUS_ORDER = ["nuevo", "contactado", "aceptado", "vendido", "rechazado"];
@@ -18,18 +20,16 @@ export default async function AdminConsignacionesPage() {
 
   return (
     <div>
-      <h2 className="text-lg font-semibold text-foreground">
-        Solicitudes &quot;Te la vendemos&quot; ({requests.length})
-      </h2>
-      <p className="mt-1 text-sm text-muted-foreground">
-        Comisión publicada: {CONSIGNMENT_COMMISSION_PERCENT}%. Escríbele al coleccionista,
-        acuerden el precio y cambia el estado a medida que avanza.
-      </p>
+      <AdminPageHeader
+        icon={Handshake}
+        title="Te la vendemos"
+        description={`${requests.length} solicitud${requests.length === 1 ? "" : "es"} de coleccionistas que quieren que vendamos su figura (comisión ${CONSIGNMENT_COMMISSION_PERCENT}%). Escríbele, acuerden el precio y cambia el estado a medida que avanza.`}
+      />
 
       {requests.length === 0 ? (
-        <p className="mt-6 text-sm text-muted-foreground">Todavía no hay solicitudes.</p>
+        <AdminEmpty>Todavía no hay solicitudes.</AdminEmpty>
       ) : (
-        <Card className="mt-4 gap-0 divide-y divide-border py-0">
+        <Card className="gap-0 divide-y divide-border py-0">
           {requests.map((req) => {
             const status = getConsignmentStatus(req.status);
             return (
