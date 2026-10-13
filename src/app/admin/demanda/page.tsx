@@ -5,7 +5,9 @@ import { ALERT_ACTIVE_DAYS } from "@/lib/newListingNotifications";
 import { wantedActiveSince } from "@/lib/wanted";
 import { SEARCH_STATS_KEEP_DAYS } from "@/lib/searchStats";
 import { formatPrice } from "@/lib/format";
+import { TrendingUp } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { AdminPageHeader } from "@/components/admin/AdminUi";
 import { Badge } from "@/components/ui/badge";
 import {
   Table,
@@ -129,28 +131,27 @@ export default async function AdminDemandaPage({ searchParams }: DemandaPageProp
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h2 className="text-lg font-semibold text-foreground">🔎 Demanda</h2>
-          <p className="mt-1 max-w-xl text-sm text-muted-foreground">
+      <AdminPageHeader
+        icon={TrendingUp}
+        title="Demanda"
+        description={
+          <>
             Qué buscan los compradores y qué no encuentran: búsquedas del catálogo, avisos de
             &quot;Avísame&quot; y pedidos de &quot;Se busca&quot;. Úsalo para decidir qué figuras
             conseguir para tu tienda.
-          </p>
-        </div>
-        <div className="flex gap-2">
-          {PERIODS.map((p) => (
-            <Badge
-              key={p}
-              render={<Link href={`/admin/demanda?dias=${p}`} />}
-              variant={p === days ? "default" : "outline"}
-              className="h-auto rounded-full px-3 py-1.5 text-sm"
-            >
-              {p} días
-            </Badge>
-          ))}
-        </div>
-      </div>
+          </>
+        }
+        actions={PERIODS.map((p) => (
+          <Badge
+            key={p}
+            render={<Link href={`/admin/demanda?dias=${p}`} />}
+            variant={p === days ? "default" : "outline"}
+            className="h-auto rounded-full px-3 py-1.5 text-sm"
+          >
+            {p} días
+          </Badge>
+        ))}
+      />
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {summary.map((s) => (

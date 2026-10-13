@@ -7,6 +7,8 @@ import { FEATURE_DAYS, FEATURE_PRICE, activeFeaturedWhere, formatShortDate } fro
 import FeatureRequestActions from "@/components/admin/FeatureRequestActions";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Star } from "lucide-react";
+import { AdminEmpty, AdminPageHeader, AdminSectionTitle } from "@/components/admin/AdminUi";
 
 export default async function AdminDestacadosPage() {
   const now = new Date();
@@ -35,6 +37,11 @@ export default async function AdminDestacadosPage() {
 
   return (
     <div className="space-y-8">
+      <AdminPageHeader
+        icon={Star}
+        title="Destacados"
+        description={`Los vendedores pagan ${formatPrice(FEATURE_PRICE)} por ${FEATURE_DAYS} días arriba del catálogo. Confirma que el pago llegó a tu Yape o Plin antes de aprobar.`}
+      />
       <div className="flex flex-wrap gap-3">
         <Card className="min-w-40 flex-1 p-4">
           <p className="text-xs text-muted-foreground">Por confirmar</p>
@@ -53,15 +60,11 @@ export default async function AdminDestacadosPage() {
       </div>
 
       <section>
-        <h2 className="text-lg font-semibold text-foreground">Solicitudes por confirmar</h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Tarifa actual: {formatPrice(FEATURE_PRICE)} por {FEATURE_DAYS} días. Confirma que el pago
-          llegó a tu Yape o Plin antes de aprobar.
-        </p>
+        <AdminSectionTitle>Solicitudes por confirmar</AdminSectionTitle>
         {pending.length === 0 ? (
-          <p className="mt-4 text-sm text-muted-foreground">No hay solicitudes pendientes.</p>
+          <AdminEmpty>No hay solicitudes pendientes.</AdminEmpty>
         ) : (
-          <Card className="mt-4 gap-0 divide-y divide-border py-0">
+          <Card className="gap-0 divide-y divide-border py-0">
             {pending.map((req) => (
               <div
                 key={req.id}
@@ -98,11 +101,11 @@ export default async function AdminDestacadosPage() {
       </section>
 
       <section>
-        <h2 className="text-lg font-semibold text-foreground">Destacadas ahora</h2>
+        <AdminSectionTitle>Destacadas ahora</AdminSectionTitle>
         {active.length === 0 ? (
-          <p className="mt-4 text-sm text-muted-foreground">Ninguna figura destacada por ahora.</p>
+          <AdminEmpty>Ninguna figura destacada por ahora.</AdminEmpty>
         ) : (
-          <Card className="mt-4 gap-0 divide-y divide-border py-0">
+          <Card className="gap-0 divide-y divide-border py-0">
             {active.map((l) => (
               <div key={l.id} className="flex items-center justify-between gap-3 p-4">
                 <div className="min-w-0">

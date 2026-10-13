@@ -142,13 +142,10 @@ export default function TikTokVideoGenerator({ listings }: { listings: VideoList
   return (
     <div className="grid gap-6 md:grid-cols-[1fr_320px]">
       <Card className="gap-4 p-5">
-        <div>
-          <h2 className="text-lg font-bold text-foreground">🎬 Video para TikTok / Reels</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Estilo anime (vertical 1080×1920) con las fotos, el precio y gerstore.club. Se arma en tu
-            navegador en unos 10-16 segundos: no cambies de pestaña mientras se genera.
-          </p>
-        </div>
+        <p className="rounded-lg bg-muted/50 px-3 py-2 text-sm text-muted-foreground">
+          Vertical 1080×1920 con las fotos, el precio y gerstore.club. Se arma en tu navegador en
+          unos 10-16 segundos: no cambies de pestaña mientras se genera.
+        </p>
 
         <div className="space-y-1.5">
           <Label htmlFor="video-search">Figura</Label>

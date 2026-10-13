@@ -2,6 +2,8 @@ import { prisma } from "@/lib/db";
 import { getCountryName } from "@/lib/geo";
 import CountryFlag from "@/components/admin/CountryFlag";
 import { Card } from "@/components/ui/card";
+import { ChartColumn } from "lucide-react";
+import { AdminPageHeader } from "@/components/admin/AdminUi";
 import {
   Table,
   TableHeader,
@@ -66,6 +68,11 @@ export default async function AdminEstadisticasPage() {
 
   return (
     <div className="space-y-8">
+      <AdminPageHeader
+        icon={ChartColumn}
+        title="Estadísticas"
+        description="Visitas a la página por día y desde qué países llegan."
+      />
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
         <Card className="p-4 shadow-sm">
           <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">

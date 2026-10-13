@@ -1,13 +1,22 @@
 import Link from "next/link";
 import Image from "next/image";
+import { MessagesSquare } from "lucide-react";
 import { prisma } from "@/lib/db";
 import DeleteCommunityPostButton from "@/components/admin/DeleteCommunityPostButton";
+import DismissReportsButton from "@/components/admin/DismissReportsButton";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AdminEmpty, AdminFilterChips, AdminPageHeader } from "@/components/admin/AdminUi";
 
-export default async function AdminComunidadPage() {
+const BASE = "/admin/comunidad";
+
+type Props = { searchParams: Promise<{ filtro?: string }> };
+
+export default async function AdminComunidadPage({ searchParams }: Props) {
+  const onlyReported = (await searchParams).filtro === "reportadas";
+
   const posts = await prisma.collectionPost.findMany({
+    where: onlyReported ? { reports: { some: {} } } : undefined,
     include: {
       images: { take: 1 },
       author: { select: { name: true, email: true } },
@@ -16,25 +25,42 @@ export default async function AdminComunidadPage() {
     },
     orderBy: { createdAt: "desc" },
   });
+  const [total, reportedCount] = await Promise.all([
+    prisma.collectionPost.count(),
+    prisma.collectionPost.count({ where: { reports: { some: {} } } }),
+  ]);
 
+  // Las reportadas siempre primero.
   const sorted = [...posts].sort((a, b) => b.reports.length - a.reports.length);
-  const reportedCount = sorted.filter((p) => p.reports.length > 0).length;
 
   return (
     <div>
-      <h2 className="flex items-center gap-2 text-lg font-semibold text-foreground">
-        Publicaciones de comunidad ({posts.length})
-        {reportedCount > 0 && (
-          <Badge className="bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 hover:bg-red-100 dark:hover:bg-red-900/40">
-            {reportedCount} con reportes
-          </Badge>
-        )}
-      </h2>
+      <AdminPageHeader
+        icon={MessagesSquare}
+        title="Comunidad"
+        description="Publicaciones de las colecciones de los usuarios. Las reportadas aparecen primero: elimínalas o, si están bien, quítales el reporte."
+      />
+
+      <div className="mb-4">
+        <AdminFilterChips
+          basePath={BASE}
+          param="filtro"
+          active={onlyReported ? "reportadas" : "todas"}
+          current={{ filtro: onlyReported ? "reportadas" : undefined }}
+          label="Filtrar publicaciones"
+          filters={[
+            { value: "todas", label: "Todas", count: total },
+            { value: "reportadas", label: "🚩 Reportadas", count: reportedCount },
+          ]}
+        />
+      </div>
 
       {sorted.length === 0 ? (
-        <p className="mt-4 text-sm text-muted-foreground">Todavía no hay publicaciones.</p>
+        <AdminEmpty>
+          {onlyReported ? "No hay publicaciones reportadas. 🎉" : "Todavía no hay publicaciones."}
+        </AdminEmpty>
       ) : (
-        <Card className="mt-4 gap-0 divide-y divide-border py-0 shadow-sm">
+        <Card className="gap-0 divide-y divide-border py-0 shadow-sm">
           {sorted.map((post) => (
             <div key={post.id} className="flex gap-4 p-4 transition hover:bg-primary/5">
               <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-muted">
@@ -43,22 +69,23 @@ export default async function AdminComunidadPage() {
                     src={post.images[0].url}
                     alt={post.caption}
                     fill
+                    sizes="64px"
                     className="object-cover"
                   />
                 ) : null}
               </div>
 
               <div className="min-w-0 flex-1">
-                <div className="flex items-center justify-between gap-2">
+                <div className="flex items-start justify-between gap-2">
                   <Link
                     href={`/comunidad/${post.id}`}
-                    className="line-clamp-1 text-sm font-medium text-foreground hover:underline"
+                    className="line-clamp-2 text-sm font-medium text-foreground hover:underline"
                   >
                     {post.caption}
                   </Link>
                   <DeleteCommunityPostButton postId={post.id} />
                 </div>
-                <p className="text-xs text-muted-foreground">
+                <p className="break-words text-xs text-muted-foreground">
                   Publicado por {post.author.name} ({post.author.email}) · {post._count.comments}{" "}
                   comentarios · {post._count.ratings} calificaciones
                 </p>
@@ -77,6 +104,9 @@ export default async function AdminComunidadPage() {
                           </li>
                         ))}
                       </ul>
+                      <div className="mt-2">
+                        <DismissReportsButton postId={post.id} />
+                      </div>
                     </AlertDescription>
                   </Alert>
                 )}
