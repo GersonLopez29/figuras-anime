@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Card } from "@/components/ui/card";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/terminos-condiciones" },
   title: "Términos y Condiciones — FigurasAnime",
   description:
     "Reglas de uso de FigurasAnime: cómo funcionan las publicaciones, las compras y ventas entre coleccionistas.",

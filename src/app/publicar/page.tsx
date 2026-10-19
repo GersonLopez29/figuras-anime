@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getCurrentUser, isAdmin } from "@/lib/session";
 import { getCategories } from "@/lib/categories";
@@ -6,6 +7,12 @@ import { hasWelcomeBonus, WELCOME_BONUS_DAYS } from "@/lib/sellerRewards";
 import ListingForm from "@/components/ListingForm";
 import EmailVerificationBanner from "@/components/EmailVerificationBanner";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+
+export const metadata: Metadata = {
+  title: "Publicar una figura — FigurasAnime",
+  // Sin sesión redirige al login: no es una página para Google.
+  robots: { index: false, follow: true },
+};
 
 export default async function PublicarPage() {
   const user = await getCurrentUser();

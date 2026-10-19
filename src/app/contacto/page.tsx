@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import SocialLinks from "@/components/SocialLinks";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/contacto" },
   title: "Contacto — FigurasAnime",
   description: "Escríbenos para sugerencias, negocios o cualquier consulta sobre FigurasAnime.",
 };

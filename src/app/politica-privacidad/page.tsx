@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Card } from "@/components/ui/card";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/politica-privacidad" },
   title: "Política de Privacidad — FigurasAnime",
   description:
     "Cómo FigurasAnime recopila, usa y protege tus datos personales al comprar, vender y publicar figuras de anime.",
