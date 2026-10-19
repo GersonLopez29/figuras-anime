@@ -1,5 +1,6 @@
 import { getActiveDiscountAmount } from "@/lib/format";
 import { getActiveReservation } from "@/lib/reservation";
+import { prettyListingTitle } from "@/lib/listingSeo";
 
 // Lo que cada consulta debe incluir para dibujar una tarjeta del catálogo.
 export const cardInclude = {
@@ -35,7 +36,7 @@ export function toCardProps(l: CardListing, trustedSellerIds?: Set<string>) {
   return {
     id: l.id,
     slug: l.slug,
-    title: l.title,
+    title: prettyListingTitle(l.title),
     price: l.price,
     discountAmount: getActiveDiscountAmount(l.discountAmount, l.discountExpiresAt),
     category: l.category,

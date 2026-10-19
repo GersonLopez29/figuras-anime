@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ACCENTS, H, W, planVideo, recordVideo, pickRecorderType } from "@/lib/animeVideo";
 import SaveToDriveButton from "@/components/admin/SaveToDriveButton";
+import { prettyListingTitle } from "@/lib/listingSeo";
 
 export type VideoListing = {
   id: string;
@@ -31,11 +32,8 @@ const KANJIS = [
 
 const TAGS = ["¡RECIÉN LLEGADA!", "¡EN OFERTA!", "¡ÚLTIMA UNIDAD!", "¡PREVENTA!"];
 
-// Mismo arreglo del título que en los videos hechos a mano ("Sh Figuarts" ->
-// "S.H.Figuarts").
-function cleanTitle(t: string) {
-  return t.replace(/\s+/g, " ").trim().replace(/\bs\.?\s*h\.?\s*figuarts\b/gi, "S.H.Figuarts");
-}
+// "Sh Figuarts" -> "S.H.Figuarts", "ssj4" -> "SSJ4" (igual que en la página).
+const cleanTitle = prettyListingTitle;
 
 function guessChips(l: VideoListing) {
   const chips = [l.conditionChip];

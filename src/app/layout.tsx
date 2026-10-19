@@ -13,6 +13,7 @@ import { registerSiteVisit } from "@/lib/siteStats";
 import { getCategories } from "@/lib/categories";
 import { getCurrentUser } from "@/lib/session";
 import { SOCIAL_LINKS } from "@/lib/social";
+import { jsonLdHtml } from "@/lib/jsonLd";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://gerstore.club";
 
@@ -26,7 +27,10 @@ const organizationJsonLd = {
   "@context": "https://schema.org",
   "@type": "Organization",
   name: "FigurasAnime",
+  alternateName: "gerstore.club",
   url: SITE_URL,
+  logo: `${SITE_URL}/icons/icon-512.png`,
+  description: "Marketplace de figuras de anime en Lima y todo el Perú.",
   sameAs: SOCIAL_LINKS.map((s) => s.url),
 };
 
@@ -47,9 +51,16 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: "FigurasAnime — Compra y venta de figuras de anime",
+  // Portada (y páginas sin título propio). "Perú" y "Lima" son como busca la
+  // gente: "figuras anime lima", "figuras de anime perú".
+  title: "Figuras de anime en Perú: compra y venta en Lima | FigurasAnime",
   description:
-    "Marketplace para comprar y vender figuras de anime (Naruto, Dragon Ball Z y más) contactando directo por WhatsApp.",
+    "Compra y vende figuras de anime en Lima y todo el Perú: S.H.Figuarts, Ichiban Kuji, Banpresto y más de Dragon Ball, Naruto y One Piece, directo por WhatsApp.",
+  openGraph: {
+    siteName: "FigurasAnime",
+    locale: "es_PE",
+    type: "website",
+  },
   other: {
     "google-adsense-account": "ca-pub-3110338196429688",
   },
@@ -77,7 +88,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       <body className="flex min-h-full flex-col bg-zinc-50 text-foreground dark:bg-background">
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+          dangerouslySetInnerHTML={{ __html: jsonLdHtml(organizationJsonLd) }}
         />
         <CursorTrail />
         <Navbar />

@@ -6,6 +6,9 @@
 import { prisma } from "@/lib/db";
 import { listingPath } from "@/lib/slug";
 import { getActiveDiscountAmount, getFinalPrice } from "@/lib/format";
+import { detectBrand, prettyListingTitle } from "@/lib/listingSeo";
+
+// Facebook exige marca: si no se reconoce en el título se usa "Genérico".
 
 const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://gerstore.club").replace(/\/$/, "");
 
@@ -13,28 +16,6 @@ export type FeedDestination = "google" | "facebook";
 
 // Categoría de la taxonomía de Google para figuras coleccionables.
 const GOOGLE_PRODUCT_CATEGORY = "Toys & Games > Toys > Dolls, Playsets & Toy Figures > Action & Toy Figures";
-
-// Marca según palabras del título. Google prefiere no recibir marca a recibir
-// una inventada; Facebook la exige, así que ahí se usa "Genérico" si no hay.
-const BRANDS: { brand: string; words: string[] }[] = [
-  { brand: "Bandai Spirits", words: ["figuarts", "shf", "s.h.", "ichiban", "masterlise", "tamashii"] },
-  { brand: "Banpresto", words: ["banpresto", "grandista", "luminasta", "dxf", "clearise"] },
-  { brand: "Good Smile Company", words: ["nendoroid", "pop up parade", "good smile"] },
-  { brand: "Max Factory", words: ["figma"] },
-  { brand: "MegaHouse", words: ["megahouse", "portrait of pirates", "p.o.p", "g.e.m."] },
-  { brand: "Kotobukiya", words: ["kotobukiya", "artfx"] },
-  { brand: "SEGA", words: ["sega", "spm"] },
-  { brand: "Taito", words: ["taito"] },
-  { brand: "FuRyu", words: ["furyu", "noodle stopper"] },
-  { brand: "Hasbro", words: ["hasbro", "marvel legends", "gi joe", "g.i. joe"] },
-  { brand: "Funko", words: ["funko"] },
-  { brand: "Bandai", words: ["bandai"] },
-];
-
-export function detectBrand(title: string): string | undefined {
-  const text = ` ${title.toLowerCase()} `;
-  return BRANDS.find((b) => b.words.some((w) => text.includes(w)))?.brand;
-}
 
 function escapeXml(value: string): string {
   return value
@@ -92,7 +73,7 @@ export async function buildProductFeed(destination: FeedDestination): Promise<st
     return [
       "<item>",
       tag("id", l.id),
-      tag("title", l.title.slice(0, 150)),
+      tag("title", prettyListingTitle(l.title).slice(0, 150)),
       tag("description", description),
       tag("link", `${SITE_URL}${listingPath(l)}`),
       tag("image_link", main),

@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { formatPrice } from "@/lib/format";
 import { listingPath } from "@/lib/slug";
+import { prettyListingTitle } from "@/lib/listingSeo";
 
 type SoldItem = {
   id: string;
@@ -41,7 +42,7 @@ export default function RecentlySoldBanner({ items }: { items: SoldItem[] }) {
                 />
               )}
               <span className="max-w-[9rem] truncate font-medium text-foreground">
-                {item.title}
+                {prettyListingTitle(item.title)}
               </span>
               <span className="shrink-0 font-bold text-green-700 dark:text-green-300">
                 {formatPrice(item.price)}

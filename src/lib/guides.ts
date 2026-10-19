@@ -142,9 +142,9 @@ export const GUIDES: Guide[] = [
       },
     ],
     links: [
-      { label: "Ver figuras S.H.Figuarts", href: "/?linea=shfiguarts#catalogo" },
-      { label: "Ver figuras Banpresto", href: "/?linea=banpresto#catalogo" },
-      { label: "Ver premios Ichiban Kuji", href: "/?linea=ichibankuji#catalogo" },
+      { label: "Ver figuras S.H.Figuarts", href: "/linea/shfiguarts#catalogo" },
+      { label: "Ver figuras Banpresto", href: "/linea/banpresto#catalogo" },
+      { label: "Ver premios Ichiban Kuji", href: "/linea/ichibankuji#catalogo" },
     ],
   },
   {

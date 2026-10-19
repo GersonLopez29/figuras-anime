@@ -110,22 +110,48 @@ export function getProductLine(slug: ProductLineSlug | undefined) {
   return PRODUCT_LINES.find((l) => l.slug === slug);
 }
 
-// La categoría va en la ruta (/categoria/naruto); el resto, como parámetros.
+// Filtro por línea (S.H.Figuarts, Ichiban Kuji…): se detecta por palabras del título.
+export function productLineWhere(linea: ProductLineSlug | undefined) {
+  const productLine = getProductLine(linea);
+  if (!productLine) return null;
+  return {
+    OR: [
+      ...productLine.contains.map((word) => ({
+        title: { contains: word, mode: "insensitive" as const },
+      })),
+      ...productLine.startsWith.map((word) => ({
+        title: { startsWith: word, mode: "insensitive" as const },
+      })),
+    ],
+  };
+}
+
+// Ruta base del catálogo: la categoría va en la ruta (/categoria/naruto); sin
+// categoría, la línea también (/linea/shfiguarts). El resto, como parámetros.
+export function catalogBasePath(state: { categoria?: string; linea?: ProductLineSlug }): string {
+  if (state.categoria) return categoryPath(state.categoria);
+  if (state.linea) return linePath(state.linea);
+  return "/";
+}
+
+export function linePath(linea: ProductLineSlug): string {
+  return `/linea/${linea}`;
+}
+
 export function catalogHref(state: CatalogState, page?: number): string {
   const params = new URLSearchParams();
   if (state.q) params.set("q", state.q);
   if (state.estado) params.set("estado", state.estado);
   if (state.oferta) params.set("oferta", "1");
   if (state.preventa) params.set("preventa", "1");
-  if (state.linea) params.set("linea", state.linea);
+  if (state.linea && state.categoria) params.set("linea", state.linea);
   if (state.zona) params.set("zona", state.zona);
   if (state.min !== undefined) params.set("min", String(state.min));
   if (state.max !== undefined) params.set("max", String(state.max));
   if (state.orden && state.orden !== "recientes") params.set("orden", state.orden);
   if (page && page > 1) params.set("pagina", String(page));
   const qs = params.toString();
-  const path = state.categoria ? categoryPath(state.categoria) : "/";
-  return `${path}${qs ? `?${qs}` : ""}#catalogo`;
+  return `${catalogBasePath(state)}${qs ? `?${qs}` : ""}#catalogo`;
 }
 
 // ---------------------------------------------------------------------------

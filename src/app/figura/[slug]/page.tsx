@@ -28,6 +28,8 @@ import { getActiveReservation, formatReservationDate } from "@/lib/reservation";
 import { isFeatured } from "@/lib/featured";
 import { OFFICIAL_STORE_NAME } from "@/lib/store";
 import { getDeliveryZoneLabel, sortDeliveryZones } from "@/lib/delivery";
+import { detectBrand, listingMetaDescription, prettyListingTitle } from "@/lib/listingSeo";
+import { jsonLdHtml } from "@/lib/jsonLd";
 import StarRating from "@/components/StarRating";
 import FavoriteButton from "@/components/FavoriteButton";
 import ShareButton from "@/components/ShareButton";
@@ -73,6 +75,11 @@ export async function generateMetadata({ params }: FiguraPageProps): Promise<Met
       price: true,
       discountAmount: true,
       discountExpiresAt: true,
+      category: true,
+      condition: true,
+      deliveryZones: true,
+      sold: true,
+      isPreorder: true,
     },
   });
 
@@ -82,8 +89,13 @@ export async function generateMetadata({ params }: FiguraPageProps): Promise<Met
 
   const activeDiscount = getActiveDiscountAmount(listing.discountAmount, listing.discountExpiresAt);
   const displayPrice = activeDiscount ? getFinalPrice(listing.price, activeDiscount) : listing.price;
-  const title = `${listing.title} — ${formatPrice(displayPrice)} | FigurasAnime`;
-  const description = listing.description.slice(0, 155);
+  const name = prettyListingTitle(listing.title);
+  const title = listing.sold
+    ? `${name} (vendida) | FigurasAnime`
+    : `${name} — ${formatPrice(displayPrice)} | FigurasAnime`;
+  // La descripción del vendedor suele ser corta ("Figura open 9/10"): para Google
+  // se arma una con nombre, precio, estado y entrega, y se le suma ese texto.
+  const description = listingMetaDescription({ ...listing, price: displayPrice });
 
   // La imagen de vista previa la generan opengraph-image.tsx y twitter-image.tsx
   // (foto + precio + estado + marca), que tienen prioridad sobre este objeto.
@@ -214,38 +226,87 @@ export default async function FiguraPage({ params, searchParams }: FiguraPagePro
     : null;
 
   const pageUrl = `${SITE_URL}${listingPath(listing)}`;
-  const jsonLd = {
+  const displayTitle = prettyListingTitle(listing.title);
+  const brand = detectBrand(listing.title);
+  const itemCondition = isNewCondition(listing.condition)
+    ? "https://schema.org/NewCondition"
+    : "https://schema.org/UsedCondition";
+  const absolute = (url: string) => (/^https?:\/\//.test(url) ? url : `${SITE_URL}${url}`);
+  // Datos de producto para Google (resultados con precio y disponibilidad).
+  // Envío y devoluciones no se declaran: los acuerda cada vendedor por
+  // WhatsApp y Google no permite publicar valores que no son reales.
+  const productJsonLd = {
     "@context": "https://schema.org",
     "@type": "Product",
-    name: listing.title,
-    description: listing.description,
-    image: listing.images.map((img) => img.url),
+    name: displayTitle,
+    description: listing.description || displayTitle,
+    image: listing.images.map((img) => absolute(img.url)),
     url: pageUrl,
-    itemCondition: isNewCondition(listing.condition)
-      ? "https://schema.org/NewCondition"
-      : "https://schema.org/UsedCondition",
+    sku: listing.id,
+    category: `Figuras de anime > ${listing.category}`,
+    ...(brand ? { brand: { "@type": "Brand", name: brand } } : {}),
+    itemCondition,
     offers: {
       "@type": "Offer",
       url: pageUrl,
       priceCurrency: "PEN",
-      price: activeDiscount ? getFinalPrice(listing.price, activeDiscount) : listing.price,
+      price: totalPrice,
+      itemCondition,
+      ...(activeDiscount && listing.discountExpiresAt
+        ? { priceValidUntil: new Date(listing.discountExpiresAt).toISOString().slice(0, 10) }
+        : {}),
       availability: listing.sold
         ? "https://schema.org/SoldOut"
         : listing.isPreorder
           ? "https://schema.org/PreOrder"
           : "https://schema.org/InStock",
+      seller: {
+        "@type": listing.user.isOfficialStore ? "Organization" : "Person",
+        name: listing.user.isOfficialStore ? OFFICIAL_STORE_NAME : listing.user.name,
+      },
     },
+  };
+  // Ruta de navegación: Inicio › Dragon Ball Z › la figura.
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Inicio", item: `${SITE_URL}/` },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: listing.category,
+        item: `${SITE_URL}${categoryPath(listing.category)}`,
+      },
+      { "@type": "ListItem", position: 3, name: displayTitle, item: pageUrl },
+    ],
   };
 
   return (
     <div className="mx-auto max-w-5xl scroll-mt-20 px-4 pb-28 pt-8 sm:pb-8">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdHtml([productJsonLd, breadcrumbJsonLd]) }}
       />
-      <Link href="/" className="text-sm text-muted-foreground hover:text-foreground">
-        &larr; Volver al catálogo
-      </Link>
+      <nav aria-label="Ruta de navegación" className="text-sm text-muted-foreground">
+        <ol className="flex min-w-0 items-center gap-1.5">
+          <li className="shrink-0">
+            <Link href="/" className="hover:text-foreground hover:underline">
+              Inicio
+            </Link>
+          </li>
+          <li aria-hidden="true" className="shrink-0">›</li>
+          <li className="shrink-0">
+            <Link href={categoryPath(listing.category)} className="hover:text-foreground hover:underline">
+              {listing.category}
+            </Link>
+          </li>
+          <li aria-hidden="true" className="shrink-0">›</li>
+          <li aria-current="page" className="min-w-0 truncate text-foreground/80">
+            {displayTitle}
+          </li>
+        </ol>
+      </nav>
 
       {showWelcomeBonus && (
         <Alert className="mt-4 border-amber-300 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/40">
@@ -260,7 +321,7 @@ export default async function FiguraPage({ params, searchParams }: FiguraPagePro
       <div className="mt-4 grid gap-8 sm:grid-cols-2">
         {/* En computadora la galería acompaña al bajar por la ficha. */}
         <div className="sm:sticky sm:top-24 sm:self-start">
-          <ListingGallery images={listing.images} title={listing.title} />
+          <ListingGallery images={listing.images} title={displayTitle} />
         </div>
 
         <Card className="p-5 shadow-sm sm:p-6">
@@ -313,11 +374,11 @@ export default async function FiguraPage({ params, searchParams }: FiguraPagePro
           </div>
 
           <div className="mt-3 flex items-start justify-between gap-3">
-            <h1 className="text-2xl font-bold text-foreground">{listing.title}</h1>
+            <h1 className="text-2xl font-bold text-foreground">{displayTitle}</h1>
             <div className="flex shrink-0 gap-2">
               <ShareButton
-                title={listing.title}
-                text={`${listing.title} — ${formatPrice(
+                title={displayTitle}
+                text={`${displayTitle} — ${formatPrice(
                   activeDiscount ? getFinalPrice(listing.price, activeDiscount) : listing.price
                 )} en FigurasAnime`}
                 url={pageUrl}
@@ -496,7 +557,7 @@ export default async function FiguraPage({ params, searchParams }: FiguraPagePro
               <StoryShareButton
                 imageUrl={`${listingPath(listing)}/historia`}
                 fileName={`figurasanime-${listing.id}-historia.png`}
-                shareText={`${listing.title} — ${formatPrice(totalPrice)} en ${pageUrl}`}
+                shareText={`${displayTitle} — ${formatPrice(totalPrice)} en ${pageUrl}`}
                 label="📲 Compartir en historias o TikTok"
                 className="w-full"
                 showHint
