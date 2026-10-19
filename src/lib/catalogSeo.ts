@@ -1,6 +1,5 @@
 import { getDeliveryZoneLabel, type DeliveryZone } from "@/lib/delivery";
-import { getProductLine, type ProductLineSlug } from "@/lib/catalog";
-import { categoryPath } from "@/lib/slug";
+import { catalogBasePath, getProductLine, type ProductLineSlug } from "@/lib/catalog";
 
 // Páginas del catálogo que vale la pena que Google indexe por separado: una
 // categoría, una zona de entrega o una línea (y sus combinaciones). El resto de
@@ -41,8 +40,9 @@ export function landingH1(input: LandingInput): string {
   return `${landingHeading(input)} ${whereLabel(input.zona)}`;
 }
 
+// En el título de Google se agrega "Perú" (también se busca "figuras … perú").
 export function landingTitle(input: LandingInput): string {
-  return `${landingH1(input)} | FigurasAnime`;
+  return `${landingH1(input)}${input.zona ? "" : ", Perú"} | FigurasAnime`;
 }
 
 function priceText(stats: LandingStats): string {
@@ -63,13 +63,14 @@ export function landingIntro(input: LandingInput, stats: LandingStats): string {
   return `${stats.count} ${what} ${where}${priceText(stats)}, publicadas por coleccionistas. Compra directo al vendedor y coordina la entrega por WhatsApp.`;
 }
 
+// Igual que los enlaces del catálogo: /categoria/naruto?linea=…, /linea/shfiguarts?zona=…
 export function landingCanonical({ categoria, zona, linea }: LandingInput, page: number): string {
   const params = new URLSearchParams();
   if (zona) params.set("zona", zona);
-  if (linea) params.set("linea", linea);
+  if (linea && categoria) params.set("linea", linea);
   if (page > 1) params.set("pagina", String(page));
   const qs = params.toString();
-  const path = categoria ? categoryPath(categoria) : "/";
+  const path = catalogBasePath({ categoria, linea });
   return qs ? `${path}?${qs}` : path;
 }
 

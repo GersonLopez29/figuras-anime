@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/sobre-nosotros" },
   title: "Sobre nosotros — FigurasAnime",
   description:
     "Qué es FigurasAnime, por qué existe y cómo funciona el marketplace de compra y venta de figuras de anime en Perú.",

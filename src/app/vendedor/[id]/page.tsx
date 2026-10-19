@@ -23,19 +23,34 @@ type VendedorPageProps = {
 
 export async function generateMetadata({ params }: VendedorPageProps): Promise<Metadata> {
   const { id } = await params;
-  const seller = await prisma.user.findUnique({ where: { id }, select: { name: true } });
+  const seller = await prisma.user.findUnique({
+    where: { id },
+    select: {
+      name: true,
+      isBlocked: true,
+      _count: { select: { listings: { where: { sold: false } } } },
+    },
+  });
 
   if (!seller) {
     return { title: "Vendedor no encontrado — FigurasAnime" };
   }
 
+  const available = seller._count.listings;
   const title = `${seller.name} — Perfil de vendedor | FigurasAnime`;
-  const description = `Figuras de anime publicadas por ${seller.name} y sus reseñas como vendedor en FigurasAnime.`;
+  const description =
+    available > 0
+      ? `${available} ${available === 1 ? "figura de anime disponible" : "figuras de anime disponibles"} de ${seller.name} en Lima, con sus reseñas como vendedor en FigurasAnime.`
+      : `Perfil de ${seller.name} en FigurasAnime, el marketplace de figuras de anime en Perú.`;
 
   return {
     title,
     description,
+    alternates: { canonical: `/vendedor/${id}` },
     openGraph: { title, description, type: "profile" },
+    // Sin figuras disponibles el perfil no aporta nada en Google (página casi
+    // vacía): se sigue viendo y compartiendo, pero no se indexa.
+    ...(available === 0 || seller.isBlocked ? { robots: { index: false, follow: true } } : {}),
   };
 }
 

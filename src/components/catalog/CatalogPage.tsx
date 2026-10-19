@@ -29,6 +29,8 @@ import {
   computePriceSummary,
   priceRangeLabel,
   ORDER_OPTIONS,
+  linePath,
+  productLineWhere,
   type CatalogState,
   type ProductLineSlug,
 } from "@/lib/catalog";
@@ -67,42 +69,36 @@ export type CatalogSearchParams = Promise<{
     zona?: string;
   }>;
 
-// Portada (/) y páginas de categoría (/categoria/<slug>) comparten este
-// catálogo. En una página de categoría, fixedCategory es el nombre de la
-// categoría; en la portada, un ?categoria= antiguo redirige a /categoria/<slug>.
+// Portada (/), páginas de categoría (/categoria/<slug>) y de línea
+// (/linea/<slug>) comparten este catálogo. fixedCategory / fixedLine vienen de
+// la ruta; en la portada, un ?categoria= o ?linea= antiguo redirige a su ruta.
 type CatalogPageProps = {
   searchParams: CatalogSearchParams;
   fixedCategory?: string;
+  fixedLine?: ProductLineSlug;
 };
 
-// Redirección permanente de /?categoria=Nombre&... a /categoria/<slug>?...
-async function redirectLegacyCategory(searchParams: CatalogSearchParams) {
-  const { categoria, ...rest } = await searchParams;
-  if (!categoria) return;
-  const names = await getCategoryNames();
-  if (!names.includes(categoria)) return;
+// Redirección permanente de /?categoria=Nombre&... a /categoria/<slug>?... y
+// de /?linea=shfiguarts&... a /linea/shfiguarts?...
+async function redirectLegacyParams(searchParams: CatalogSearchParams, fixedLine?: ProductLineSlug) {
+  const { categoria, linea, ...rest } = await searchParams;
   const params = new URLSearchParams();
   for (const [key, value] of Object.entries(rest)) {
     if (typeof value === "string" && value !== "") params.set(key, value);
   }
-  const qs = params.toString();
-  permanentRedirect(`${categoryPath(categoria)}${qs ? `?${qs}` : ""}`);
-}
-
-// Filtro por línea (S.H.Figuarts, Ichiban Kuji…): se detecta por palabras del título.
-function productLineWhere(linea: ProductLineSlug | undefined) {
-  const productLine = getProductLine(linea);
-  if (!productLine) return null;
-  return {
-    OR: [
-      ...productLine.contains.map((word) => ({
-        title: { contains: word, mode: "insensitive" as const },
-      })),
-      ...productLine.startsWith.map((word) => ({
-        title: { startsWith: word, mode: "insensitive" as const },
-      })),
-    ],
-  };
+  if (categoria) {
+    const names = await getCategoryNames();
+    if (!names.includes(categoria)) return;
+    const line = fixedLine ?? (getProductLine(linea as ProductLineSlug) ? linea : undefined);
+    if (line) params.set("linea", line);
+    const qs = params.toString();
+    permanentRedirect(`${categoryPath(categoria)}${qs ? `?${qs}` : ""}`);
+  }
+  const line = getProductLine(linea as ProductLineSlug)?.slug;
+  if (line && line !== fixedLine) {
+    const qs = params.toString();
+    permanentRedirect(`${linePath(line)}${qs ? `?${qs}` : ""}`);
+  }
 }
 
 // Títulos, descripción y URL canónica propios por categoría, zona y línea,
@@ -110,10 +106,12 @@ function productLineWhere(linea: ProductLineSlug | undefined) {
 export async function catalogMetadata({
   searchParams,
   fixedCategory,
+  fixedLine,
 }: CatalogPageProps): Promise<Metadata> {
   // "categoria" es el parámetro antiguo: la categoría llega por fixedCategory.
   const { q, pagina, ...rawFilters } = await searchParams;
-  const { linea, zona } = parseCatalogFilters(rawFilters);
+  const { zona, ...filters } = parseCatalogFilters(rawFilters);
+  const linea = fixedLine ?? filters.linea;
   const landing: LandingInput = {
     categoria: fixedCategory,
     zona,
@@ -128,7 +126,11 @@ export async function catalogMetadata({
   }
 
   if (!isLandingPage(landing)) {
-    return { alternates: { canonical } };
+    // Portada: el título y la descripción vienen del layout.
+    return {
+      alternates: { canonical },
+      openGraph: { url: canonical, type: "website", siteName: "FigurasAnime", locale: "es_PE" },
+    };
   }
 
   const lineWhere = productLineWhere(linea);
@@ -154,13 +156,13 @@ export async function catalogMetadata({
     title,
     description,
     alternates: { canonical },
-    openGraph: { title, description, url: canonical, type: "website" },
+    openGraph: { title, description, url: canonical, type: "website", siteName: "FigurasAnime", locale: "es_PE" },
   };
 }
 
-export default async function CatalogPage({ searchParams, fixedCategory }: CatalogPageProps) {
+export default async function CatalogPage({ searchParams, fixedCategory, fixedLine }: CatalogPageProps) {
   if (!fixedCategory) {
-    await redirectLegacyCategory(searchParams);
+    await redirectLegacyParams(searchParams, fixedLine);
   }
   const { q: rawQ, bienvenida, pagina, ...rawFilters } = await searchParams;
   const categoria = fixedCategory;
@@ -178,8 +180,9 @@ export default async function CatalogPage({ searchParams, fixedCategory }: Catal
     }),
   ]);
   const category = categories.some((c) => c.name === categoria) ? categoria : undefined;
-  const { estado, oferta, preventa, orden, min, max, linea, zona } =
-    parseCatalogFilters(rawFilters);
+  const filters = parseCatalogFilters(rawFilters);
+  const { estado, oferta, preventa, orden, min, max, zona } = filters;
+  const linea = fixedLine ?? filters.linea;
   const productLine = getProductLine(linea);
   const catalogState: CatalogState = {
     categoria: category,
@@ -473,12 +476,13 @@ export default async function CatalogPage({ searchParams, fixedCategory }: Catal
                   Compra y vende{" "}
                   <span className="bg-gradient-to-r from-orange-600 to-amber-500 bg-clip-text text-transparent">
                     figuras de anime
-                  </span>
+                  </span>{" "}
+                  en Perú
                 </h1>
                 <p className="mt-4 max-w-xl text-sm text-muted-foreground sm:text-base">
-                  Naruto, Dragon Ball Z, One Piece y muchas más. Publica las figuras que ya
-                  no usas o encuentra tu próxima pieza de colección, y coordina todo directo
-                  por WhatsApp.
+                  S.H.Figuarts, Ichiban Kuji, Banpresto y más de Naruto, Dragon Ball Z y One
+                  Piece. Publica las figuras que ya no usas o encuentra tu próxima pieza de
+                  colección en Lima y provincias, y coordina todo directo por WhatsApp.
                 </p>
                 <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center lg:justify-start">
                   <Button

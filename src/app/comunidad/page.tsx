@@ -1,7 +1,15 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { prisma } from "@/lib/db";
 import CommunityPostCard from "@/components/CommunityPostCard";
 import { Button } from "@/components/ui/button";
+
+export const metadata: Metadata = {
+  title: "Comunidad de coleccionistas de figuras de anime en Perú | FigurasAnime",
+  description:
+    "Colecciones de figuras de anime de coleccionistas peruanos: fotos de sus repisas, calificaciones y comentarios. Comparte la tuya en FigurasAnime.",
+  alternates: { canonical: "/comunidad" },
+};
 
 export default async function ComunidadPage() {
   const posts = await prisma.collectionPost.findMany({

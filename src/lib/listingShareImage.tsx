@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { formatPrice, getActiveDiscountAmount, getFinalPrice } from "@/lib/format";
 import { getDeliveryZoneLabel, sortDeliveryZones } from "@/lib/delivery";
 import { OFFICIAL_STORE_NAME } from "@/lib/store";
+import { prettyListingTitle } from "@/lib/listingSeo";
 import { getActiveReservation } from "@/lib/reservation";
 import {
   GREEN,
@@ -236,7 +237,7 @@ export async function renderListingShareImage(id: string): Promise<ImageResponse
                 color: INK,
               }}
             >
-              {truncate(listing.title, 58)}
+              {truncate(prettyListingTitle(listing.title), 58)}
             </div>
 
             {discount ? (

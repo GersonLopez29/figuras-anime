@@ -3,18 +3,22 @@ import { prisma } from "@/lib/db";
 import { DELIVERY_ZONES } from "@/lib/delivery";
 import { categoryPath, listingPath } from "@/lib/slug";
 import { GUIDES } from "@/lib/guides";
+import { PRODUCT_LINES, linePath, productLineWhere } from "@/lib/catalog";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://gerstore.club";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [listings, sellers, posts, categories, zoneCounts] = await Promise.all([
+  const [listings, sellers, posts, categories, zoneCounts, lineCounts] = await Promise.all([
     prisma.listing.findMany({
       where: { sold: false },
       select: { id: true, slug: true, updatedAt: true },
       orderBy: { updatedAt: "desc" },
       take: 1000,
     }),
+    // Solo vendedores con figuras disponibles: un perfil vacío es una página
+    // sin contenido para Google (y además se marca como noindex).
     prisma.user.findMany({
+      where: { isBlocked: false, listings: { some: { sold: false } } },
       select: { id: true },
       take: 1000,
     }),
@@ -38,12 +42,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         }),
       }))
     ),
+    Promise.all(
+      PRODUCT_LINES.map(async (line) => ({
+        slug: line.slug,
+        count: await prisma.listing.count({
+          where: { sold: false, ...productLineWhere(line.slug)! },
+        }),
+      }))
+    ),
   ]);
 
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: SITE_URL, changeFrequency: "daily", priority: 1 },
     { url: `${SITE_URL}/comunidad`, changeFrequency: "daily", priority: 0.7 },
-    { url: `${SITE_URL}/publicar`, changeFrequency: "monthly", priority: 0.5 },
     { url: `${SITE_URL}/registro`, changeFrequency: "monthly", priority: 0.3 },
     { url: `${SITE_URL}/contacto`, changeFrequency: "yearly", priority: 0.3 },
     { url: `${SITE_URL}/te-la-vendemos`, changeFrequency: "monthly", priority: 0.6 },
@@ -76,6 +87,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.7,
     }));
 
+  const lineRoutes: MetadataRoute.Sitemap = lineCounts
+    .filter((l) => l.count > 0)
+    .map((l) => ({
+      url: `${SITE_URL}${linePath(l.slug)}`,
+      changeFrequency: "daily",
+      priority: 0.8,
+    }));
+
   const listingRoutes: MetadataRoute.Sitemap = listings.map((listing) => ({
     url: `${SITE_URL}${listingPath(listing)}`,
     lastModified: listing.updatedAt,
@@ -99,6 +118,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     ...staticRoutes,
     ...categoryRoutes,
+    ...lineRoutes,
     ...zoneRoutes,
     ...listingRoutes,
     ...sellerRoutes,

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { jsonLdHtml } from "@/lib/jsonLd";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { GUIDES, getGuide } from "@/lib/guides";
@@ -57,7 +58,7 @@ export default async function GuidePage({ params }: GuidePageProps) {
 
   return (
     <article className="mx-auto max-w-3xl px-4 py-10">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdHtml(jsonLd) }} />
       <Link href="/guias" className="text-sm text-muted-foreground hover:text-foreground">
         &larr; Todas las guías
       </Link>
