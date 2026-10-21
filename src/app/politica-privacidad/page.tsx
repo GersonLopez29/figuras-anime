@@ -8,7 +8,7 @@ export const metadata: Metadata = {
     "Cómo GerStore recopila, usa y protege tus datos personales al comprar, vender y publicar figuras de anime.",
 };
 
-const LAST_UPDATED = "7 de octubre de 2026";
+const LAST_UPDATED = "21 de octubre de 2026";
 const CONTACT_EMAIL = "gersonownd@gmail.com";
 
 export default function PoliticaPrivacidadPage() {
@@ -74,6 +74,11 @@ export default function PoliticaPrivacidadPage() {
                 buscan los coleccionistas. Se borran a los 6 meses.
               </li>
               <li>
+                Las preguntas que le haces al asistente de la página (el chat &quot;¿Dudas?&quot;) y sus
+                respuestas, junto con tu dirección IP, para limitar el uso y mejorar las respuestas. Se
+                borran a los 90 días. No escribas datos personales en el chat.
+              </li>
+              <li>
                 Una cookie de sesión técnica (httpOnly, no accesible desde JavaScript) que solo sirve para
                 mantenerte con la sesión iniciada.
               </li>
@@ -119,6 +124,10 @@ export default function PoliticaPrivacidadPage() {
             <ul className="mt-2 list-disc space-y-1 pl-5 text-muted-foreground">
               <li>Vercel — hosting, base de datos y almacenamiento de las imágenes que subes</li>
               <li>Resend — envío de los correos transaccionales del servicio</li>
+              <li>
+                Anthropic (Claude) — genera las respuestas del asistente de la página; recibe solo lo que
+                escribes en ese chat
+              </li>
             </ul>
             <p className="mt-2 text-muted-foreground">
               No vendemos ni compartimos tus datos con terceros con fines publicitarios.

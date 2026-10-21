@@ -9,6 +9,9 @@ import Footer from "@/components/Footer";
 import CursorTrail from "@/components/CursorTrail";
 import EmailVerificationBanner from "@/components/EmailVerificationBanner";
 import SuggestionButton from "@/components/SuggestionButton";
+import AssistantWidget from "@/components/AssistantWidget";
+import { assistantEnabled } from "@/lib/assistant";
+import { getFeaturePaymentInfo } from "@/lib/featured";
 import { registerSiteVisit } from "@/lib/siteStats";
 import { getCategories } from "@/lib/categories";
 import { getCurrentUser } from "@/lib/session";
@@ -70,10 +73,14 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
-  const [totalVisits, categories, user] = await Promise.all([
+  // Con ANTHROPIC_API_KEY en Vercel se muestra el asistente (que también
+  // incluye "Sugerencias"); sin la clave, solo el botón de sugerencias.
+  const withAssistant = assistantEnabled();
+  const [totalVisits, categories, user, contact] = await Promise.all([
     registerSiteVisit(),
     getCategories(),
     getCurrentUser(),
+    withAssistant ? getFeaturePaymentInfo() : Promise.resolve(null),
   ]);
 
   return (
@@ -96,7 +103,11 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
         {user && !user.emailVerified && <EmailVerificationBanner />}
         <main className="flex-1">{children}</main>
         <Footer totalVisits={totalVisits} categories={categories} />
-        <SuggestionButton />
+        {withAssistant ? (
+          <AssistantWidget contactNumber={contact?.number ?? null} />
+        ) : (
+          <SuggestionButton />
+        )}
         <Script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3110338196429688"

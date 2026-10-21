@@ -1,5 +1,6 @@
 import type { LucideIcon } from "lucide-react";
 import {
+  Bot,
   ChartColumn,
   Clapperboard,
   Handshake,
@@ -56,6 +57,7 @@ export const ADMIN_NAV: AdminNavGroup[] = [
     items: [
       { href: "/admin/usuarios", label: "Usuarios", description: "Cuentas, bloqueos y verificación", icon: Users },
       { href: "/admin/comunidad", label: "Comunidad", description: "Publicaciones y reportes", icon: MessagesSquare },
+      { href: "/admin/asistente", label: "Asistente", description: "Qué le preguntan al chat", icon: Bot },
     ],
   },
   {
