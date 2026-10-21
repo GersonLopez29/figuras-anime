@@ -14,7 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = {
-  title: "Se busca: figuras de anime que buscan los coleccionistas — FigurasAnime",
+  title: "Se busca: figuras de anime que buscan los coleccionistas — GerStore",
   description:
     "Coleccionistas de Perú publican las figuras de anime que buscan. Si tienes una, escríbeles por WhatsApp y véndela.",
   alternates: { canonical: "/se-busca" },

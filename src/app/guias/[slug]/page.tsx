@@ -20,8 +20,8 @@ export const dynamicParams = false;
 export async function generateMetadata({ params }: GuidePageProps): Promise<Metadata> {
   const { slug } = await params;
   const guide = getGuide(slug);
-  if (!guide) return { title: "Guía no encontrada — FigurasAnime" };
-  const title = `${guide.title} | FigurasAnime`;
+  if (!guide) return { title: "Guía no encontrada — GerStore" };
+  const title = `${guide.title} | GerStore`;
   return {
     title,
     description: guide.description,
@@ -53,7 +53,7 @@ export default async function GuidePage({ params }: GuidePageProps) {
     dateModified: guide.updated,
     url: `${SITE_URL}/guias/${guide.slug}`,
     inLanguage: "es-PE",
-    publisher: { "@type": "Organization", name: "FigurasAnime", url: SITE_URL },
+    publisher: { "@type": "Organization", name: "GerStore", url: SITE_URL },
   };
 
   return (

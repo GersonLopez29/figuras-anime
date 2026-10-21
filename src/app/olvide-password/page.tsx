@@ -48,7 +48,7 @@ export default function OlvidePasswordPage() {
             🎌
           </span>
           <span className="bg-gradient-to-r from-orange-600 to-amber-500 bg-clip-text text-transparent">
-            FigurasAnime
+            GerStore
           </span>
         </Link>
 

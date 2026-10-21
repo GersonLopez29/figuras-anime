@@ -33,15 +33,15 @@ export async function generateMetadata({ params }: VendedorPageProps): Promise<M
   });
 
   if (!seller) {
-    return { title: "Vendedor no encontrado — FigurasAnime" };
+    return { title: "Vendedor no encontrado — GerStore" };
   }
 
   const available = seller._count.listings;
-  const title = `${seller.name} — Perfil de vendedor | FigurasAnime`;
+  const title = `${seller.name} — Perfil de vendedor | GerStore`;
   const description =
     available > 0
-      ? `${available} ${available === 1 ? "figura de anime disponible" : "figuras de anime disponibles"} de ${seller.name} en Lima, con sus reseñas como vendedor en FigurasAnime.`
-      : `Perfil de ${seller.name} en FigurasAnime, el marketplace de figuras de anime en Perú.`;
+      ? `${available} ${available === 1 ? "figura de anime disponible" : "figuras de anime disponibles"} de ${seller.name} en Lima, con sus reseñas como vendedor en GerStore.`
+      : `Perfil de ${seller.name} en GerStore, el marketplace de figuras de anime en Perú.`;
 
   return {
     title,

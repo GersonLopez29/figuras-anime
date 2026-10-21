@@ -70,7 +70,7 @@ export default function FeatureListingButton({
     router.refresh();
   }
 
-  const proofMessage = `Hola, yapeé S/ ${price} para destacar mi figura "${listingTitle}" en FigurasAnime. Te envío la captura.`;
+  const proofMessage = `Hola, yapeé S/ ${price} para destacar mi figura "${listingTitle}" en GerStore. Te envío la captura.`;
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

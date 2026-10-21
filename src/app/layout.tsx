@@ -26,8 +26,9 @@ const themeScript = `(function(){try{var t=localStorage.getItem("theme");var d=t
 const organizationJsonLd = {
   "@context": "https://schema.org",
   "@type": "Organization",
-  name: "FigurasAnime",
-  alternateName: "gerstore.club",
+  name: "GerStore",
+  // Antes se llamaba FigurasAnime: así Google relaciona el nombre anterior.
+  alternateName: ["gerstore.club", "FigurasAnime"],
   url: SITE_URL,
   logo: `${SITE_URL}/icons/icon-512.png`,
   description: "Marketplace de figuras de anime en Lima y todo el Perú.",
@@ -53,11 +54,11 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   // Portada (y páginas sin título propio). "Perú" y "Lima" son como busca la
   // gente: "figuras anime lima", "figuras de anime perú".
-  title: "Figuras de anime en Perú: compra y venta en Lima | FigurasAnime",
+  title: "Figuras de anime en Perú: compra y venta en Lima | GerStore",
   description:
     "Compra y vende figuras de anime en Lima y todo el Perú: S.H.Figuarts, Ichiban Kuji, Banpresto y más de Dragon Ball, Naruto y One Piece, directo por WhatsApp.",
   openGraph: {
-    siteName: "FigurasAnime",
+    siteName: "GerStore",
     locale: "es_PE",
     type: "website",
   },
@@ -65,7 +66,7 @@ export const metadata: Metadata = {
     "google-adsense-account": "ca-pub-3110338196429688",
   },
   // En iPhone, la app instalada usa este nombre bajo el ícono.
-  appleWebApp: { capable: true, title: "FigurasAnime", statusBarStyle: "default" },
+  appleWebApp: { capable: true, title: "GerStore", statusBarStyle: "default" },
 };
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {

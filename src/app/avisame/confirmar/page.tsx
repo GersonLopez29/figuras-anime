@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = {
-  title: "Activar aviso — FigurasAnime",
+  title: "Activar aviso — GerStore",
   robots: { index: false },
 };
 

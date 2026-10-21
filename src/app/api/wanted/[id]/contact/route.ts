@@ -55,6 +55,6 @@ export async function POST(_request: NextRequest, { params }: { params: Promise<
     );
   }
 
-  const message = `Hola, vi tu pedido "${post.title}" en FigurasAnime (Se busca) y tengo esa figura. ¿Sigues buscándola?`;
+  const message = `Hola, vi tu pedido "${post.title}" en GerStore (Se busca) y tengo esa figura. ¿Sigues buscándola?`;
   return NextResponse.json({ url: buildWhatsAppLink(post.user.whatsapp, message) });
 }

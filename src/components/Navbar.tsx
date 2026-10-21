@@ -28,7 +28,7 @@ export default async function Navbar() {
           <span aria-hidden="true" className="logo-pop inline-block text-3xl sm:text-4xl">
             🎌
           </span>
-          <span className="logo-shine">FigurasAnime</span>
+          <span className="logo-shine">GerStore</span>
         </Link>
 
         {/* Buscador siempre a mano en pantallas grandes (en las chicas está

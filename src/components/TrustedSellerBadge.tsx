@@ -1,7 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { TRUST_MIN_REVIEWS, TRUST_MIN_SALES } from "@/lib/trust";
 
-export const TRUSTED_SELLER_EXPLANATION = `Tiene ${TRUST_MIN_SALES} o más ventas, al menos ${TRUST_MIN_REVIEWS} reseñas con buena calificación y más de un mes en FigurasAnime.`;
+export const TRUSTED_SELLER_EXPLANATION = `Tiene ${TRUST_MIN_SALES} o más ventas, al menos ${TRUST_MIN_REVIEWS} reseñas con buena calificación y más de un mes en GerStore.`;
 
 export default function TrustedSellerBadge({ size = "sm" }: { size?: "sm" | "md" }) {
   return (

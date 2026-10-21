@@ -10,14 +10,14 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://gerstore.club";
 const SITE_HOST = SITE_URL.replace(/^https?:\/\//, "");
 
 const HASHTAGS =
-  "#figurasanime #coleccionista #shfiguarts #ichibankuji #dragonballz #onepiece #naruto #animeperu #lima #coleccionables";
+  "#gerstore #coleccionista #shfiguarts #ichibankuji #dragonballz #onepiece #naruto #animeperu #lima #coleccionables";
 
 export default async function AdminRedesPage() {
   const listings = await getWeeklyListings(6);
   const date = new Date().toISOString().slice(0, 10);
 
   const caption = [
-    "🔥 Novedades de la semana en FigurasAnime",
+    "🔥 Novedades de la semana en GerStore",
     "",
     ...listings.map((l) => {
       const price = getFinalPrice(l.price, getActiveDiscountAmount(l.discountAmount, l.discountExpiresAt));
@@ -72,7 +72,7 @@ export default async function AdminRedesPage() {
             <p className="text-xs text-muted-foreground">{f.text}</p>
             <StoryShareButton
               imageUrl={`/api/admin/redes?formato=${f.key}`}
-              fileName={`figurasanime-novedades-${date}-${f.key}.png`}
+              fileName={`gerstore-novedades-${date}-${f.key}.png`}
               shareText={caption}
               label="📲 Compartir o descargar"
             />

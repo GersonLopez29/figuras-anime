@@ -5,8 +5,8 @@ import type { MetadataRoute } from "next";
 // /manifest.webmanifest y agrega el <link> solo.
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "FigurasAnime — Compra y venta de figuras de anime",
-    short_name: "FigurasAnime",
+    name: "GerStore — Compra y venta de figuras de anime",
+    short_name: "GerStore",
     description:
       "Compra y vende figuras de anime en Perú: Naruto, Dragon Ball Z y más, directo por WhatsApp.",
     id: "/",

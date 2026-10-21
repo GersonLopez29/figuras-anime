@@ -148,7 +148,7 @@ export default async function AdminUsuariosPage({ searchParams }: Props) {
                         <>
                           {" · "}
                           <a
-                            href={buildWhatsAppLink(user.whatsapp, `Hola ${user.name}, te escribo de FigurasAnime.`)}
+                            href={buildWhatsAppLink(user.whatsapp, `Hola ${user.name}, te escribo de GerStore.`)}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="font-medium text-green-700 hover:underline dark:text-green-300"

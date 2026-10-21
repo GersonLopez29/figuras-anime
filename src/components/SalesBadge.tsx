@@ -9,7 +9,7 @@ export default function SalesBadge({ sales, size = "sm" }: { sales: number; size
   return (
     <Badge
       variant="outline"
-      title={`${sales} ${sales === 1 ? "figura vendida" : "figuras vendidas"} en FigurasAnime`}
+      title={`${sales} ${sales === 1 ? "figura vendida" : "figuras vendidas"} en GerStore`}
       className={`border-orange-200 dark:border-orange-800 bg-orange-50 dark:bg-orange-950/40 font-semibold text-orange-800 dark:text-orange-300 ${size === "md" ? "h-auto px-2.5 py-1 text-sm" : ""}`}
     >
       {badge.icon} {badge.label}

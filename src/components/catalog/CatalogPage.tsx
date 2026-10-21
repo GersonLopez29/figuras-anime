@@ -129,7 +129,7 @@ export async function catalogMetadata({
     // Portada: el título y la descripción vienen del layout.
     return {
       alternates: { canonical },
-      openGraph: { url: canonical, type: "website", siteName: "FigurasAnime", locale: "es_PE" },
+      openGraph: { url: canonical, type: "website", siteName: "GerStore", locale: "es_PE" },
     };
   }
 
@@ -156,7 +156,7 @@ export async function catalogMetadata({
     title,
     description,
     alternates: { canonical },
-    openGraph: { title, description, url: canonical, type: "website", siteName: "FigurasAnime", locale: "es_PE" },
+    openGraph: { title, description, url: canonical, type: "website", siteName: "GerStore", locale: "es_PE" },
   };
 }
 
@@ -307,7 +307,7 @@ export default async function CatalogPage({ searchParams, fixedCategory, fixedLi
           include: cardInclude,
         })
       : Promise.resolve([]),
-    // Fila "Tienda FigurasAnime" en la portada, con las figuras de la tienda oficial.
+    // Fila "Tienda GerStore" en la portada, con las figuras de la tienda oficial.
     wantsHero
       ? prisma.listing.findMany({
           where: { sold: false, user: { isOfficialStore: true } },

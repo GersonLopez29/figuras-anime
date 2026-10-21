@@ -25,7 +25,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   if (request.nextUrl.searchParams.get("descargar") === "1") {
     headers.set(
       "Content-Disposition",
-      `attachment; filename="figurasanime-${resolved.slug ?? id}-historia.png"`
+      `attachment; filename="gerstore-${resolved.slug ?? id}-historia.png"`
     );
   }
   return new Response(png, { status: 200, headers });

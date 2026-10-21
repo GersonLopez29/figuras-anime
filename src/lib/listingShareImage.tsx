@@ -23,7 +23,7 @@ import {
 // al compartir una figura: foto, título, precio, estado, zona y la marca.
 
 export const SHARE_IMAGE_SIZE = { width: 1200, height: 630 };
-export const SHARE_IMAGE_ALT = "Figura en venta en FigurasAnime";
+export const SHARE_IMAGE_ALT = "Figura en venta en GerStore";
 
 const PHOTO_SIZE = 630;
 function Pill({ children, background, color }: { children: string; background: string; color: string }) {
@@ -48,7 +48,7 @@ function Brand() {
   return (
     <div style={{ display: "flex", alignItems: "baseline", gap: 14 }}>
       <div style={{ display: "flex", fontSize: 36, fontWeight: 900, color: ORANGE }}>
-        FigurasAnime
+        GerStore
       </div>
       <div style={{ display: "flex", fontSize: 22, fontWeight: 500, color: MUTED }}>{SITE_HOST}</div>
     </div>
@@ -72,7 +72,7 @@ function fallbackImage(fonts: ImageFonts) {
         }}
       >
         <div style={{ display: "flex", fontSize: 84, fontWeight: 900, color: ORANGE }}>
-          FigurasAnime
+          GerStore
         </div>
         <div style={{ display: "flex", fontSize: 34, fontWeight: 500, color: INK }}>
           Compra y vende figuras de anime en Lima
@@ -158,7 +158,7 @@ export async function renderListingShareImage(id: string): Promise<ImageResponse
             />
           ) : (
             <div style={{ display: "flex", fontSize: 64, fontWeight: 900, color: ORANGE }}>
-              FigurasAnime
+              GerStore
             </div>
           )}
           {listing.sold && (

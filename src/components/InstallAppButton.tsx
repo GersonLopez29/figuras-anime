@@ -108,7 +108,7 @@ export default function InstallAppButton({ className = "" }: { className?: strin
       <Dialog open={showIosHelp} onOpenChange={setShowIosHelp}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>📲 Instala FigurasAnime en tu iPhone</DialogTitle>
+            <DialogTitle>📲 Instala GerStore en tu iPhone</DialogTitle>
             <DialogDescription>Son dos toques, desde Safari:</DialogDescription>
           </DialogHeader>
           <ol className="space-y-2 text-sm text-foreground">

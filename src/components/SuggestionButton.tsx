@@ -76,7 +76,7 @@ export default function SuggestionButton() {
         <DialogHeader>
           <DialogTitle>¿Tienes una idea?</DialogTitle>
           <DialogDescription>
-            Cuéntanos qué te gustaría ver en FigurasAnime. Tu mensaje nos llega directo por correo.
+            Cuéntanos qué te gustaría ver en GerStore. Tu mensaje nos llega directo por correo.
           </DialogDescription>
         </DialogHeader>
 

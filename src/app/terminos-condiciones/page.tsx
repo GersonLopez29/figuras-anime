@@ -3,9 +3,9 @@ import { Card } from "@/components/ui/card";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/terminos-condiciones" },
-  title: "Términos y Condiciones — FigurasAnime",
+  title: "Términos y Condiciones — GerStore",
   description:
-    "Reglas de uso de FigurasAnime: cómo funcionan las publicaciones, las compras y ventas entre coleccionistas.",
+    "Reglas de uso de GerStore: cómo funcionan las publicaciones, las compras y ventas entre coleccionistas.",
 };
 
 const LAST_UPDATED = "4 de septiembre de 2026";
@@ -21,15 +21,15 @@ export default function TerminosCondicionesPage() {
         <div className="space-y-8 text-sm leading-relaxed text-foreground/90">
           <section>
             <p>
-              Al usar FigurasAnime (<span className="font-medium">gerstore.club</span>) aceptas estos
+              Al usar GerStore (<span className="font-medium">gerstore.club</span>) aceptas estos
               términos. Léelos antes de publicar, comprar o vender una figura en la plataforma.
             </p>
           </section>
 
           <section>
-            <h2 className="text-lg font-semibold text-foreground">1. Qué es FigurasAnime</h2>
+            <h2 className="text-lg font-semibold text-foreground">1. Qué es GerStore</h2>
             <p className="mt-2 text-muted-foreground">
-              FigurasAnime es un marketplace que conecta coleccionistas para comprar y vender figuras
+              GerStore es un marketplace que conecta coleccionistas para comprar y vender figuras
               de anime. No vendemos los productos ni los tenemos en inventario: publicamos los anuncios
               que crean los propios usuarios, y la compra se coordina y se paga directamente entre
               comprador y vendedor por WhatsApp.
@@ -61,7 +61,7 @@ export default function TerminosCondicionesPage() {
           <section>
             <h2 className="text-lg font-semibold text-foreground">4. Compras y pagos</h2>
             <p className="mt-2 text-muted-foreground">
-              FigurasAnime no procesa pagos ni participa en la transacción: solo facilita el contacto
+              GerStore no procesa pagos ni participa en la transacción: solo facilita el contacto
               entre comprador y vendedor vía WhatsApp. La forma de pago, el envío o la entrega en persona,
               y cualquier garantía sobre el producto se acuerdan directamente entre ambas partes. Te
               recomendamos verificar el estado del producto y coordinar la entrega en un lugar seguro.

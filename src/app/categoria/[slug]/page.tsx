@@ -24,7 +24,7 @@ export async function generateMetadata({
   searchParams,
 }: CategoriaPageProps): Promise<Metadata> {
   const category = await resolveCategory(params);
-  if (!category) return { title: "Categoría no encontrada — FigurasAnime" };
+  if (!category) return { title: "Categoría no encontrada — GerStore" };
   return catalogMetadata({ searchParams, fixedCategory: category });
 }
 

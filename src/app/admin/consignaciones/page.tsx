@@ -48,7 +48,7 @@ export default async function AdminConsignacionesPage() {
                   <a
                     href={buildWhatsAppLink(
                       req.user.whatsapp,
-                      `Hola ${req.user.name}, te escribo de FigurasAnime por tu figura "${req.figure}" que quieres que vendamos. ¿Me mandas unas fotos?`
+                      `Hola ${req.user.name}, te escribo de GerStore por tu figura "${req.figure}" que quieres que vendamos. ¿Me mandas unas fotos?`
                     )}
                     target="_blank"
                     rel="noopener noreferrer"

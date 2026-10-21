@@ -15,7 +15,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = {
-  title: "Invita y gana destacados gratis — FigurasAnime",
+  title: "Invita y gana destacados gratis — GerStore",
   robots: { index: false },
 };
 

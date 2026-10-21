@@ -23,7 +23,9 @@ export default function Footer({ totalVisits, categories }: FooterProps) {
           <div>
             <p className="flex items-center gap-1.5 text-base font-extrabold text-foreground">
               <span aria-hidden="true">🎌</span>
-              Figuras<span className="text-orange-600">Anime</span>
+              <span>
+                Ger<span className="text-orange-600">Store</span>
+              </span>
             </p>
             <p className="mt-2 max-w-xs text-sm text-muted-foreground">
               El marketplace para comprar y vender figuras de anime entre coleccionistas,
@@ -130,7 +132,7 @@ export default function Footer({ totalVisits, categories }: FooterProps) {
         <Separator className="mt-10" />
         <div className="flex flex-col items-center gap-2 pt-6 text-center text-xs text-muted-foreground sm:flex-row sm:justify-between">
           <div className="flex flex-col items-center gap-1 sm:flex-row sm:gap-3">
-            <p>FigurasAnime © {year} — Compra y venta entre coleccionistas</p>
+            <p>GerStore © {year} — Compra y venta entre coleccionistas</p>
             <Link
               href="/politica-privacidad"
               className="underline-offset-2 hover:text-orange-600 hover:underline"

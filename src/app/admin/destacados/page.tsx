@@ -84,7 +84,7 @@ export default async function AdminDestacadosPage() {
                   <a
                     href={buildWhatsAppLink(
                       req.user.whatsapp,
-                      `Hola ${req.user.name}, te escribo por el destacado de "${req.listing.title}" en FigurasAnime.`
+                      `Hola ${req.user.name}, te escribo por el destacado de "${req.listing.title}" en GerStore.`
                     )}
                     target="_blank"
                     rel="noopener noreferrer"
