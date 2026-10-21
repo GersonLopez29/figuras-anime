@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
     const date = new Date().toISOString().slice(0, 10);
     headers.set(
       "Content-Disposition",
-      `attachment; filename="figurasanime-novedades-${date}-${format}.png"`
+      `attachment; filename="gerstore-novedades-${date}-${format}.png"`
     );
   }
   return new Response(png, { status: 200, headers });

@@ -5,7 +5,7 @@ import { getCurrentUser, isAdmin } from "@/lib/session";
 
 const schema = z.object({ isOfficialStore: z.boolean() });
 
-// Marca o desmarca una cuenta como "Tienda FigurasAnime". A diferencia de
+// Marca o desmarca una cuenta como "Tienda GerStore". A diferencia de
 // bloquear o borrar, el admin sí puede marcar su propia cuenta.
 export async function PATCH(
   request: NextRequest,

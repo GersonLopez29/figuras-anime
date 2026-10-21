@@ -35,7 +35,7 @@ export default function SocialLinks({ showHandle = false }: { showHandle?: boole
             href={s.url}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label={`FigurasAnime en ${s.name}`}
+            aria-label={`GerStore en ${s.name}`}
             className={`group inline-flex items-center gap-2 rounded-full border border-border bg-card px-3.5 py-1.5 text-sm font-medium text-foreground/80 transition ${HOVER[s.network]}`}
           >
             <span className={`${ICON_COLOR[s.network]} transition group-hover:text-white`}>

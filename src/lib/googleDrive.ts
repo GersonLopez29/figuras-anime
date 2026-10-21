@@ -10,7 +10,7 @@
 
 export const DRIVE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? "";
 const SCOPE = "https://www.googleapis.com/auth/drive.file";
-export const DRIVE_FOLDER_NAME = "FigurasAnime - Videos TikTok";
+export const DRIVE_FOLDER_NAME = "GerStore - Videos TikTok";
 const GIS_SRC = "https://accounts.google.com/gsi/client";
 const API = "https://www.googleapis.com";
 
@@ -96,7 +96,7 @@ async function driveFetch(token: string, url: string, init: RequestInit = {}) {
   return res;
 }
 
-// Carpeta "FigurasAnime - Videos TikTok" (la crea la primera vez). Con el
+// Carpeta "GerStore - Videos TikTok" (la crea la primera vez). Con el
 // permiso drive.file solo se ven las carpetas que creó la propia página.
 async function ensureFolder(token: string): Promise<string> {
   const q = encodeURIComponent(

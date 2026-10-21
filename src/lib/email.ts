@@ -10,7 +10,7 @@ function escapeHtml(value: string) {
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
 }
-const FROM = process.env.RESEND_FROM_EMAIL ?? "FigurasAnime <onboarding@resend.dev>";
+const FROM = process.env.RESEND_FROM_EMAIL ?? "GerStore <onboarding@resend.dev>";
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://gerstore.club";
 
 async function sendEmail(to: string, subject: string, html: string) {
@@ -28,7 +28,7 @@ async function sendEmail(to: string, subject: string, html: string) {
 function wrapper(title: string, bodyHtml: string) {
   return `
     <div style="font-family: -apple-system, sans-serif; max-width: 480px; margin: 0 auto; padding: 24px;">
-      <p style="font-size: 20px; font-weight: 800; color: #c2410c; margin: 0 0 16px;">🎌 FigurasAnime</p>
+      <p style="font-size: 20px; font-weight: 800; color: #c2410c; margin: 0 0 16px;">🎌 GerStore</p>
       <h1 style="font-size: 18px; color: #18181b; margin: 0 0 12px;">${title}</h1>
       ${bodyHtml}
       <p style="margin-top: 32px; font-size: 12px; color: #a1a1aa;">
@@ -42,12 +42,12 @@ export async function sendVerificationEmail(to: string, name: string, token: str
   const verifyUrl = `${SITE_URL}/verificar-email?token=${token}`;
   await sendEmail(
     to,
-    "Confirma tu correo en FigurasAnime",
+    "Confirma tu correo en GerStore",
     wrapper(
       `¡Hola ${escapeHtml(name)}!`,
       `
         <p style="font-size: 14px; color: #3f3f46; line-height: 1.6;">
-          Gracias por registrarte en FigurasAnime. Confirma tu correo para activar tu cuenta:
+          Gracias por registrarte en GerStore. Confirma tu correo para activar tu cuenta:
         </p>
         <a href="${verifyUrl}" style="display: inline-block; margin-top: 12px; background: #ea580c; color: white; padding: 10px 20px; border-radius: 999px; text-decoration: none; font-weight: 600; font-size: 14px;">
           Confirmar mi correo
@@ -63,12 +63,12 @@ export async function sendVerificationEmail(to: string, name: string, token: str
 export async function sendAccountExistsEmail(to: string, name: string) {
   await sendEmail(
     to,
-    "Ya tienes una cuenta en FigurasAnime",
+    "Ya tienes una cuenta en GerStore",
     wrapper(
       `¡Hola ${escapeHtml(name)}!`,
       `
         <p style="font-size: 14px; color: #3f3f46; line-height: 1.6;">
-          Alguien intentó crear una cuenta en FigurasAnime usando este correo, pero ya tienes una.
+          Alguien intentó crear una cuenta en GerStore usando este correo, pero ya tienes una.
           Si fuiste tú, simplemente inicia sesión con tu contraseña habitual.
         </p>
         <a href="${SITE_URL}/login" style="display: inline-block; margin-top: 12px; background: #ea580c; color: white; padding: 10px 20px; border-radius: 999px; text-decoration: none; font-weight: 600; font-size: 14px;">
@@ -121,7 +121,7 @@ export async function sendNewReviewEmail(
   const stars = "⭐".repeat(Math.max(1, Math.min(5, Math.round(rating))));
   await sendEmail(
     to,
-    `${reviewerName} te dejó una reseña en FigurasAnime`,
+    `${reviewerName} te dejó una reseña en GerStore`,
     wrapper(
       `¡Hola ${escapeHtml(sellerName)}!`,
       `
@@ -142,7 +142,7 @@ export async function sendPasswordResetEmail(to: string, name: string, token: st
   const resetUrl = `${SITE_URL}/restablecer-password?token=${token}`;
   await sendEmail(
     to,
-    "Restablece tu contraseña en FigurasAnime",
+    "Restablece tu contraseña en GerStore",
     wrapper(
       `¡Hola ${escapeHtml(name)}!`,
       `
@@ -165,7 +165,7 @@ const SUGGESTIONS_INBOX = "gersonownd@gmail.com";
 export async function sendSuggestionEmail(message: string, fromName?: string, fromEmail?: string) {
   await sendEmail(
     SUGGESTIONS_INBOX,
-    fromName ? `Sugerencia de ${fromName}` : "Nueva sugerencia en FigurasAnime",
+    fromName ? `Sugerencia de ${fromName}` : "Nueva sugerencia en GerStore",
     wrapper(
       "💡 Nueva sugerencia",
       `
@@ -282,7 +282,7 @@ export async function sendAlertConfirmEmail(to: string, query: string, token: st
       `
         <p style="font-size: 14px; color: #3f3f46; line-height: 1.6;">
           Pediste que te avisemos cuando publiquen una figura de
-          <strong>${escapeHtml(query)}</strong> en FigurasAnime. Confirma tu correo para activarlo:
+          <strong>${escapeHtml(query)}</strong> en GerStore. Confirma tu correo para activarlo:
         </p>
         ${button(confirmUrl, "Activar aviso")}
         ${smallPrint("Si no fuiste tú, ignora este correo: sin confirmar no te enviaremos nada.")}
@@ -366,7 +366,7 @@ export async function sendReferralRewardEmail(
 ) {
   await sendEmail(
     to,
-    "🎁 Ganaste un destacado gratis en FigurasAnime",
+    "🎁 Ganaste un destacado gratis en GerStore",
     wrapper(
       `¡Gracias, ${escapeHtml(name)}!`,
       `
@@ -393,7 +393,7 @@ export async function sendWelcomeBonusEmail(
     to,
     "⭐ Tu primera figura está destacada gratis",
     wrapper(
-      `¡Bienvenido a FigurasAnime, ${escapeHtml(name)}!`,
+      `¡Bienvenido a GerStore, ${escapeHtml(name)}!`,
       `
         <p style="font-size: 14px; color: #3f3f46; line-height: 1.6;">
           Como regalo de bienvenida, <strong>${escapeHtml(listingTitle)}</strong> sale

@@ -166,9 +166,9 @@ function drawBrand(ctx: CanvasRenderingContext2D, x: number, y: number, size: nu
   ctx.textAlign = "left";
   ctx.textBaseline = "top";
   ctx.fillStyle = "#fff";
-  ctx.fillText("Figuras", x, y);
+  ctx.fillText("Ger", x, y);
   ctx.fillStyle = animeColor;
-  ctx.fillText("Anime", x + ctx.measureText("Figuras").width, y);
+  ctx.fillText("Store", x + ctx.measureText("Ger").width, y);
 }
 
 function infoOverlay(o: VideoOptions) {
@@ -312,7 +312,7 @@ function endCard(o: VideoOptions, bg: HTMLCanvasElement, lines: HTMLCanvasElemen
     ctx.fillText(text, 450, yy);
   }
   ctx.font = `900 54px ${f}`;
-  const bw = ctx.measureText("FigurasAnime").width;
+  const bw = ctx.measureText("GerStore").width;
   drawBrand(ctx, 450 - bw / 2, 640, 54, f, "rgb(15,12,10)");
   ctx.restore();
   drawShuriken(ctx, 150, 430, 70, "rgba(230,230,235,0.9)", 0.3);

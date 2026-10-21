@@ -70,7 +70,7 @@ export const GUIDES: Guide[] = [
           "Fotos reales de la figura y de la caja por todos los lados, incluido el sello si lo tiene.",
           "Un video corto girando la figura, o una foto con un papel que tenga su nombre y la fecha.",
           "Si se encuentran en persona, revisa la figura antes de pagar.",
-          "En FigurasAnime fíjate en la etiqueta \"📷 Fotos reales\" y en las reseñas del vendedor.",
+          "En GerStore fíjate en la etiqueta \"📷 Fotos reales\" y en las reseñas del vendedor.",
         ],
       },
     ],

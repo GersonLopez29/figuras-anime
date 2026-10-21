@@ -4,7 +4,7 @@ import UnsubscribeAlertButton from "@/components/UnsubscribeAlertButton";
 import { Card } from "@/components/ui/card";
 
 export const metadata: Metadata = {
-  title: "Dar de baja aviso — FigurasAnime",
+  title: "Dar de baja aviso — GerStore",
   robots: { index: false },
 };
 

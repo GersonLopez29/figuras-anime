@@ -88,9 +88,9 @@ export async function POST(
 
   // Si está separada, el comprador ya avisa que pagaría el total.
   const message = offer !== null
-    ? `Hola ${listing.user.name}, vi tu figura "${listing.title}" en FigurasAnime (publicada a ${formatPrice(total)}). ¿Aceptarías ${formatPrice(offer)}? Si te parece, coordinamos la entrega.`
+    ? `Hola ${listing.user.name}, vi tu figura "${listing.title}" en GerStore (publicada a ${formatPrice(total)}). ¿Aceptarías ${formatPrice(offer)}? Si te parece, coordinamos la entrega.`
     : reserved
-    ? `Hola ${listing.user.name}, vi tu figura "${listing.title}" en FigurasAnime. Sé que está separada, pero me interesa comprarla pagando el total de ${formatPrice(total)}. ¿Es posible?`
-    : `Hola ${listing.user.name}, vi tu figura "${listing.title}" en FigurasAnime y me interesa. ¿Sigue disponible?`;
+    ? `Hola ${listing.user.name}, vi tu figura "${listing.title}" en GerStore. Sé que está separada, pero me interesa comprarla pagando el total de ${formatPrice(total)}. ¿Es posible?`
+    : `Hola ${listing.user.name}, vi tu figura "${listing.title}" en GerStore y me interesa. ¿Sigue disponible?`;
   return NextResponse.json({ link: buildWhatsAppLink(listing.user.whatsapp, message) });
 }

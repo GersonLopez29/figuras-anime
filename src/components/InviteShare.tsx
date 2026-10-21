@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 
 export default function InviteShare({ link }: { link: string }) {
   const [copied, setCopied] = useState(false);
-  const message = `Te invito a FigurasAnime, la página para comprar y vender figuras de anime en Perú. Publicar es gratis: ${link}`;
+  const message = `Te invito a GerStore, la página para comprar y vender figuras de anime en Perú. Publicar es gratis: ${link}`;
 
   async function copy() {
     try {

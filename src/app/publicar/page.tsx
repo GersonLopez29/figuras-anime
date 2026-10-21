@@ -9,7 +9,7 @@ import EmailVerificationBanner from "@/components/EmailVerificationBanner";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 
 export const metadata: Metadata = {
-  title: "Publicar una figura — FigurasAnime",
+  title: "Publicar una figura — GerStore",
   // Sin sesión redirige al login: no es una página para Google.
   robots: { index: false, follow: true },
 };

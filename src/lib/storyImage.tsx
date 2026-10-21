@@ -46,7 +46,7 @@ function BrandHeader({ subtitle }: { subtitle: string }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, flexShrink: 0 }}>
       <div style={{ display: "flex", fontSize: 76, fontWeight: 900, color: "#ffffff", letterSpacing: -1 }}>
-        FigurasAnime
+        GerStore
       </div>
       <div style={{ display: "flex", fontSize: 32, fontWeight: 500, color: "rgba(255,255,255,0.9)" }}>
         {subtitle}
@@ -174,7 +174,7 @@ export async function renderListingStory(id: string): Promise<ImageResponse | nu
               />
             ) : (
               <div style={{ display: "flex", fontSize: 72, fontWeight: 900, color: ORANGE }}>
-                FigurasAnime
+                GerStore
               </div>
             )}
             {listing.sold && (
@@ -402,7 +402,7 @@ export async function renderWeeklyImage(format: WeeklyFormat): Promise<ImageResp
                     <img src={photos[i]!} width={cell} height={photoHeight} alt="" style={{ objectFit: "cover" }} />
                   ) : (
                     <div style={{ display: "flex", fontSize: 40, fontWeight: 900, color: ORANGE }}>
-                      FigurasAnime
+                      GerStore
                     </div>
                   )}
                 </div>

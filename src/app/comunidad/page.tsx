@@ -5,9 +5,9 @@ import CommunityPostCard from "@/components/CommunityPostCard";
 import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = {
-  title: "Comunidad de coleccionistas de figuras de anime en Perú | FigurasAnime",
+  title: "Comunidad de coleccionistas de figuras de anime en Perú | GerStore",
   description:
-    "Colecciones de figuras de anime de coleccionistas peruanos: fotos de sus repisas, calificaciones y comentarios. Comparte la tuya en FigurasAnime.",
+    "Colecciones de figuras de anime de coleccionistas peruanos: fotos de sus repisas, calificaciones y comentarios. Comparte la tuya en GerStore.",
   alternates: { canonical: "/comunidad" },
 };
 

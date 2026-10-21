@@ -42,7 +42,7 @@ export function landingH1(input: LandingInput): string {
 
 // En el título de Google se agrega "Perú" (también se busca "figuras … perú").
 export function landingTitle(input: LandingInput): string {
-  return `${landingH1(input)}${input.zona ? "" : ", Perú"} | FigurasAnime`;
+  return `${landingH1(input)}${input.zona ? "" : ", Perú"} | GerStore`;
 }
 
 function priceText(stats: LandingStats): string {

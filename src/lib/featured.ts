@@ -34,7 +34,7 @@ export async function getFeaturePaymentInfo(): Promise<{ name: string; number: s
   });
   const number = process.env.FEATURE_PAYMENT_NUMBER ?? admin?.whatsapp;
   if (!number) return null;
-  return { name: admin?.name ?? "FigurasAnime", number };
+  return { name: admin?.name ?? "GerStore", number };
 }
 
 export function formatShortDate(date: Date): string {

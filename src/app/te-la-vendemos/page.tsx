@@ -9,7 +9,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = {
-  title: "Te la vendemos — vende tus figuras sin esfuerzo | FigurasAnime",
+  title: "Te la vendemos — vende tus figuras sin esfuerzo | GerStore",
   description: `¿Tienes figuras de anime que ya no usas? ${OFFICIAL_STORE_NAME} las vende por ti en Lima: nosotros publicamos, atendemos a los compradores y entregamos. Solo cobramos una comisión del ${CONSIGNMENT_COMMISSION_PERCENT}% si se vende.`,
   alternates: { canonical: "/te-la-vendemos" },
 };

@@ -22,7 +22,7 @@ async function resolveLine(params: LineaPageProps["params"]): Promise<ProductLin
 
 export async function generateMetadata({ params, searchParams }: LineaPageProps): Promise<Metadata> {
   const line = await resolveLine(params);
-  if (!line) return { title: "Línea no encontrada — FigurasAnime" };
+  if (!line) return { title: "Línea no encontrada — GerStore" };
   return catalogMetadata({ searchParams, fixedLine: line });
 }
 

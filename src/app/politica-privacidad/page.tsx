@@ -3,9 +3,9 @@ import { Card } from "@/components/ui/card";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/politica-privacidad" },
-  title: "Política de Privacidad — FigurasAnime",
+  title: "Política de Privacidad — GerStore",
   description:
-    "Cómo FigurasAnime recopila, usa y protege tus datos personales al comprar, vender y publicar figuras de anime.",
+    "Cómo GerStore recopila, usa y protege tus datos personales al comprar, vender y publicar figuras de anime.",
 };
 
 const LAST_UPDATED = "7 de octubre de 2026";
@@ -21,7 +21,7 @@ export default function PoliticaPrivacidadPage() {
         <div className="space-y-8 text-sm leading-relaxed text-foreground/90">
           <section>
             <p>
-              Esta política explica qué datos personales recopila FigurasAnime (
+              Esta política explica qué datos personales recopila GerStore (
               <span className="font-medium">gerstore.club</span>), para qué los usamos, con quién los
               compartimos y qué derechos tienes sobre ellos. Al crear una cuenta o usar el marketplace,
               aceptas el tratamiento de tus datos descrito aquí.
@@ -151,7 +151,7 @@ export default function PoliticaPrivacidadPage() {
           <section>
             <h2 className="text-lg font-semibold text-foreground">6. Menores de edad</h2>
             <p className="mt-2 text-muted-foreground">
-              FigurasAnime no está dirigido a menores de edad y no recopilamos deliberadamente datos de
+              GerStore no está dirigido a menores de edad y no recopilamos deliberadamente datos de
               menores. Si detectamos una cuenta de un menor, la eliminaremos.
             </p>
           </section>

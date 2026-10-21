@@ -4,9 +4,9 @@ import StockAlertForm from "@/components/StockAlertForm";
 import { Card } from "@/components/ui/card";
 
 export const metadata: Metadata = {
-  title: "Avísame cuando llegue — FigurasAnime",
+  title: "Avísame cuando llegue — GerStore",
   description:
-    "Dinos qué figura de anime buscas y te avisamos por correo apenas alguien la publique en FigurasAnime.",
+    "Dinos qué figura de anime buscas y te avisamos por correo apenas alguien la publique en GerStore.",
   alternates: { canonical: "/avisame" },
 };
 

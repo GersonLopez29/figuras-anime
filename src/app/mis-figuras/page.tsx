@@ -168,7 +168,7 @@ export default async function MisFigurasPage({ searchParams }: MisFigurasPagePro
             <p className="mt-2 text-muted-foreground">
               {nextMilestone
                 ? `Te ${salesToNext === 1 ? "falta 1 venta" : `faltan ${salesToNext} ventas`} para ${nextMilestone.icon} ${nextMilestone.label}. Cada logro te regala un destacado gratis de 7 días y una insignia en tu perfil. Marca tus figuras como vendidas para que cuenten (desde que la publicas tiene que pasar al menos ${MILESTONE_MIN_LISTED_HOURS / 24} día).`
-                : "¡Desbloqueaste todos los logros! Gracias por vender en FigurasAnime."}
+                : "¡Desbloqueaste todos los logros! Gracias por vender en GerStore."}
             </p>
           </div>
         </div>
@@ -360,7 +360,7 @@ export default async function MisFigurasPage({ searchParams }: MisFigurasPagePro
                 {!listing.sold && (
                   <StoryShareButton
                     imageUrl={`${listingPath(listing)}/historia`}
-                    fileName={`figurasanime-${listing.id}-historia.png`}
+                    fileName={`gerstore-${listing.id}-historia.png`}
                     shareText={`${listing.title} en ${SITE_URL}${listingPath(listing)}`}
                     label="📲 Historia o TikTok"
                     size="sm"

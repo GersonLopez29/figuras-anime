@@ -29,10 +29,10 @@ export async function generateMetadata({ params }: ComunidadDetailPageProps): Pr
   });
 
   if (!post) {
-    return { title: "Publicación no encontrada — FigurasAnime" };
+    return { title: "Publicación no encontrada — GerStore" };
   }
 
-  const title = `${post.author.name} en Comunidad | FigurasAnime`;
+  const title = `${post.author.name} en Comunidad | GerStore`;
   const description = post.caption.slice(0, 155);
   const image = post.images[0]?.url;
 

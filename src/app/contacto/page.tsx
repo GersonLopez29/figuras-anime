@@ -4,8 +4,8 @@ import SocialLinks from "@/components/SocialLinks";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/contacto" },
-  title: "Contacto — FigurasAnime",
-  description: "Escríbenos para sugerencias, negocios o cualquier consulta sobre FigurasAnime.",
+  title: "Contacto — GerStore",
+  description: "Escríbenos para sugerencias, negocios o cualquier consulta sobre GerStore.",
 };
 
 const CONTACT_EMAIL = "gersonownd@gmail.com";
@@ -15,7 +15,7 @@ export default function ContactoPage() {
     <div className="mx-auto max-w-3xl px-4 py-10">
       <h1 className="text-3xl font-bold text-foreground">Contacto</h1>
       <p className="mt-2 text-sm text-muted-foreground">
-        ¿Tienes una sugerencia, una propuesta de negocio o algo que contarnos sobre FigurasAnime?
+        ¿Tienes una sugerencia, una propuesta de negocio o algo que contarnos sobre GerStore?
       </p>
 
       <Card className="mt-6 p-6 shadow-sm sm:p-8">

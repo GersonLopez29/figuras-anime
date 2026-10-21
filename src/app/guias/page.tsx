@@ -4,7 +4,7 @@ import { GUIDES } from "@/lib/guides";
 import { Card } from "@/components/ui/card";
 
 export const metadata: Metadata = {
-  title: "Guías para coleccionistas de figuras de anime — FigurasAnime",
+  title: "Guías para coleccionistas de figuras de anime — GerStore",
   description:
     "Aprende a reconocer figuras originales, a elegir entre Banpresto, S.H.Figuarts o Nendoroid, a cuidarlas y a comprar seguro en Perú.",
   alternates: { canonical: "/guias" },

@@ -62,7 +62,7 @@ export async function generateMetadata({ params }: FiguraPageProps): Promise<Met
   const { slug: param } = await params;
   const resolved = await resolveParam(param);
   if (!resolved) {
-    return { title: "Figura no encontrada — FigurasAnime" };
+    return { title: "Figura no encontrada — GerStore" };
   }
   const id = resolved.id;
   const listing = await prisma.listing.findUnique({
@@ -84,15 +84,15 @@ export async function generateMetadata({ params }: FiguraPageProps): Promise<Met
   });
 
   if (!listing) {
-    return { title: "Figura no encontrada — FigurasAnime" };
+    return { title: "Figura no encontrada — GerStore" };
   }
 
   const activeDiscount = getActiveDiscountAmount(listing.discountAmount, listing.discountExpiresAt);
   const displayPrice = activeDiscount ? getFinalPrice(listing.price, activeDiscount) : listing.price;
   const name = prettyListingTitle(listing.title);
   const title = listing.sold
-    ? `${name} (vendida) | FigurasAnime`
-    : `${name} — ${formatPrice(displayPrice)} | FigurasAnime`;
+    ? `${name} (vendida) | GerStore`
+    : `${name} — ${formatPrice(displayPrice)} | GerStore`;
   // La descripción del vendedor suele ser corta ("Figura open 9/10"): para Google
   // se arma una con nombre, precio, estado y entrega, y se le suma ese texto.
   const description = listingMetaDescription({ ...listing, price: displayPrice });
@@ -380,7 +380,7 @@ export default async function FiguraPage({ params, searchParams }: FiguraPagePro
                 title={displayTitle}
                 text={`${displayTitle} — ${formatPrice(
                   activeDiscount ? getFinalPrice(listing.price, activeDiscount) : listing.price
-                )} en FigurasAnime`}
+                )} en GerStore`}
                 url={pageUrl}
               />
               {currentUser && (
@@ -556,7 +556,7 @@ export default async function FiguraPage({ params, searchParams }: FiguraPagePro
             <div className="mt-4">
               <StoryShareButton
                 imageUrl={`${listingPath(listing)}/historia`}
-                fileName={`figurasanime-${listing.id}-historia.png`}
+                fileName={`gerstore-${listing.id}-historia.png`}
                 shareText={`${displayTitle} — ${formatPrice(totalPrice)} en ${pageUrl}`}
                 label="📲 Compartir en historias o TikTok"
                 className="w-full"
