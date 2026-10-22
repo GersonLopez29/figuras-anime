@@ -403,3 +403,22 @@ model SearchStat {
   @@unique([date, query])
   @@index([date])
 }
+
+// Asistente de la página (botón de chat): cada pregunta y su respuesta. Sirve
+// para el límite por conexión y por día, y para ver en el panel admin qué
+// pregunta la gente. Los tokens permiten estimar el costo de la API.
+model AssistantMessage {
+  id           String   @id @default(cuid())
+  ip           String
+  userId       String?
+  question     String
+  answer       String
+  usedSearch   Boolean  @default(false)
+  failed       Boolean  @default(false)
+  inputTokens  Int      @default(0)
+  outputTokens Int      @default(0)
+  createdAt    DateTime @default(now())
+
+  @@index([ip, createdAt])
+  @@index([createdAt])
+}

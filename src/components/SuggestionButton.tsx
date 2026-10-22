@@ -18,7 +18,39 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
+// Botón flotante "Sugerencias" (cuando el asistente no está activo).
 export default function SuggestionButton() {
+  return (
+    <SuggestionDialog
+      trigger={
+        <Button
+          aria-label="Enviar una sugerencia"
+          className="suggestion-fab fixed bottom-4 right-4 z-40 size-11 gap-1.5 rounded-full p-0 opacity-90 shadow-lg shadow-orange-600/20 transition-opacity hover:opacity-100 sm:bottom-5 sm:right-5 sm:h-11 sm:w-auto sm:px-4"
+        />
+      }
+      triggerContent={
+        <>
+          <Lightbulb className="size-4" />
+          <span className="hidden sm:inline">Sugerencias</span>
+        </>
+      }
+    />
+  );
+}
+
+// El formulario de sugerencias. Con trigger se abre con ese botón; sin trigger
+// se controla desde afuera con open/onOpenChange (lo usa el chat del asistente).
+export function SuggestionDialog({
+  trigger,
+  triggerContent,
+  open,
+  onOpenChange,
+}: {
+  trigger?: React.ReactElement;
+  triggerContent?: React.ReactNode;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}) {
   const [message, setMessage] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -56,21 +88,12 @@ export default function SuggestionButton() {
       setError(null);
       setSent(false);
     }
+    onOpenChange?.(nextOpen);
   }
 
   return (
-    <Dialog onOpenChange={handleOpenChange}>
-      <DialogTrigger
-        render={
-          <Button
-            aria-label="Enviar una sugerencia"
-            className="suggestion-fab fixed bottom-4 right-4 z-40 size-11 gap-1.5 rounded-full p-0 opacity-90 shadow-lg shadow-orange-600/20 transition-opacity hover:opacity-100 sm:bottom-5 sm:right-5 sm:h-11 sm:w-auto sm:px-4"
-          />
-        }
-      >
-        <Lightbulb className="size-4" />
-        <span className="hidden sm:inline">Sugerencias</span>
-      </DialogTrigger>
+    <Dialog {...(open !== undefined ? { open } : {})} onOpenChange={handleOpenChange}>
+      {trigger && <DialogTrigger render={trigger}>{triggerContent}</DialogTrigger>}
 
       <DialogContent showCloseButton={!loading}>
         <DialogHeader>
