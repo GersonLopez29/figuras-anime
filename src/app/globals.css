@@ -216,6 +216,13 @@ body {
 html[data-sticky-bar] .suggestion-fab {
   bottom: 6rem;
 }
+/* Saludo del asistente: siempre justo encima del botón "¿Dudas?". */
+.assistant-teaser {
+  transition: bottom 0.3s ease;
+}
+html[data-sticky-bar] .assistant-teaser {
+  bottom: 9.75rem;
+}
 
 /* Efecto 3D de las fotos (componente Tilt3D). Funciona igual en Chrome, Edge,
    Firefox, Safari, Opera, Brave y Samsung Internet. Quién mueve la tarjeta:
