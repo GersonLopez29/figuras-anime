@@ -25,6 +25,11 @@ type Card = {
 type Msg = { role: "user" | "assistant"; content: string; cards?: Card[]; error?: boolean };
 
 const STORAGE_KEY = "gerstore-asistente";
+// Se abre solo una vez por visita (pestaña): si la persona lo cierra, no
+// vuelve a aparecer mientras navega.
+const AUTO_KEY = "gerstore-asistente-auto";
+const AUTO_DELAY_MS = 4000;
+const TEASER_MS = 15000;
 const MAX_CHARS = 500;
 const QUICK_QUESTIONS = [
   "¿Cómo publico una figura?",
@@ -158,8 +163,42 @@ export default function AssistantWidget({ contactNumber }: { contactNumber: stri
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [suggestOpen, setSuggestOpen] = useState(false);
+  // Burbuja de saludo junto al botón (en celular, en vez de abrir el chat).
+  const [teaser, setTeaser] = useState(false);
   const listRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  // Solo se enfoca el campo de texto si la persona abrió el chat: al abrirse
+  // solo no debe robar el foco ni sacar el teclado del celular.
+  const focusOnOpen = useRef(false);
+  const isAdmin = pathname.startsWith("/admin");
+
+  // A los pocos segundos de entrar: en computadora se abre el chat; en celular
+  // aparece la burbuja (el chat taparía casi toda la pantalla, y Google
+  // penaliza las ventanas que tapan el contenido en celular al cargar).
+  useEffect(() => {
+    if (isAdmin) return;
+    try {
+      if (window.sessionStorage.getItem(AUTO_KEY)) return;
+    } catch {
+      return;
+    }
+    const timer = window.setTimeout(() => {
+      try {
+        window.sessionStorage.setItem(AUTO_KEY, "1");
+      } catch {
+        // sin almacenamiento: igual se muestra esta vez
+      }
+      if (window.matchMedia("(min-width: 640px)").matches) setOpen(true);
+      else setTeaser(true);
+    }, AUTO_DELAY_MS);
+    return () => window.clearTimeout(timer);
+  }, [isAdmin]);
+
+  useEffect(() => {
+    if (!teaser) return;
+    const timer = window.setTimeout(() => setTeaser(false), TEASER_MS);
+    return () => window.clearTimeout(timer);
+  }, [teaser]);
 
   useEffect(() => {
     try {
@@ -175,11 +214,18 @@ export default function AssistantWidget({ contactNumber }: { contactNumber: stri
   }, [messages, loading, open]);
 
   useEffect(() => {
-    if (open) inputRef.current?.focus();
+    if (open && focusOnOpen.current) inputRef.current?.focus();
+    focusOnOpen.current = false;
   }, [open]);
 
   // En el panel de administrador no hace falta.
-  if (pathname.startsWith("/admin")) return null;
+  if (isAdmin) return null;
+
+  function openByUser() {
+    focusOnOpen.current = true;
+    setTeaser(false);
+    setOpen(true);
+  }
 
   async function ask(text: string) {
     const question = text.trim().slice(0, MAX_CHARS);
@@ -229,9 +275,28 @@ export default function AssistantWidget({ contactNumber }: { contactNumber: stri
 
   return (
     <>
+      {!open && teaser && (
+        <div className="assistant-teaser fixed bottom-[4.5rem] right-4 z-40 w-64 rounded-2xl rounded-br-sm border border-border bg-background p-3 pr-8 text-sm shadow-xl sm:bottom-[4.75rem] sm:right-5">
+          <button type="button" onClick={openByUser} className="text-left text-foreground">
+            <span className="font-semibold">👋 ¡Hola! ¿Tienes dudas?</span>
+            <span className="mt-0.5 block text-muted-foreground">
+              Te ayudo a encontrar figuras o a vender la tuya. Toca aquí para preguntarme.
+            </span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setTeaser(false)}
+            aria-label="Cerrar el saludo"
+            className="absolute right-2 top-2 rounded-full p-1 text-muted-foreground transition hover:bg-muted hover:text-foreground"
+          >
+            <X className="size-4" />
+          </button>
+        </div>
+      )}
+
       {!open && (
         <Button
-          onClick={() => setOpen(true)}
+          onClick={openByUser}
           aria-label="Abrir el asistente de GerStore"
           className="suggestion-fab fixed bottom-4 right-4 z-40 h-12 gap-2 rounded-full px-4 shadow-lg shadow-orange-600/25 sm:bottom-5 sm:right-5"
         >
