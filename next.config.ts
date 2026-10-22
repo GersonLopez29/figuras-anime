@@ -9,7 +9,7 @@ const contentSecurityPolicy = [
   // Vista previa de los videos para TikTok que se generan en el panel admin.
   "media-src 'self' blob:",
   // Google Drive (guardar videos desde el panel admin) y su inicio de sesión.
-  "connect-src 'self' https://www.googleapis.com https://accounts.google.com",
+  "connect-src 'self' https://www.googleapis.com https://accounts.google.com https://vercel.com https://*.blob.vercel-storage.com",
   "frame-src https://accounts.google.com https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://www.google.com https://pagead2.googlesyndication.com",
   "frame-ancestors 'none'",
 ].join("; ");
