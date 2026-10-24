@@ -25,3 +25,9 @@ Gotchas de Base UI encontrados al migrar (tenerlos en cuenta al tocar componente
 - `src/lib/email.ts` escapa HTML de todo valor con contenido de usuario (nombre, comentario, categoría) antes de interpolarlo en las plantillas.
 - Login usa `bcrypt.compare` contra un hash de relleno cuando el correo no existe (tiempo constante), y el registro no revela por HTTP si un correo ya está en uso — ambos para reducir enumeración de usuarios.
 - CSP (`next.config.ts`): `script-src`/`img-src`/`frame-src`/`connect-src` permiten cualquier `https:` porque Google AdSense no publica una lista fija de dominios (con una lista cerrada los anuncios no se mostraban). Se mantienen `object-src 'none'`, `base-uri 'self'` y `frame-ancestors 'none'`. El script de AdSense lo carga `src/components/AdSenseScript.tsx`, que lo omite en páginas privadas/formularios (`NO_ADS_PREFIXES`).
+
+## Base de datos (Neon, plan Launch — se paga por hora de cómputo)
+
+- Toda consulta despierta la base; con scale-to-zero se apaga a los 5 min sin uso. Evitar consultas en cada request del layout.
+- `getCategories()` y el contacto del admin (`getFeaturePaymentInfo`) usan `unstable_cache` (1 h). Toda escritura de categorías debe llamar a `expireCategoriesCache()` (`src/lib/categoriesCache.ts`).
+- `registerSiteVisit()` no cuenta bots (`isBotUserAgent`) y para ellos devuelve el total cacheado 10 min.

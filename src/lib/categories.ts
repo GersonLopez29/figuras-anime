@@ -1,16 +1,26 @@
+import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/db";
+
+// Las categorías casi no cambian y se leen en cada página (menú y footer):
+// se guardan en caché para no despertar la base de datos en cada visita.
+// Al crear, editar o borrar una categoría se llama a expireCategoriesCache().
+export const CATEGORIES_TAG = "categories";
 
 export type CategoryOption = { name: string; icon: string };
 export type CategoryWithCoverImage = CategoryOption & { imageUrl: string | null };
 
-export async function getCategories(): Promise<CategoryOption[]> {
-  const categories = await prisma.category.findMany({
-    orderBy: { createdAt: "asc" },
-    select: { name: true, icon: true },
-  });
-  // "Otras" es el cajón de sastre — siempre va al final, sin importar cuándo se creó.
-  return categories.sort((a, b) => Number(a.name === "Otras") - Number(b.name === "Otras"));
-}
+export const getCategories = unstable_cache(
+  async (): Promise<CategoryOption[]> => {
+    const categories = await prisma.category.findMany({
+      orderBy: { createdAt: "asc" },
+      select: { name: true, icon: true },
+    });
+    // "Otras" es el cajón de sastre — siempre va al final, sin importar cuándo se creó.
+    return categories.sort((a, b) => Number(a.name === "Otras") - Number(b.name === "Otras"));
+  },
+  ["categories-v1"],
+  { tags: [CATEGORIES_TAG], revalidate: 3600 }
+);
 
 // Usa la foto real de la publicación activa más reciente de cada categoría
 // como miniatura, en vez de un ícono genérico. Si la categoría todavía no
