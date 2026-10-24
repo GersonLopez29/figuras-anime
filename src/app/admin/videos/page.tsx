@@ -3,6 +3,7 @@ import { formatPrice, getActiveDiscountAmount, getFinalPrice } from "@/lib/forma
 import { isNewCondition, isOpenBoxCondition } from "@/lib/condition";
 import { listingPath } from "@/lib/slug";
 import TikTokVideoGenerator, { type VideoListing } from "@/components/admin/TikTokVideoGenerator";
+import { facebookEnabled } from "@/lib/facebook";
 import { Clapperboard } from "lucide-react";
 import { AdminPageHeader } from "@/components/admin/AdminUi";
 
@@ -49,9 +50,9 @@ export default async function AdminVideosPage() {
       <AdminPageHeader
         icon={Clapperboard}
         title="Videos TikTok"
-        description="Elige una figura disponible y arma un video vertical estilo anime para TikTok, Reels o historias. Al terminar puedes descargarlo o guardarlo en tu Google Drive."
+        description="Elige una figura disponible y arma un video vertical estilo anime para TikTok, Reels o historias. Al terminar puedes descargarlo, guardarlo en tu Google Drive o enviarlo como borrador a tu página de Facebook para ponerle música."
       />
-      <TikTokVideoGenerator listings={items} />
+      <TikTokVideoGenerator listings={items} facebookEnabled={facebookEnabled()} />
     </div>
   );
 }

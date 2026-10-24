@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ACCENTS, H, W, planVideo, recordVideo, pickRecorderType } from "@/lib/animeVideo";
 import SaveToDriveButton from "@/components/admin/SaveToDriveButton";
+import SendToFacebookButton from "@/components/admin/SendToFacebookButton";
 import { prettyListingTitle } from "@/lib/listingSeo";
 
 export type VideoListing = {
@@ -35,6 +36,22 @@ const TAGS = ["¡RECIÉN LLEGADA!", "¡EN OFERTA!", "¡ÚLTIMA UNIDAD!", "¡PREV
 // "Sh Figuarts" -> "S.H.Figuarts", "ssj4" -> "SSJ4" (igual que en la página).
 const cleanTitle = prettyListingTitle;
 
+const SITE_HOST = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://gerstore.club").replace(/^https?:\/\//, "");
+
+function hashtag(text: string) {
+  return `#${text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/gi, "").toLowerCase()}`;
+}
+
+// Texto propuesto para el Reel de Facebook (se puede editar antes de enviar).
+function reelDescription(l: VideoListing, title: string) {
+  const condition = l.conditionChip === "NUEVA" ? "Nueva" : l.conditionChip === "OPEN BOX" ? "Open box" : "Usada";
+  const tags = new Set(["#figurasanime", "#anime", "#coleccionista", "#animeperu", "#lima", hashtag(l.category)]);
+  if (/figuarts/i.test(l.title)) tags.add("#shfiguarts");
+  if (/ichiban/i.test(l.title)) tags.add("#ichibankuji");
+  if (/banpresto/i.test(l.title)) tags.add("#banpresto");
+  return `🔥 ${title} — ${l.priceLabel} (${condition})\n\n¿La quieres? Escríbele directo al vendedor por WhatsApp 👉 ${SITE_HOST}${l.path}\n\n${[...tags].join(" ")}`;
+}
+
 function guessChips(l: VideoListing) {
   const chips = [l.conditionChip];
   if (/figuarts|bandai|ichiban|banpresto|tamashii/i.test(l.title)) chips.push("ORIGINAL BANDAI");
@@ -54,7 +71,13 @@ function loadImage(src: string): Promise<HTMLImageElement> {
   });
 }
 
-export default function TikTokVideoGenerator({ listings }: { listings: VideoListing[] }) {
+export default function TikTokVideoGenerator({
+  listings,
+  facebookEnabled = false,
+}: {
+  listings: VideoListing[];
+  facebookEnabled?: boolean;
+}) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState(listings[0]?.id ?? "");
@@ -274,8 +297,17 @@ export default function TikTokVideoGenerator({ listings }: { listings: VideoList
               ⬇️ Descargar {fileName}
             </a>
             <SaveToDriveButton key={result.url} blob={result.blob} fileName={fileName} />
+            {selected && (
+              <SendToFacebookButton
+                key={`fb-${result.url}`}
+                blob={result.blob}
+                fileName={fileName}
+                defaultDescription={reelDescription(selected, title.trim() || cleanTitle(selected.title))}
+                enabled={facebookEnabled}
+              />
+            )}
             <p className="mt-2 text-xs">
-              Va sin música: al subirlo, agrega un sonido en tendencia desde TikTok o Instagram.
+              Va sin música: agrégale un sonido en tendencia en TikTok, Instagram o en el borrador de Facebook.
             </p>
           </div>
         )}
