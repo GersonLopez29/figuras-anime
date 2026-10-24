@@ -80,8 +80,8 @@ export default function TerminosCondicionesPage() {
           <section>
             <h2 className="text-lg font-semibold text-foreground">6. Cambios a estos términos</h2>
             <p className="mt-2 text-muted-foreground">
-              Podemos actualizar estos términos cuando cambiemos la plataforma. La fecha de "Última
-              actualización" arriba refleja la versión vigente.
+              Podemos actualizar estos términos cuando cambiemos la plataforma. La fecha de &quot;Última
+              actualización&quot; arriba refleja la versión vigente.
             </p>
           </section>
 
