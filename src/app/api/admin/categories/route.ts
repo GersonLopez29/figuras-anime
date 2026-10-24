@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
+import { expireCategoriesCache } from "@/lib/categoriesCache";
 import { getCurrentUser, isAdmin } from "@/lib/session";
 
 const createCategorySchema = z.object({
@@ -37,5 +38,6 @@ export async function POST(request: NextRequest) {
     },
   });
 
+  expireCategoriesCache();
   return NextResponse.json(created, { status: 201 });
 }

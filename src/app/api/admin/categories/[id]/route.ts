@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
+import { expireCategoriesCache } from "@/lib/categoriesCache";
 import { getCurrentUser, isAdmin } from "@/lib/session";
 
 const updateCategorySchema = z.object({
@@ -63,6 +64,7 @@ export async function PATCH(
     return category;
   });
 
+  expireCategoriesCache();
   return NextResponse.json(updated);
 }
 
@@ -100,6 +102,7 @@ export async function DELETE(
   }
 
   await prisma.category.delete({ where: { id } });
+  expireCategoriesCache();
 
   return NextResponse.json({ ok: true });
 }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
+import { expireCategoriesCache } from "@/lib/categoriesCache";
 import { getCurrentUser, isAdmin } from "@/lib/session";
 import { sendCategoryRequestResolvedEmail } from "@/lib/email";
 
@@ -63,5 +64,6 @@ export async function PATCH(
   );
 
   const updated = await prisma.categoryRequest.findUnique({ where: { id } });
+  expireCategoriesCache();
   return NextResponse.json(updated);
 }

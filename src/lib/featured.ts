@@ -1,3 +1,4 @@
+import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/db";
 
 // Precio y duración de una publicación destacada. Cambia estos valores para
@@ -26,12 +27,21 @@ export function extendFeaturedUntil(current: Date | null, days: number, now = ne
 
 // Número de Yape/Plin donde pagan los vendedores: el WhatsApp del primer
 // administrador. FEATURE_PAYMENT_NUMBER en Vercel lo reemplaza si hace falta.
+// El admin y su WhatsApp casi nunca cambian: se cachea 1 hora para no
+// consultar la base de datos en cada página (lo usa el layout).
+const getMainAdmin = unstable_cache(
+  () =>
+    prisma.user.findFirst({
+      where: { role: "admin" },
+      orderBy: { createdAt: "asc" },
+      select: { name: true, whatsapp: true },
+    }),
+  ["main-admin-contact-v1"],
+  { revalidate: 3600 }
+);
+
 export async function getFeaturePaymentInfo(): Promise<{ name: string; number: string } | null> {
-  const admin = await prisma.user.findFirst({
-    where: { role: "admin" },
-    orderBy: { createdAt: "asc" },
-    select: { name: true, whatsapp: true },
-  });
+  const admin = await getMainAdmin();
   const number = process.env.FEATURE_PAYMENT_NUMBER ?? admin?.whatsapp;
   if (!number) return null;
   return { name: admin?.name ?? "GerStore", number };
