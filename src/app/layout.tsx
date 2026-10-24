@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import Script from "next/script";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
@@ -10,6 +9,7 @@ import CursorTrail from "@/components/CursorTrail";
 import EmailVerificationBanner from "@/components/EmailVerificationBanner";
 import SuggestionButton from "@/components/SuggestionButton";
 import AssistantWidget from "@/components/AssistantWidget";
+import AdSenseScript from "@/components/AdSenseScript";
 import { assistantEnabled } from "@/lib/assistant";
 import { getFeaturePaymentInfo } from "@/lib/featured";
 import { registerSiteVisit } from "@/lib/siteStats";
@@ -108,12 +108,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
         ) : (
           <SuggestionButton />
         )}
-        <Script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3110338196429688"
-          crossOrigin="anonymous"
-          strategy="afterInteractive"
-        />
+        <AdSenseScript />
         <Analytics />
         <SpeedInsights />
       </body>
