@@ -2,15 +2,24 @@ import type { NextConfig } from "next";
 
 const contentSecurityPolicy = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' https://pagead2.googlesyndication.com https://accounts.google.com",
-  "style-src 'self' 'unsafe-inline' https://accounts.google.com",
-  "img-src 'self' data: blob: https://*.public.blob.vercel-storage.com https://flagcdn.com",
-  "font-src 'self' data:",
+  // Google AdSense carga sus scripts, imágenes y marcos desde muchos dominios
+  // que cambian sin aviso (googlesyndication, doubleclick, adtrafficquality,
+  // el mensaje de consentimiento de Google…) y no publica una lista fija:
+  // por eso se permite cualquier origen https en scripts, imágenes, marcos y
+  // conexiones. 'unsafe-inline' ya estaba en script-src, así que restringir
+  // dominios aquí no agregaba protección real contra XSS.
+  // https://support.google.com/adsense/answer/16283098
+  "script-src 'self' 'unsafe-inline' https:",
+  "style-src 'self' 'unsafe-inline' https:",
+  "img-src 'self' data: blob: https:",
+  "font-src 'self' data: https:",
   // Vista previa de los videos para TikTok que se generan en el panel admin.
   "media-src 'self' blob:",
-  // Google Drive (guardar videos desde el panel admin) y su inicio de sesión.
-  "connect-src 'self' https://www.googleapis.com https://accounts.google.com",
-  "frame-src https://accounts.google.com https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://www.google.com https://pagead2.googlesyndication.com",
+  // Google Drive y Vercel Blob (panel admin) + reportes de AdSense.
+  "connect-src 'self' https:",
+  "frame-src https:",
+  "object-src 'none'",
+  "base-uri 'self'",
   "frame-ancestors 'none'",
 ].join("; ");
 

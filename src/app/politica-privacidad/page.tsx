@@ -8,7 +8,7 @@ export const metadata: Metadata = {
     "Cómo GerStore recopila, usa y protege tus datos personales al comprar, vender y publicar figuras de anime.",
 };
 
-const LAST_UPDATED = "21 de octubre de 2026";
+const LAST_UPDATED = "24 de octubre de 2026";
 const CONTACT_EMAIL = "gersonownd@gmail.com";
 
 export default function PoliticaPrivacidadPage() {
@@ -82,6 +82,9 @@ export default function PoliticaPrivacidadPage() {
                 Una cookie de sesión técnica (httpOnly, no accesible desde JavaScript) que solo sirve para
                 mantenerte con la sesión iniciada.
               </li>
+              <li>
+                Cookies de publicidad de Google y otros proveedores de anuncios (ver el punto 4).
+              </li>
             </ul>
           </section>
 
@@ -123,6 +126,7 @@ export default function PoliticaPrivacidadPage() {
             </p>
             <ul className="mt-2 list-disc space-y-1 pl-5 text-muted-foreground">
               <li>Vercel — hosting, base de datos y almacenamiento de las imágenes que subes</li>
+              <li>Google AdSense — muestra los anuncios de la página (ver el punto 4)</li>
               <li>Resend — envío de los correos transaccionales del servicio</li>
               <li>
                 Anthropic (Claude) — genera las respuestas del asistente de la página; recibe solo lo que
@@ -130,12 +134,71 @@ export default function PoliticaPrivacidadPage() {
               </li>
             </ul>
             <p className="mt-2 text-muted-foreground">
-              No vendemos ni compartimos tus datos con terceros con fines publicitarios.
+              No vendemos tus datos de cuenta (nombre, correo, WhatsApp) ni los compartimos con anunciantes.
             </p>
           </section>
 
           <section>
-            <h2 className="text-lg font-semibold text-foreground">4. Cómo protegemos tus datos</h2>
+            <h2 className="text-lg font-semibold text-foreground">4. Publicidad y cookies de terceros</h2>
+            <p className="mt-2 text-muted-foreground">
+              Para mantener GerStore gratis mostramos anuncios de Google AdSense. Sobre estos anuncios:
+            </p>
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-muted-foreground">
+              <li>
+                Proveedores externos, incluido Google, usan cookies para mostrar anuncios basados en tus
+                visitas anteriores a este sitio o a otros sitios web.
+              </li>
+              <li>
+                Las cookies de publicidad permiten a Google y a sus socios mostrarte anuncios según tus
+                visitas a este sitio y/o a otros sitios de Internet.
+              </li>
+              <li>
+                Puedes desactivar la publicidad personalizada en la{" "}
+                <a
+                  href="https://adssettings.google.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-medium text-primary hover:underline"
+                >
+                  Configuración de anuncios de Google
+                </a>
+                . También puedes desactivar las cookies de otros proveedores para la publicidad
+                personalizada en{" "}
+                <a
+                  href="https://www.aboutads.info/choices/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-medium text-primary hover:underline"
+                >
+                  www.aboutads.info
+                </a>
+                .
+              </li>
+              <li>
+                Otros proveedores y redes de anuncios aprobados por Google también pueden mostrar anuncios
+                aquí. Puedes ver cómo usa Google la información de los sitios que usan sus servicios en{" "}
+                <a
+                  href="https://policies.google.com/technologies/partner-sites"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-medium text-primary hover:underline"
+                >
+                  policies.google.com/technologies/partner-sites
+                </a>
+                .
+              </li>
+              <li>
+                Si nos visitas desde la Unión Europea, el Reino Unido o Suiza, te pediremos tu
+                consentimiento antes de usar cookies de publicidad personalizada.
+              </li>
+              <li>
+                Evitamos mostrar anuncios en el panel de tu cuenta, el chat, el inicio de sesión y el registro.
+              </li>
+            </ul>
+          </section>
+
+          <section>
+            <h2 className="text-lg font-semibold text-foreground">5. Cómo protegemos tus datos</h2>
             <ul className="mt-2 list-disc space-y-1 pl-5 text-muted-foreground">
               <li>Contraseñas almacenadas solo como hash (bcrypt), nunca en texto plano</li>
               <li>Toda la comunicación con el sitio va cifrada (HTTPS)</li>
@@ -145,7 +208,7 @@ export default function PoliticaPrivacidadPage() {
           </section>
 
           <section>
-            <h2 className="text-lg font-semibold text-foreground">5. Tus derechos</h2>
+            <h2 className="text-lg font-semibold text-foreground">6. Tus derechos</h2>
             <p className="mt-2 text-muted-foreground">
               Puedes solicitar en cualquier momento: acceder a los datos que tenemos sobre ti, corregirlos si
               están desactualizados, eliminar tu cuenta y tus datos, u oponerte a un uso específico de tu
@@ -158,7 +221,7 @@ export default function PoliticaPrivacidadPage() {
           </section>
 
           <section>
-            <h2 className="text-lg font-semibold text-foreground">6. Menores de edad</h2>
+            <h2 className="text-lg font-semibold text-foreground">7. Menores de edad</h2>
             <p className="mt-2 text-muted-foreground">
               GerStore no está dirigido a menores de edad y no recopilamos deliberadamente datos de
               menores. Si detectamos una cuenta de un menor, la eliminaremos.
@@ -166,7 +229,7 @@ export default function PoliticaPrivacidadPage() {
           </section>
 
           <section>
-            <h2 className="text-lg font-semibold text-foreground">7. Cambios a esta política</h2>
+            <h2 className="text-lg font-semibold text-foreground">8. Cambios a esta política</h2>
             <p className="mt-2 text-muted-foreground">
               Podemos actualizar esta política cuando cambie cómo tratamos tus datos. La fecha de la última
               actualización siempre aparece al inicio de esta página.
@@ -174,7 +237,7 @@ export default function PoliticaPrivacidadPage() {
           </section>
 
           <section>
-            <h2 className="text-lg font-semibold text-foreground">8. Contacto</h2>
+            <h2 className="text-lg font-semibold text-foreground">9. Contacto</h2>
             <p className="mt-2 text-muted-foreground">
               Para cualquier consulta sobre esta política o el tratamiento de tus datos, escríbenos a{" "}
               <a href={`mailto:${CONTACT_EMAIL}`} className="font-medium text-primary hover:underline">
