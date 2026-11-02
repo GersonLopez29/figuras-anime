@@ -607,6 +607,124 @@ export const GUIDES: Guide[] = [
       { label: "Ver figuras disponibles", href: "/" },
     ],
   },
+  {
+    slug: "precio-sh-figuarts-peru",
+    title: "¿Cuánto cuesta una S.H.Figuarts en Perú? Precios de referencia",
+    description:
+      "Precios reales de S.H.Figuarts en Perú según el catálogo de GerStore: usadas, nuevas, exclusivas web y qué hace que una figura cueste más o menos.",
+    emoji: "💰",
+    updated: "2026-11-02",
+    intro:
+      "Es la pregunta que más se repite entre coleccionistas. No hay un precio único, pero sí rangos claros. Estos son los precios de las S.H.Figuarts publicadas y vendidas en GerStore en octubre de 2026, y lo que explica las diferencias.",
+    sections: [
+      {
+        heading: "Los rangos de precio en GerStore",
+        paragraphs: [
+          "Tomando las S.H.Figuarts publicadas y vendidas en el catálogo durante octubre de 2026, los precios se agrupan así:",
+        ],
+        bullets: [
+          "Usadas de personajes comunes: entre S/ 110 y S/ 180 aproximadamente (por ejemplo, un Trunks usado en excelente estado se publicó en S/ 120 y un Goku GT usado en S/ 180).",
+          "Nuevas u open box de líneas regulares: entre S/ 150 y S/ 260 (Naruto sellado en S/ 159, Nezuko nueva en S/ 220, Goku SSJ4 open box en S/ 230).",
+          "Personajes muy pedidos o exclusivas web (caja marrón): de S/ 300 en adelante (Majin Buu sellado en S/ 329, Tsunade en S/ 365, Metal Cooler vendido en S/ 410, King Cold vendido en S/ 580).",
+        ],
+      },
+      {
+        heading: "Qué hace que una S.H.Figuarts cueste más",
+        bullets: [
+          "Ser exclusiva web o de evento: se fabrican menos y no llegan a tiendas.",
+          "Estar sellada: una caja nunca abierta vale bastante más que una open box.",
+          "El personaje: villanos y secundarios que casi no tienen figuras (King Cold, Zarbon, Androide 20) suelen venderse caro.",
+          "Que esté agotada y sin reedición anunciada.",
+          "Tamaño y accesorios: figuras grandes o con muchos efectos y caras cuestan más.",
+        ],
+      },
+      {
+        heading: "Qué hace que cueste menos",
+        bullets: [
+          "Que sea usada, sin caja o le falten manos, caras o soportes.",
+          "Una reedición anunciada: cuando Bandai vuelve a fabricar una figura, su precio de reventa baja.",
+          "Caja dañada, aunque la figura esté perfecta.",
+          "Que sea una réplica: una S.H.Figuarts \"bootleg\" debe costar mucho menos que una original.",
+        ],
+      },
+      {
+        heading: "¿Conviene importarla o comprarla aquí?",
+        paragraphs: [
+          "Importar una figura nueva desde Japón o Estados Unidos puede salir más barato en algunos casos, pero hay que sumar el envío internacional, los posibles impuestos de importación y semanas de espera, además del riesgo de que llegue golpeada. Comprar en Perú te permite ver la figura antes de pagar y recibirla el mismo día. Para figuras agotadas o exclusivas, el mercado local suele ser la única opción realista.",
+        ],
+      },
+      {
+        heading: "Cómo saber si un precio es justo",
+        bullets: [
+          "Busca la misma figura en el catálogo y compara solo con las que están en el mismo estado (sellada, open box o usada).",
+          "Mira la barra \"Vendidas hace poco\": muestra a cuánto se vendieron figuras parecidas.",
+          "Desconfía de una S.H.Figuarts nueva muy por debajo de los rangos de arriba: puede ser una réplica.",
+          "Si en la ficha aparece el botón \"🤝 Hacer una oferta\", puedes proponerle tu precio al vendedor.",
+        ],
+      },
+    ],
+    links: [
+      { label: "Ver S.H.Figuarts disponibles", href: "/linea/shfiguarts" },
+      { label: "Qué son las S.H.Figuarts", href: "/guias/que-es-sh-figuarts" },
+      { label: "Cómo reconocer una figura original", href: "/guias/figura-original-o-bamba" },
+    ],
+  },
+  {
+    slug: "donde-comprar-figuras-anime-lima",
+    title: "Dónde comprar figuras de anime en Lima: opciones y consejos",
+    description:
+      "Las formas de comprar figuras de anime en Lima: tiendas, ferias, grupos de coleccionistas, importación y marketplaces. Ventajas, riesgos y cómo no caer en estafas.",
+    emoji: "📍",
+    updated: "2026-11-02",
+    intro:
+      "En Lima hay varias formas de conseguir figuras de anime, y cada una tiene sus ventajas. Esta guía te ayuda a elegir según lo que buscas: precio, rapidez o figuras difíciles de encontrar.",
+    sections: [
+      {
+        heading: "Tiendas especializadas",
+        paragraphs: [
+          "Hay tiendas de anime, cómics y juguetes de colección en centros comerciales y galerías de Lima. Su ventaja es que ves la figura en persona y tienes a quién reclamar. A cambio, los precios suelen ser más altos y el catálogo depende de lo que importen. Antes de comprar, revisa que la caja tenga el logo y el sello del fabricante.",
+        ],
+      },
+      {
+        heading: "Ferias y eventos de anime",
+        paragraphs: [
+          "En los eventos y ferias de anime y cultura pop se juntan muchos vendedores en un mismo lugar, lo que te permite comparar precios en minutos. Ve con efectivo o Yape, revisa bien cada figura (en las ferias también circulan réplicas) y pregunta si es original antes de pagar.",
+        ],
+      },
+      {
+        heading: "Grupos de coleccionistas en redes",
+        paragraphs: [
+          "En los grupos de Facebook y WhatsApp de coleccionistas hay muchas figuras usadas y a buen precio. El riesgo es que cualquiera puede publicar: no hay reseñas ni historial del vendedor. Si compras ahí, pide fotos reales, no adelantes todo el pago y prefiere la entrega en persona.",
+        ],
+      },
+      {
+        heading: "Importar desde el extranjero",
+        paragraphs: [
+          "Comprar en tiendas de Japón o Estados Unidos, o en la tienda online de Bandai, es la forma de conseguir lanzamientos y preventas. Ten en cuenta el envío internacional, los posibles impuestos de importación y que la figura puede tardar semanas o meses. Si algo llega dañado, el reclamo es más difícil.",
+        ],
+      },
+      {
+        heading: "Marketplaces entre coleccionistas, como GerStore",
+        paragraphs: [
+          "En GerStore los coleccionistas de Lima y provincias publican sus figuras con fotos y precio, y tú le escribes al vendedor directo por WhatsApp, sin registrarte. Puedes filtrar por categoría, línea (S.H.Figuarts, Ichiban Kuji, Banpresto…), estado y zona de entrega, y ver las reseñas de cada vendedor antes de comprar.",
+        ],
+      },
+      {
+        heading: "Dónde quedar para la entrega",
+        bullets: [
+          "Elige lugares públicos y concurridos: estaciones del Metropolitano o de la Línea 1, centros comerciales o plazas.",
+          "Ve de día y, si puedes, acompañado.",
+          "Revisa la figura completa antes de pagar: caja, sellos, accesorios y que sea la de las fotos.",
+          "Confirma el pago por Yape o Plin en tu propia app, no con una captura.",
+        ],
+      },
+    ],
+    links: [
+      { label: "Ver figuras en Lima", href: "/" },
+      { label: "Cómo comprar y vender seguro", href: "/guias/comprar-y-vender-figuras-seguro" },
+      { label: "Cuánto cuesta una S.H.Figuarts", href: "/guias/precio-sh-figuarts-peru" },
+    ],
+  },
 ];
 
 export function getGuide(slug: string): Guide | undefined {
