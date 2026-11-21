@@ -156,6 +156,24 @@ body {
   }
 }
 
+/* La nevada corre una sola vez cada vez que se carga la página: los copos
+   caen, y al final el contenedor se desvanece y deja de ocupar la pantalla. */
+@keyframes xmas-snow-end {
+  0%,
+  80% {
+    opacity: 1;
+    visibility: visible;
+  }
+  100% {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+.xmas-snowfall {
+  animation: xmas-snow-end 11s linear both;
+}
+
 .xmas-flake {
   position: absolute;
   top: 0;
@@ -164,16 +182,18 @@ body {
   text-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
   animation-name: xmas-fall;
   animation-timing-function: linear;
-  animation-iteration-count: infinite;
+  animation-iteration-count: 1;
+  animation-fill-mode: both;
   will-change: transform;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .xmas-lights,
-  .xmas-flake {
+  .xmas-flake,
+  .xmas-snowfall {
     animation: none;
   }
-  .xmas-flake {
+  .xmas-snowfall {
     display: none;
   }
 }
