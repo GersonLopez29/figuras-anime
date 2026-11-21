@@ -5,6 +5,7 @@ import { getCurrentUser, isAdmin } from "@/lib/session";
 import { claimSalesMilestones } from "@/lib/sellerRewards";
 import { sendSalesMilestoneEmail } from "@/lib/email";
 import { FEATURE_DAYS } from "@/lib/featured";
+import { getActiveDiscountAmount, getFinalPrice } from "@/lib/format";
 
 const soldSchema = z.object({ sold: z.boolean() });
 
@@ -42,6 +43,16 @@ export async function PATCH(
       // Guarda cuándo se vendió (para "Vendidas hace poco"). Si ya estaba
       // vendida se conserva la fecha original; al volver a disponible se borra.
       soldAt: parsed.data.sold ? (existing.sold ? (existing.soldAt ?? new Date()) : new Date()) : null,
+      // Monto de la venta: precio con el descuento vigente en ese momento. Si
+      // ya estaba vendida se conserva el monto original.
+      soldPrice: parsed.data.sold
+        ? existing.sold
+          ? (existing.soldPrice ?? null)
+          : getFinalPrice(
+              existing.price,
+              getActiveDiscountAmount(existing.discountAmount, existing.discountExpiresAt)
+            )
+        : null,
     },
   });
 
