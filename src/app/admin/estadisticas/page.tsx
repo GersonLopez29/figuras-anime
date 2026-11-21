@@ -4,6 +4,7 @@ import CountryFlag from "@/components/admin/CountryFlag";
 import { Card } from "@/components/ui/card";
 import { ChartColumn } from "lucide-react";
 import { AdminPageHeader } from "@/components/admin/AdminUi";
+import SalesStats from "@/components/admin/SalesStats";
 import {
   Table,
   TableHeader,
@@ -97,6 +98,8 @@ export default async function AdminEstadisticasPage() {
           </p>
         </Card>
       </div>
+
+      <SalesStats />
 
       <Card className="p-4 shadow-sm">
         <h3 className="text-sm font-semibold text-foreground">

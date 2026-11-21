@@ -194,6 +194,9 @@ model Listing {
   // Momento en que se marcó como vendida (null si está disponible). La barra
   // "Vendidas hace poco" ordena por esto: updatedAt cambia con cada visita.
   soldAt            DateTime?
+  // Precio con el que se marcó como vendida (con descuento vigente, si lo había).
+  // null en ventas anteriores a este campo: el panel usa el precio actual.
+  soldPrice         Float?
   views             Int            @default(0)
   createdAt         DateTime       @default(now())
   updatedAt         DateTime       @updatedAt
