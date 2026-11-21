@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db";
+import { isNavidadTheme } from "@/lib/seasonal";
 import { getCurrentUser, isAdmin } from "@/lib/session";
 import LogoutButton from "@/components/LogoutButton";
 import MobileMenu from "@/components/MobileMenu";
@@ -26,7 +27,7 @@ export default async function Navbar() {
       <div className="relative mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3.5">
         <Link href="/" className="flex items-center gap-2 text-2xl font-extrabold sm:text-3xl">
           <span aria-hidden="true" className="logo-pop inline-block text-3xl sm:text-4xl">
-            🎌
+            {isNavidadTheme ? "🎄" : "🎌"}
           </span>
           <span className="logo-shine">GerStore</span>
         </Link>

@@ -117,6 +117,67 @@ body {
   }
 }
 
+/* Tema navideño (ver src/lib/seasonal.ts para apagarlo). */
+.xmas-lights {
+  position: relative;
+  z-index: 30;
+  height: 0.6rem;
+  background-image:
+    radial-gradient(circle, #dc2626 0.22rem, transparent 0.26rem),
+    radial-gradient(circle, #16a34a 0.22rem, transparent 0.26rem),
+    radial-gradient(circle, #facc15 0.22rem, transparent 0.26rem),
+    radial-gradient(circle, #2563eb 0.22rem, transparent 0.26rem);
+  background-size: 2.2rem 0.6rem;
+  background-position: 0 0, 0.73rem 0, 1.46rem 0, 1.1rem 0;
+  background-color: #0f3d24;
+  background-repeat: repeat-x;
+  animation: xmas-twinkle 2.4s ease-in-out infinite;
+}
+
+@keyframes xmas-twinkle {
+  0%,
+  100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.35);
+  }
+}
+
+@keyframes xmas-fall {
+  0% {
+    transform: translate3d(0, -4vh, 0);
+  }
+  50% {
+    transform: translate3d(14px, 50vh, 0);
+  }
+  100% {
+    transform: translate3d(-10px, 104vh, 0);
+  }
+}
+
+.xmas-flake {
+  position: absolute;
+  top: 0;
+  color: #ffffff;
+  line-height: 1;
+  text-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
+  animation-name: xmas-fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .xmas-lights,
+  .xmas-flake {
+    animation: none;
+  }
+  .xmas-flake {
+    display: none;
+  }
+}
+
 :root {
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
