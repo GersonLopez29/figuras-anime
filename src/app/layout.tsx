@@ -6,6 +6,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CursorTrail from "@/components/CursorTrail";
+import SeasonalDecor from "@/components/SeasonalDecor";
 import EmailVerificationBanner from "@/components/EmailVerificationBanner";
 import SuggestionButton from "@/components/SuggestionButton";
 import AssistantWidget from "@/components/AssistantWidget";
@@ -99,6 +100,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
           dangerouslySetInnerHTML={{ __html: jsonLdHtml(organizationJsonLd) }}
         />
         <CursorTrail />
+        <SeasonalDecor />
         <Navbar />
         {user && !user.emailVerified && <EmailVerificationBanner />}
         <main className="flex-1">{children}</main>

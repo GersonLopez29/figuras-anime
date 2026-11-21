@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import SocialLinks from "@/components/SocialLinks";
 import InstallAppButton from "@/components/InstallAppButton";
+import { isNavidadTheme } from "@/lib/seasonal";
 
 type CategoryOption = { name: string; icon: string };
 
@@ -17,12 +18,19 @@ export default function Footer({ totalVisits, categories }: FooterProps) {
 
   return (
     <footer className="mt-16 overflow-hidden rounded-t-3xl border-t border-border bg-card">
-      <div aria-hidden="true" className="h-1 bg-gradient-to-r from-orange-600 via-orange-500 to-amber-400" />
+      <div
+        aria-hidden="true"
+        className={
+          isNavidadTheme
+            ? "h-1 bg-gradient-to-r from-red-600 via-green-600 to-red-600"
+            : "h-1 bg-gradient-to-r from-orange-600 via-orange-500 to-amber-400"
+        }
+      />
       <div className="mx-auto max-w-7xl px-4 py-12">
         <div className="grid gap-8 sm:grid-cols-3">
           <div>
             <p className="flex items-center gap-1.5 text-base font-extrabold text-foreground">
-              <span aria-hidden="true">🎌</span>
+              <span aria-hidden="true">{isNavidadTheme ? "🎄" : "🎌"}</span>
               <span>
                 Ger<span className="text-orange-600">Store</span>
               </span>
@@ -133,6 +141,7 @@ export default function Footer({ totalVisits, categories }: FooterProps) {
         <div className="flex flex-col items-center gap-2 pt-6 text-center text-xs text-muted-foreground sm:flex-row sm:justify-between">
           <div className="flex flex-col items-center gap-1 sm:flex-row sm:gap-3">
             <p>GerStore © {year} — Compra y venta entre coleccionistas</p>
+            {isNavidadTheme && <p>🎁 ¡Feliz Navidad desde GerStore!</p>}
             <Link
               href="/politica-privacidad"
               className="underline-offset-2 hover:text-orange-600 hover:underline"
