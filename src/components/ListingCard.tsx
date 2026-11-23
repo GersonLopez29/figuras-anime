@@ -3,6 +3,8 @@ import Image from "next/image";
 import { discountPercent, formatPrice, getFinalPrice } from "@/lib/format";
 import { isNewCondition, isOpenBoxCondition } from "@/lib/condition";
 import { getDeliveryZoneLabel, sortDeliveryZones } from "@/lib/delivery";
+import { isNavidadTheme } from "@/lib/seasonal";
+import SantaHat from "@/components/SantaHat";
 import { isFeatured } from "@/lib/featured";
 import { OFFICIAL_STORE_NAME } from "@/lib/store";
 import { listingPath } from "@/lib/slug";
@@ -124,8 +126,13 @@ export default function ListingCard({
                 -{percentOff} %
               </Badge>
             )}
+            {isNavidadTheme && <SantaHat />}
             {typeof isFavorited === "boolean" && (
-              <FavoriteButton listingId={id} initialFavorited={isFavorited} />
+              <FavoriteButton
+                listingId={id}
+                initialFavorited={isFavorited}
+                overlayPosition={isNavidadTheme ? "right-2 top-12" : undefined}
+              />
             )}
             {sold && (
               <div className="absolute inset-0 flex items-center justify-center bg-zinc-900/50 backdrop-blur-[1px]">
